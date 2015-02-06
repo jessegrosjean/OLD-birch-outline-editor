@@ -1,0 +1,9 @@
+[submodule "browser/atom/event-kit"]
+	path = browser/atom/event-kit
+	url = https://github.com/FoldingText/event-kit.git
+[submodule "browser/atom/grim"]
+	path = browser/atom/grim
+	url = https://github.com/FoldingText/grim.git
+[submodule "browser/atom/atom-keymap"]
+	path = browser/atom/atom-keymap
+	url = https://github.com/FoldingText/atom-keymap.git
