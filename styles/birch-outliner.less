@@ -1,0 +1,332 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
+// for a full listing of what's available.
+//@import "ui-variables";
+
+@fontFamily: Helvetica;
+@fontSize: 16px;
+@lineHeight: @fontSize * 1.5;
+
+@itemPadding: @fontSize / 4.0;
+@gutterWidthPerLevel: @fontSize * 1.5;
+
+// Base color for things "on" the paper.
+@inkColor: black;
+
+// Paper contains text the content.
+@paperColor: white;
+@deskColor: lightgray;
+
+// Color used to indicate clickable interface elements (similar to iOS 7 tint color)
+@interfaceColor: default;
+
+// Color used to indicate something. Such as when mouse is over a link.
+@indicatedColor: #007aff;
+
+// Default text color
+@textColor: @inkColor;
+
+// Secondary text color is used for text content that's not primary. For example
+@secondaryPercent: 0.5;
+@secondaryTextColor: mix(@textColor, @paperColor, percentage(@secondaryPercent));
+
+@selectionColor: #B0D6FD;
+@secondarySelectionColor: mix(@selectionColor, @paperColor, percentage(0.15));
+
+@handleColor: mix(@textColor, @paperColor, percentage(0.25));
+@loadedHandleColor: @textColor;
+
+// Colors used to indicate folded regions
+@foldColor: @textColor;
+@foldedLineColor: @secondaryTextColor;
+
+// Color to indicate errors
+@errorColor: rgb(75%,20%,20%);
+
+body {
+  background: grey;
+}
+
+::selection {
+  background: @selectionColor;
+}
+
+#textIteratorIFrame {
+  position: absolute;
+  left:-999em;
+}
+
+outline-editor {
+  cursor: text;
+  color: @inkColor;
+  background: @deskColor;
+  font-family: @fontFamily;
+  font-size: @fontSize;
+  line-height: @lineHeight;
+
+  position: absolute;
+  top: 0rem;
+  bottom: 0rem;
+  left: 0rem;
+  right: 0rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+input[is="outline-editor-focus"] {
+  position: fixed;
+  width:1px;
+  height:1px;
+  color: transparent;
+  background: none;
+  border:none;
+  margin:0;
+  padding:0;
+  pointer-events: none;
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+}
+
+outline-editor > ul {
+  margin: 0 auto;
+  padding: 0;
+  background: @paperColor;
+  overflow: hidden;
+  min-height: 100%;
+  position: relative;
+}
+
+.bitem.bhoistedItem {
+  > .bcontent {
+    display: none;
+  }
+  margin: @gutterWidthPerLevel 0;
+}
+
+//
+// Item
+//
+
+.bitem {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bchildren {
+  margin: 0;
+  padding: 0;
+//	padding-left: @gutterWidthPerLevel / 2.0;
+//	margin-left: @gutterWidthPerLevel / 2.0;
+//	border-left: 1px dashed mix(@textColor, @paperColor, percentage(0.1));
+}
+
+//.bitem[level="0"] > .bchildren {
+//	padding-left: 0;
+//	margin-left: 0;
+//	border-left: none;
+//}
+
+.bcontent {
+  display: flex;
+  margin-right: @gutterWidthPerLevel;
+}
+
+.bgutter {
+  flex: 0 0 auto;
+  display: flex;
+  padding-top: @itemPadding;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.generate-gutter-levels(@n, @i: 0) when (@i =< @n) {
+  .bitem[level="@{i}"] {
+    > .bcontent > .bgutter {
+      flex-basis: (@gutterWidthPerLevel * @i);
+    }
+  }
+
+  /*.bselectedItem[level="@{i}"] > .bcontent > .bbody::after {
+    pointer-events: none;
+    position: absolute;
+    background: @selectionColor;
+    top: -@itemMargin / 2.0;
+    bottom: -@itemMargin / 2.0;
+    left: @gutterWidthPerLevel * @i;
+    right: 0;
+    z-index: 1;
+    content: '';
+  }
+
+  .bselectedItemWithTextSelection[level="@{i}"] > .bcontent > .bbody::after {
+    content: none;
+  }
+
+  .bselectedItem[level="@{i}"] > .bchildren::after {
+    pointer-events: none;
+    position: absolute;
+    background: @secondarySelectionColor;
+    top: -@itemMargin / 2.0;
+    bottom: -@itemMargin / 2.0;
+    left: @gutterWidthPerLevel * @i;
+    right: @gutterWidthPerLevel;
+    z-index: 0;
+    content: '';
+  }
+
+  .bselectedItemWithTextSelection[level="@{i}"] > .bchildren::after {
+    content: none;
+  }*/
+  .generate-gutter-levels(@n, (@i + 1));
+}
+.generate-gutter-levels(20);
+
+.bbody {
+  color: @textColor;
+  flex: 1 1 auto;
+  display: inline;
+  user-select: text;
+  line-height: @lineHeight;
+  white-space: pre-wrap;
+  padding: @itemPadding 0;
+  margin: 0;
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+}
+
+//
+// Selection
+//
+
+.bselectedItem > .bcontent > .bbody {
+  background: @selectionColor;
+}
+
+.bselectedItem:not(.bselectedItemWithTextSelection) > .bcontent *::selection {
+  background: transparent;
+}
+
+.bselectedItemWithTextSelection > .bcontent > .bbody {
+  background: none;
+}
+
+.bsimulatedSelectionCursor {
+  background: @textColor;
+}
+
+.bsimulatedSelection {
+  background: @selectionColor;
+}
+
+//
+// Handles
+//
+
+.bitemHandle, .bselectionHandle {
+  pointer-events: all;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: @gutterWidthPerLevel;
+  background: none;
+  text-align: center;
+  user-select: none;
+  color: @handleColor;
+}
+
+.bitemHandle:focus, .bselectionHandle:focus {
+  outline-color: transparent;
+  outline-style: none;
+}
+
+.bhasChildren:not(.bexpandedItem) > .bcontent > .bgutter > .bitemHandle {
+  color: @loadedHandleColor;
+}
+
+.bitemHandle::after {
+  font-size: @fontSize;
+  line-height: @lineHeight;
+  font-weight: normal;
+  content: "▸"; //▸•
+}
+
+//
+// Drag and Drop
+//
+
+.bdropInsertBeforeItem > .bcontent > .bbody,
+.bdropInsertAfterItem > .bcontent > .bbody {
+  position: relative;
+}
+
+@dropBallRadius: @fontSize / 4;
+@dropBallDiameter: @dropBallRadius * 2.0;
+
+.bdropInsertBeforeItem > .bcontent > .bbody::before,
+.bdropInsertAfterItem > .bcontent > .bbody::after {
+  pointer-events: none;
+  display:block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: @dropBallDiameter;
+  margin: -(@itemPadding + @dropBallRadius) 0 0 -@dropBallDiameter;
+  content: "";
+  // data-uri isn't working since I upated npm... try again later in next update I guess
+  //background-image: data-uri('image/svg+xml;charset=UTF-8', 'dropindicator.svg');
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMDByZW0iIGhlaWdodD0iMC41cmVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJPGcgaWQ9ImRyb3BJbmRpY2F0b3IiPgoJCTxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDA3YWZmIiBzdHJva2Utd2lkdGg9IjIiIGN4PSI0IiBjeT0iNCIgcj0iMy4wIiAvPgoJCTxsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwN2FmZiIgc3Ryb2tlLXdpZHRoPSIyIiB4MT0iNyIgeTE9IjQiIHgyPSIxMDAwMCIgeTI9IjQiIC8+Cgk8L2c+Cjwvc3ZnPg==);
+  background-repeat: no-repeat;
+}
+
+
+.bdropInsertAfterItem > .bcontent > .bbody::after {
+  margin: (@itemPadding - @dropBallRadius) 0 0 -@dropBallDiameter;
+}
+
+/*
+ * Type styling
+ */
+
+.bchildren {
+  counter-reset:OLCounter 0 HCounter 0;
+}
+
+.bitem[data-type="h"] > .bcontent {
+  > .bbody {
+    font-weight: bold;
+    font-size: @fontSize * 1.5;
+  }
+}
+
+.bitem[data-type="ol"] {
+  > .bcontent > .bgutter > .bitemHandle::after {
+    counter-increment: OLCounter;
+    content: counter(OLCounter, decimal)'.';
+  }
+  //margin:0 0;
+}
+
+.bitem[data-type="ul"] {
+  > .bcontent > .bgutter > .bitemHandle::after {
+    content: '•';
+  }
+  //margin:0 0;
+}
+
+.bitem[data-type="p"] > .bcontent {
+  > .bgutter > .bitemHandle::after {
+    content: '¶';
+  }
+}
+
+.bitem[data-done] > .bcontent > .bbody {
+  //opacity: 0.25;
+  text-decoration: line-through;
+}
