@@ -22,6 +22,11 @@ path = require 'path'
 
 module.exports =
 class OutlineEditor extends Model
+  atom.deserializers.add(this)
+
+  @deserialize: (data) ->
+    console.log(data)
+    new OutlineEditor(new Outline({filePath: data.filePath}))
 
   constructor: (outline, hostElement) ->
     id = shortid()
@@ -58,22 +63,23 @@ class OutlineEditor extends Model
     @subscribeToOutline()
     @setHoistedItemsStack([])
 
+  serialize: ->
+    {} =
+      deserializer: 'OutlineEditor',
+      filePath: @outline.getPath()
+
   subscribeToOutline: ->
     outline = @outline
     undoManager = outline.undoManager
 
     outline.retain()
 
-    @subscribe outline.onDidChange @outlineDidChange.bind(@)
+    @subscribe outline.onDidChange @outlineDidChange.bind(this)
 
     @subscribe outline.onDidChangePath =>
       unless atom.project.getPaths()[0]?
         atom.project.setPaths([path.dirname(@getPath())])
       @emitter.emit 'did-change-title', @getTitle()
-      @emitter.emit 'did-change-path', @getPath()
-
-    @subscribe outline.onDidChangeEncoding =>
-      @emitter.emit 'did-change-encoding', @getEncoding()
 
     @subscribe outline.onDidDestroy => @destroy()
 
@@ -128,6 +134,34 @@ class OutlineEditor extends Model
       @outlineEditorElement.parentNode.removeChild(@outlineEditorElement)
     @outlineEditorElement = null
     @emitter.emit 'did-destroy'
+
+  ###
+  Section: Event Subscription
+  ###
+
+  onDidChangeTitle: (callback) ->
+    @emitter.on 'did-change-title', callback
+
+  onDidChangePath: (callback) ->
+    @outline.onDidChangePath(callback)
+
+  onDidChange: (callback) ->
+    @emitter.on 'did-change', callback
+
+  onDidChangeEncoding: (callback) ->
+    @outline.onDidChangeEncoding(callback)
+
+  onDidChangeModified: (callback) ->
+    @outline.onDidChangeModified(callback)
+
+  onDidConflict: (callback) ->
+    @outline.onDidConflict(callback)
+
+  onDidSave: (callback) ->
+    @outline.onDidSave(callback)
+
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
 
   ###
   Section: Hoisting Items
@@ -1072,7 +1106,7 @@ class OutlineEditor extends Model
     if selectionRange.isCollapsed
       @toggleTypingFormattingTag(tagName)
     else if startItem
-      tagAttributes = startItem.elementAtBodyTextIndex(tagName, 0)
+      tagAttributes = startItem.elementAtBodyTextIndex(tagName, selectionRange.startOffset or 0)
       addingTag
 
       if tagAttributes == undefined
@@ -1288,16 +1322,16 @@ class OutlineEditor extends Model
       'Untitled'
 
   getURI: ->
-    @outline.URI
+    @outline.getUri()
 
   getPath: ->
-    @outline.path
+    @outline.getPath()
 
   isModified: ->
-    @outline.isModified
+    @outline.isModified()
 
   isEmpty: ->
-    @outline.isEmpty
+    @outline.isEmpty()
 
   save: ->
     @outline.save()
@@ -1306,7 +1340,7 @@ class OutlineEditor extends Model
     @outline.saveAs(filePath)
 
   shouldPromptToSave: ->
-    @isModified() && !@outline.hasMultipleEditors()
+    @isModified() and not @outline.hasMultipleEditors()
 
   ###
   Section: Util

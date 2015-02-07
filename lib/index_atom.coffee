@@ -3,6 +3,10 @@ OutlineEditor = require './OutlineEditor'
 Outline = require './Outline'
 path = require 'path'
 
+# Do this early because serlialization happens before package activation
+atom.views.addViewProvider OutlineEditor, (model) ->
+  model.outlineEditorElement
+
 module.exports = BirchOutliner =
   subscriptions: null
 
@@ -13,14 +17,11 @@ module.exports = BirchOutliner =
       extension = path.extname(filePath).toLowerCase()
       switch extension
         when '.outline'
-          o = new Outline()
-          o.root.appendChild(o.createItem('hello world 1'));
-          o.root.appendChild(o.createItem('hello world 2'));
-          o.root.appendChild(o.createItem('hello world 3'));
+          o = new Outline({
+            filePath: filePath,
+            load: true
+          })
           new OutlineEditor(o)
-
-    @subscriptions.add atom.views.addViewProvider OutlineEditor, (model) ->
-      model.outlineEditorElement
 
   deactivate: ->
     @subscriptions.dispose()

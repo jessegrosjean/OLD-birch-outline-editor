@@ -30,6 +30,8 @@ document.addEventListener('keydown', (e) ->
 window.atom =
   commands: commands
   keymaps: keymaps
+  deserializers:
+  	add: ->
   inBrowserMode: -> true
 
 module.exports =

@@ -1,4 +1,4 @@
-{Emitter, CompositeDisposable} = require 'atom'
+{File, Color, Emitter, CompositeDisposable} = require 'atom'
 ItemSerializer = require './ItemSerializer'
 OutlineChange = require './OutlineChange'
 UndoManager = require './UndoManager'
@@ -7,10 +7,14 @@ emissary = require 'emissary'
 shortid = require './shortid'
 assert = require 'assert'
 Item = require './Item'
+Q = require 'q'
 
 class Outline
+  atom.deserializers.add(this)
 
   refcount: 0
+  changeCount: 0
+  undoSubscriptions: null
   updateCount: 0
   updateMutations: null
   updateMutationObserver: null
@@ -22,6 +26,9 @@ class Outline
   fileConflict: false
   fileSubscriptions: null
 
+  @deserialize: (data) ->
+    new Outline(data)
+
   constructor: (params) ->
     @outlineStore = @createOutlineStoreIfNeeded(params?.outlineStore)
 
@@ -29,10 +36,14 @@ class Outline
     @root = @createItem(null, @outlineStore.getElementById(Constants.RootID))
     @loadingLIUsedIDs = null;
 
-    @undoManager = new UndoManager()
+    @undoManager = undoManager = new UndoManager()
     @emitter = new Emitter()
     @setEncoding(params?.encoding)
+
     @loaded = false
+    @digestWhenLastPersisted = params?.digestWhenLastPersisted ? false
+    @modifiedWhenLastPersisted = params?.modifiedWhenLastPersisted ? false
+    @useSerializedText = @modifiedWhenLastPersisted isnt false
 
     @updateMutationObserver = new MutationObserver (mutations) =>
       @updateMutations = @updateMutations.concat(mutations)
@@ -45,6 +56,19 @@ class Outline
       characterDataOldValue: true
     })
 
+    @undoSubscriptions = new CompositeDisposable(
+      undoManager.onDidCloseUndoGroup =>
+        unless undoManager.isUndoing or undoManager.isRedoing
+          @changeCount++
+          @scheduleModifiedEvents()
+      undoManager.onDidUndo =>
+        @changeCount--
+        @scheduleModifiedEvents()
+      undoManager.onDidRedo =>
+        @changeCount++
+        @scheduleModifiedEvents()
+    )
+
     @setPath(params.filePath) if params?.filePath
     @load() if params?.load
 
@@ -55,6 +79,15 @@ class Outline
       rootUL.id = Constants.RootID
       outlineStore.documentElement.lastChild.appendChild(rootUL)
     return outlineStore
+
+  serialize: ->
+    {} =
+      deserializer: 'Outline'
+      text: @getText()
+      encoding: @getEncoding()
+      filePath: @getPath()
+      modifiedWhenLastPersisted: @isModified()
+      digestWhenLastPersisted: @file?.getDigest()
 
   ###
   Section: Event Subscription
@@ -94,62 +127,6 @@ class Outline
     @emitter.on 'did-destroy', callback
 
   getStoppedChangingDelay: -> @stoppedChangingDelay
-
-  ###
-  Section: File Details
-  ###
-
-  isModified: ->
-    return false unless @loaded
-    if @file
-      if @file.exists()
-        @getText() != @cachedDiskContents
-      else
-        @wasModifiedBeforeRemove ? not @isEmpty()
-    else
-      not @isEmpty()
-
-  isInConflict: -> @conflict
-
-  getPath: ->
-    @file?.getPath()
-
-  setPath: (filePath) ->
-    return if filePath == @getPath()
-
-    if filePath
-      @file = new File(filePath)
-      @file.setEncoding(@getEncoding())
-      @subscribeToFile()
-    else
-      @file = null
-
-    @emitter.emit 'did-change-path', @getPath()
-
-  setEncoding: (encoding='utf8') ->
-    return if encoding is @getEncoding()
-
-    @encoding = encoding
-    if @file?
-      @file.setEncoding(encoding)
-      @emitter.emit 'did-change-encoding', encoding
-
-      unless @isModified()
-        @updateCachedDiskContents true, =>
-          @reload()
-          @clearUndoStack()
-    else
-      @emitter.emit 'did-change-encoding', encoding
-
-    return
-
-  getEncoding: -> @encoding ? @file?.getEncoding()
-
-  getUri: ->
-    @getPath()
-
-  getBaseName: ->
-    @file?.getBaseName()
 
   ###
   Section: Reading Items
@@ -282,32 +259,86 @@ class Outline
         @scheduleModifiedEvents()
 
   ###
-  Section: Buffer Operations
+  Section: File Details
+  ###
+
+  isModified: ->
+    @changeCount != 0
+
+  isInConflict: -> @conflict
+
+  getPath: ->
+    @file?.getPath()
+
+  setPath: (filePath) ->
+    return if filePath == @getPath()
+
+    if filePath
+      @file = new File(filePath)
+      @file.setEncoding(@getEncoding())
+      @subscribeToFile()
+    else
+      @file = null
+
+    @emitter.emit 'did-change-path', @getPath()
+
+  setEncoding: (encoding='utf8') ->
+    return if encoding is @getEncoding()
+
+    @encoding = encoding
+    if @file?
+      @file.setEncoding(encoding)
+      @emitter.emit 'did-change-encoding', encoding
+
+      unless @isModified()
+        @updateCachedDiskContents true, =>
+          @reload()
+          @undoManager.removeAllActions()
+    else
+      @emitter.emit 'did-change-encoding', encoding
+
+    return
+
+  getEncoding: -> @encoding ? @file?.getEncoding()
+
+  getUri: ->
+    @getPath()
+
+  getBaseName: ->
+    @file?.getBaseName()
+
+  ###
+  Section: File Content Operations
   ###
 
   save: ->
     @saveAs(@getPath())
 
   saveAs: (filePath) ->
-    unless filePath then throw new Error("Can't save buffer with no file path")
+    unless filePath then throw new Error("Can't save outline with no file path")
 
     @emitter.emit 'will-save', {path: filePath}
-    @emit 'will-be-saved', this
     @setPath(filePath)
     @file.write(@getText())
     @cachedDiskContents = @getText()
     @conflict = false
+    @changeCount = 0
     @emitModifiedStatusChanged(false)
     @emitter.emit 'did-save', {path: filePath}
-    @emit 'saved', this
 
   reload: ->
     @emitter.emit 'will-reload'
-    @emit 'will-reload'
-    @setTextViaDiff(@cachedDiskContents)
+
+    try
+      @root.removeChildren(@root.children)
+      for each in ItemSerializer.itemsFromHTML(@cachedDiskContents, this)
+        @root.appendChild(each)
+    catch error
+      console.log error
+
+    @changeCount = 0
     @emitModifiedStatusChanged(false)
     @emitter.emit 'did-reload'
-    @emit 'reloaded'
 
   updateCachedDiskContentsSync: ->
     @cachedDiskContents = @file?.readSync() ? ""
@@ -370,12 +401,14 @@ class Outline
         @emitModifiedStatusChanged(true)
       else
         @reload()
-      @clearUndoStack()
+      @undoManager.removeAllActions()
     this
 
   destroy: ->
     unless @destroyed
+      @updateMutationObserver.disconnect()
       @cancelStoppedChangingTimeout()
+      @undoSubscriptions?.dispose()
       @fileSubscriptions?.dispose()
       @destroyed = true
       @emitter.emit 'did-destroy'
@@ -413,17 +446,11 @@ class Outline
 
       if @conflict
         @emitter.emit 'did-conflict'
-        @emit "contents-conflicted"
       else
         @reload()
 
     @fileSubscriptions.add @file.onDidDelete =>
-      modified = @getText() != @cachedDiskContents
-      @wasModifiedBeforeRemove = modified
-      if modified
-        @updateCachedDiskContents()
-      else
-        @destroy()
+      @destroy() unless isModified()
 
     @fileSubscriptions.add @file.onDidRename =>
       @emitter.emit 'did-change-path', @getPath()
