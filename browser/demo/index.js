@@ -53,15 +53,9 @@ outline.root.appendChild(outline.createItem('b'));
 outline.root.appendChild(outline.createItem('c'));
 
 var outline3 = new Outline();
-outline3.root.appendChild(outline.createItem('three'));
-
-/*	var div = document.createElement('DIV');
-	div.contentEditable = true;
-	div.textContent = 'HELLO WORLD';
-	div.style.position = 'absolute';
-	div.style.backgroundColor = 'red';
-	div.style.zIndex = 10000;
-	document.body.appendChild(div);*/
+outline3.root.appendChild(outline3.createItem('three'));
+outline3.root.firstChild.appendChild(outline3.createItem('four'));
+outline3.root.appendChild(outline3.createItem('five'));
 
 var container1 = document.getElementById('container1'),
 	container2 = document.getElementById('container2'),
