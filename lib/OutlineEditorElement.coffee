@@ -907,15 +907,22 @@ Event and Command registration
 ###
 
 EventDelegate.add 'input[is="outline-editor-focus"]', stopEventPropagation(
-  'cut': (e) -> @parentElement.editor.cutSelection(e)
-  'copy': (e) -> @parentElement.editor.copySelection(e)
-  'paste': (e) -> @parentElement.editor.pasteToSelection(e)
+  'cut': (e) -> @parentElement.editor.cutSelection(e.clipboardData)
+  'copy': (e) -> @parentElement.editor.copySelection(e.clipboardData)
+  'paste': (e) -> @parentElement.editor.pasteToSelection(e.clipboardData)
 )
 
+clipboardAsDatatransfer =
+  getData: (type) -> atom.clipboard.read()
+  setData: (type, data) -> atom.clipboard.write(data)
+
 atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(
-  'core:cut': -> @editor.cutSelection()
-  'core:copy': -> @editor.copySelection()
-  'core:paste': -> @editor.pasteToSelection()
+  'core:cut': (e) ->
+    @editor.cutSelection clipboardAsDatatransfer
+  'core:copy': (e) ->
+    @editor.copySelection clipboardAsDatatransfer
+  'core:paste': (e) ->
+    @editor.pasteToSelection clipboardAsDatatransfer
 )
 
 atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(

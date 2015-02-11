@@ -296,7 +296,7 @@ class OutlineEditor extends Model
     @toggleFoldItems items, true
 
   ###
-  Section: Item Path
+  Section: Item Filter Path
   ###
 
   itemFilterPath: ->
@@ -1049,13 +1049,13 @@ class OutlineEditor extends Model
   Section: Pasteboard
   ###
 
-  copySelection: (clipboard) ->
+  copySelection: (dataTransfer) ->
     selectionRange = @selectionRange()
 
     if not selectionRange.isCollapsed
       if selectionRange.isItemMode
         items = selectionRange.rangeItemsCover
-        ItemSerializer.writeItems(items, this, clipboard)
+        ItemSerializer.writeItems(items, this, dataTransfer)
       else if selectionRange.isTextMode
         focusItem = selectionRange.focusItem
         startOffset = selectionRange.startOffset
@@ -1063,19 +1063,19 @@ class OutlineEditor extends Model
         selectedText = focusItem.attributedBodyTextSubstring(startOffset, endOffset - startOffset)
         p = document.createElement('P')
         p.appendChild(ItemBodyEncoder.attributedStringToDocumentFragment(selectedText, document))
-        clipboard.setData('text/plain', selectedText.string())
-        clipboard.setData('text/html', p.innerHTML)
+        dataTransfer.setData('text/plain', selectedText.string())
+        dataTransfer.setData('text/html', p.innerHTML)
 
-  cutSelection: (clipboard) ->
+  cutSelection: (dataTransfer) ->
     selectionRange = @selectionRange()
     if selectionRange.isValid
       if not selectionRange.isCollapsed
-        @copySelection(clipboard)
+        @copySelection(dataTransfer)
         @delete()
 
-  pasteToSelection: (clipboard) ->
+  pasteToSelection: (dataTransfer) ->
     selectionRange = @selectionRange()
-    items = ItemSerializer.readItems(this, clipboard)
+    items = ItemSerializer.readItems(this, dataTransfer)
 
     if items.itemFragmentString
       @insertText(items.itemFragmentString)
