@@ -84,6 +84,7 @@
   'cmd-k cmd-7': 'editor:fold-at-indent-level-7'
   'cmd-k cmd-8': 'editor:fold-at-indent-level-8'
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
+  'cmd-.': 'outline-editor:toggle-fold-items'
 
   'cmd-b' : 'editor:toggle-bold'
   'cmd-i' : 'editor:toggle-italic'
@@ -104,7 +105,6 @@
   'f i' : 'outline-editor:hoist',
   'f o' : 'outline-editor:unhoist',
 
-  ',' : 'toggleExpandItems',
-  '<' : 'toggleFullyExpandItems',
+  '.' : 'outline-editor:toggle-fold-items',
 
   'd' : 'outline-editor:toggle-done'

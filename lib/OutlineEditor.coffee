@@ -251,37 +251,49 @@ class OutlineEditor extends Model
     @_revalidateSelectionRange()
     @_disableScrollToSelection = false
 
-  toggleExpandItems: (items, fully) ->
-    items ?= @selectionRange().rangeItemsCover
+  foldItems: (items, fully) ->
+    @_foldItems items, false, fully
 
+  unfoldItems: (items, fully) ->
+    @_foldItems items, true, fully
+
+  toggleFoldItems: (items, fully) ->
+    @_foldItems items, undefined, fully
+
+  _foldItems: (items, expand, fully) ->
+    items ?= @selectionRange().rangeItemsCover
     unless typechecker.isArray(items)
       items = [items]
 
     unless items.length
       return
 
-    first = items[0]
-    unless first.hasChildren
-      parent = first.parent
-      if @isVisible(parent)
-        @moveSelectionRange(parent)
-        @toggleExpandItems(parent, fully)
-        return
+    unless expand
+      first = items[0]
+      unless first.hasChildren
+        parent = first.parent
+        if @isVisible(parent)
+          @moveSelectionRange(parent)
+          @_foldItems(parent, expand, fully)
+          return
 
-    toggleItems = []
+    foldItems = []
+
+    if expand == undefined
+      expand = not @isExpanded((each for each in items when each.hasChildren)[0])
 
     if fully
-      for each in Item.coverItems(items) when each.hasChildren
-        toggleItems.push each
-        toggleItems.push each for each in each.descendants when each.hasChildren
+      for each in Item.coverItems(items) when each.hasChildren and @isExpanded(each) != expand
+        foldItems.push each
+        foldItems.push each for each in each.descendants when each.hasChildren and @isExpanded(each) != expand
     else
-      toggleItems = (each for each in items when each.hasChildren)
+      foldItems = (each for each in items when each.hasChildren and @isExpanded(each) != expand)
 
-    if toggleItems.length
-      @setExpanded(toggleItems, not @isExpanded(toggleItems[0]))
+    if foldItems.length
+      @setExpanded(foldItems, expand)
 
   toggleFullyExpandItems: (items) ->
-    @toggleExpandItems items, true
+    @toggleFoldItems items, true
 
   ###
   Section: Item Path

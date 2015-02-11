@@ -1006,6 +1006,10 @@ atom.commands.add 'outline-editor', stopEventPropagation(
   'core:scroll-page-down': -> @editor.scrollPageDown()
   'core:select-page-down': -> @editor.pageDownAndModifySelection()
   'core:page-down': -> @editor.pageDown()
+  'editor:fold-current-row': -> @editor.foldItems()
+  'editor:unfold-current-row': -> @editor.unfoldItems()
+  'outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
+
 )
 
 module.exports = document.registerElement 'outline-editor', prototype: OutlineEditorElement.prototype
