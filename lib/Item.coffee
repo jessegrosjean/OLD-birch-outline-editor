@@ -395,10 +395,14 @@ class Item
       outline.endUpdates()
 
   _insertChildrenBeforeIgnoringAliases: (children, referenceSibling) ->
-    documentFragment = @_liOrRootUL.ownerDocument.createDocumentFragment()
+    ownerDocument = @_liOrRootUL.ownerDocument
+    documentFragment = ownerDocument.createDocumentFragment()
     referenceSiblingLI = referenceSibling?._liOrRootUL
+
     for each in children
+      assert.ok(each._liOrRootUL.ownerDocument == ownerDocument, 'children must share same owner document')
       documentFragment.appendChild(each._liOrRootUL)
+
     _childrenUL(@_liOrRootUL, true).insertBefore(documentFragment, referenceSiblingLI)
 
   appendChildren: (children) ->
