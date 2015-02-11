@@ -134,8 +134,7 @@ class OutlineEditor extends Model
   destroyed: ->
     @unsubscribe()
     @outline.release(@outlineEditorElement.id)
-    if @outlineEditorElement?.parentNode
-      @outlineEditorElement.parentNode.removeChild(@outlineEditorElement)
+    @outlineEditorElement.destroyed()
     @outlineEditorElement = null
     @emitter.emit 'did-destroy'
 

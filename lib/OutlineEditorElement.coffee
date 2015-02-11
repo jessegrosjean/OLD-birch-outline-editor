@@ -30,7 +30,6 @@ class OutlineEditorElement extends HTMLElement
 
   detachedCallback: ->
     @_extendSelectionDisposables.dispose()
-    @_idsToElements = {}
 
   attributeChangedCallback: ->
 
@@ -62,6 +61,11 @@ class OutlineEditorElement extends HTMLElement
     @topListElement = topListElement
 
     this
+
+  destroyed: ->
+    if @parentNode
+      @parentNode.removeChild(this)
+    @_idsToElements = null
 
   ###
   Section: Rendering
