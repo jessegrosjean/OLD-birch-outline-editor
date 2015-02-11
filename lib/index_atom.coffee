@@ -10,6 +10,11 @@ atom.views.addViewProvider OutlineEditor, (model) ->
 module.exports = BirchOutliner =
   subscriptions: null
 
+  config:
+    disableAnimation:
+      type: 'boolean'
+      default: true
+
   activate: (state) ->
     @subscriptions = new CompositeDisposable
 

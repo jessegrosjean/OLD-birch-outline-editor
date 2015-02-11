@@ -60,11 +60,16 @@ class OutlineEditorElement extends HTMLElement
     @appendChild(topListElement)
     @topListElement = topListElement
 
+    @disableAnimationOverride = atom.config.get 'birch-outliner.disableAnimation'
+    @disableAnimationObserver = atom.config.observe 'birch-outliner.disableAnimation', (newValue) =>
+      @disableAnimationOverride = newValue
+
     this
 
   destroyed: ->
     if @parentNode
       @parentNode.removeChild(this)
+    @disableAnimationObserver.dispose()
     @_idsToElements = null
 
   ###
@@ -194,7 +199,7 @@ class OutlineEditorElement extends HTMLElement
   ###
 
   isAnimationEnabled: ->
-    @_animationDisabled == 0
+    not @disableAnimationOverride and @_animationDisabled == 0
 
   disableAnimation: ->
     @_animationDisabled++
