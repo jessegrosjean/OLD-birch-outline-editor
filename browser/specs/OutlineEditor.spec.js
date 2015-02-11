@@ -47,10 +47,10 @@ describe('OutlineEditor', function() {
 		});
 
 		it('should toggle expanded state', function() {
-			editor.toggleExpandItems(outlineSetup.one);
+			editor.toggleFoldItems(outlineSetup.one);
 			editor.isExpanded(outlineSetup.one).should.be.true;
 
-			editor.toggleExpandItems(outlineSetup.one);
+			editor.toggleFoldItems(outlineSetup.one);
 			editor.isExpanded(outlineSetup.one).should.be.false;
 		});
 	});
