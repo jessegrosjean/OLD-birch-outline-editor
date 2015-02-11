@@ -25,8 +25,7 @@ class OutlineEditor extends Model
   atom.deserializers.add(this)
 
   @deserialize: (data) ->
-    console.log(data)
-    new OutlineEditor(new Outline({filePath: data.filePath}))
+    new OutlineEditor(Outline.deserialize(data.outline))
 
   constructor: (outline, hostElement) ->
     id = shortid()
@@ -65,8 +64,8 @@ class OutlineEditor extends Model
 
   serialize: ->
     {} =
-      deserializer: 'OutlineEditor',
-      filePath: @outline.getPath()
+      deserializer: 'OutlineEditor'
+      outline: @outline.serialize()
 
   subscribeToOutline: ->
     outline = @outline
@@ -81,6 +80,8 @@ class OutlineEditor extends Model
         atom.project.setPaths([path.dirname(@getPath())])
       @emitter.emit 'did-change-title', @getTitle()
 
+    @subscribe outline.onWillReload => @outlineEditorElement.disableAnimation()
+    @subscribe outline.onDidReload => @outlineEditorElement.enableAnimation()
     @subscribe outline.onDidDestroy => @destroy()
 
     @subscribe undoManager.onDidOpenUndoGroup () =>
@@ -107,7 +108,7 @@ class OutlineEditor extends Model
       @_overrideIsFocused = false
 
   outlineDidChange: (e) ->
-    if @itemFilterPath
+    if @itemFilterPath()
       hoistedItem = @hoistedItem()
       for eachDelta in e.deltas
         if eachDelta.type == OutlineChangeDelta.ChildrenChanged
@@ -1346,10 +1347,10 @@ class OutlineEditor extends Model
     @outline.isEmpty()
 
   save: ->
-    @outline.save()
+    @outline.save(this)
 
   saveAs: (filePath) ->
-    @outline.saveAs(filePath)
+    @outline.saveAs(filePath, this)
 
   shouldPromptToSave: ->
     @isModified() and not @outline.hasMultipleEditors()

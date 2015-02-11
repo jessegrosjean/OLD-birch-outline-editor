@@ -26,8 +26,16 @@ class Outline
   fileConflict: false
   fileSubscriptions: null
 
+  @pathsToOutlines = {}
   @deserialize: (data) ->
-    new Outline(data)
+    filePath = data.filePath
+    outline = Outline.pathsToOutlines[filePath]
+    unless outline
+      data.load = true
+      outline = new Outline(data)
+      if filePath
+        Outline.pathsToOutlines[filePath] = outline
+    outline
 
   constructor: (params) ->
     @outlineStore = @createOutlineStoreIfNeeded(params?.outlineStore)
@@ -311,16 +319,16 @@ class Outline
   Section: File Content Operations
   ###
 
-  save: ->
-    @saveAs(@getPath())
+  save: (editor) ->
+    @saveAs @getPath(), editor
 
-  saveAs: (filePath) ->
+  saveAs: (filePath, editor) ->
     unless filePath then throw new Error("Can't save outline with no file path")
 
     @emitter.emit 'will-save', {path: filePath}
     @setPath(filePath)
-    @file.write(@getText())
-    @cachedDiskContents = @getText()
+    @file.write(@getText(editor))
+    @cachedDiskContents = @getText(editor)
     @conflict = false
     @changeCount = 0
     @emitModifiedStatusChanged(false)
@@ -381,11 +389,11 @@ class Outline
     newAliases.push(item)
     itemAliases.push(newAlias)
 
-  getText: ->
+  getText: (editor) ->
     if @cachedText?
       @cachedText
     else
-      @cachedText = ItemSerializer.itemsToHTML(@root.children)
+      @cachedText = ItemSerializer.itemsToHTML(@root.children, editor)
 
   loadSync: ->
     @updateCachedDiskContentsSync()
@@ -406,6 +414,7 @@ class Outline
 
   destroy: ->
     unless @destroyed
+      delete Outline.pathsToOutlines[@getPath()]
       @updateMutationObserver.disconnect()
       @cancelStoppedChangingTimeout()
       @undoSubscriptions?.dispose()
