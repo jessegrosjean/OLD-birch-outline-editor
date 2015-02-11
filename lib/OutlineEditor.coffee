@@ -62,6 +62,9 @@ class OutlineEditor extends Model
     @subscribeToOutline()
     @setHoistedItemsStack([])
 
+  copy: ->
+    new OutlineEditor(@outline)
+
   serialize: ->
     {} =
       deserializer: 'OutlineEditor'
