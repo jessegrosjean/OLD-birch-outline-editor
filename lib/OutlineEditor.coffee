@@ -485,16 +485,16 @@ class OutlineEditor extends Model
     @outlineEditorElement.focus()
 
   moveBackward: ->
-    @modifySelectionRange('move', 'backward', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('move', 'backward', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveBackwardAndModifySelection: ->
-    @modifySelectionRange('extend', 'backward', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('extend', 'backward', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveForward: ->
-    @modifySelectionRange('move', 'forward', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('move', 'forward', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveForwardAndModifySelection: ->
-    @modifySelectionRange('extend', 'forward', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('extend', 'forward', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveUp: ->
     @modifySelectionRange('move', 'up', (if @isTextMode() then 'line' else 'paragraph'), true)
@@ -509,16 +509,16 @@ class OutlineEditor extends Model
     @modifySelectionRange('extend', 'down', (if @isTextMode() then 'line' else 'paragraph'), true)
 
   moveLeft: ->
-    @modifySelectionRange('move', 'left', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('move', 'left', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveLeftAndModifySelection: ->
-    @modifySelectionRange('extend', 'left', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('extend', 'left', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveToBeginningOfLine: ->
-    @modifySelectionRange('move', 'backward', (if @isTextMode() then 'lineboundary' else 'paragraphboundary'), true)
+    @modifySelectionRange('move', 'backward', (if @isTextMode() then 'lineboundary' else 'paragraphboundary'))
 
   moveToBeginningOfLineAndModifySelection: ->
-    @modifySelectionRange('extend', 'backward', (if @isTextMode() then 'lineboundary' else 'paragraphboundary'), true)
+    @modifySelectionRange('extend', 'backward', (if @isTextMode() then 'lineboundary' else 'paragraphboundary'))
 
   moveToBeginningOfParagraph: ->
     @modifySelectionRange('move', 'backward', 'paragraphboundary')
@@ -528,35 +528,35 @@ class OutlineEditor extends Model
 
   moveParagraphBackward: ->
     if @isTextMode()
-      @modifySelectionRange('move', 'backward', 'character', true)
-      @modifySelectionRange('move', 'backward', 'paragraphboundary', true)
+      @modifySelectionRange('move', 'backward', 'character')
+      @modifySelectionRange('move', 'backward', 'paragraphboundary')
     else
-      @modifySelectionRange('move', 'backward', 'paragraph', true)
+      @modifySelectionRange('move', 'backward', 'paragraph')
 
   moveParagraphBackwardAndModifySelection: ->
     if @isTextMode()
-      @modifySelectionRange('extend', 'backward', 'character', true)
-      @modifySelectionRange('extend', 'backward', 'paragraphboundary', true)
+      @modifySelectionRange('extend', 'backward', 'character')
+      @modifySelectionRange('extend', 'backward', 'paragraphboundary')
     else
-      @modifySelectionRange('extend', 'backward', 'paragraph', true)
+      @modifySelectionRange('extend', 'backward', 'paragraph')
 
   moveWordLeft: ->
-    @modifySelectionRange('move', 'left', (if @isTextMode() then 'word' else 'paragraph'), true)
+    @modifySelectionRange('move', 'left', (if @isTextMode() then 'word' else 'paragraph'))
 
   moveWordLeftAndModifySelection: ->
-    @modifySelectionRange('extend', 'left', (if @isTextMode() then 'word' else 'paragraph'), true)
+    @modifySelectionRange('extend', 'left', (if @isTextMode() then 'word' else 'paragraph'))
 
   moveRight: ->
-    @modifySelectionRange('move', 'right', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('move', 'right', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveRightAndModifySelection: ->
-    @modifySelectionRange('extend', 'right', (if @isTextMode() then 'character' else 'paragraph'), true)
+    @modifySelectionRange('extend', 'right', (if @isTextMode() then 'character' else 'paragraph'))
 
   moveWordRight: ->
-    @modifySelectionRange('move', 'right', (if @isTextMode() then 'word' else 'paragraph'), true)
+    @modifySelectionRange('move', 'right', (if @isTextMode() then 'word' else 'paragraph'))
 
   moveWordRightAndModifySelection: ->
-    @modifySelectionRange('extend', 'right', (if @isTextMode() then 'word' else 'paragraph'), true)
+    @modifySelectionRange('extend', 'right', (if @isTextMode() then 'word' else 'paragraph'))
 
   moveToEndOfLine: ->
     @modifySelectionRange('move', 'forward', 'lineboundary')
@@ -572,17 +572,17 @@ class OutlineEditor extends Model
 
   moveParagraphForward: ->
     if @isTextMode()
-      @modifySelectionRange('move', 'forward', 'character', true)
-      @modifySelectionRange('move', 'forward', 'paragraphboundary', true)
+      @modifySelectionRange('move', 'forward', 'character')
+      @modifySelectionRange('move', 'forward', 'paragraphboundary')
     else
-      @modifySelectionRange('move', 'forward', 'paragraph', true)
+      @modifySelectionRange('move', 'forward', 'paragraph')
 
   moveParagraphForwardAndModifySelection: ->
     if @isTextMode()
-      @modifySelectionRange('extend', 'forward', 'character', true)
-      @modifySelectionRange('extend', 'forward', 'paragraphboundary', true)
+      @modifySelectionRange('extend', 'forward', 'character')
+      @modifySelectionRange('extend', 'forward', 'paragraphboundary')
     else
-      @modifySelectionRange('extend', 'forward', 'paragraph', true)
+      @modifySelectionRange('extend', 'forward', 'paragraph')
 
   moveToBeginningOfDocument: ->
     @modifySelectionRange('move', 'backward', 'documentboundary')
