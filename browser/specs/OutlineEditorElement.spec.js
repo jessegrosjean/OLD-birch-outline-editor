@@ -51,9 +51,9 @@ describe('OutlineEditorElement', function() {
 
 			it('should update when attribute is changed', function() {
 				var viewLI = document.getElementById(outlineSetup.three.id);
-				should(viewLI.getAttribute('data-my') === null);
+				should(viewLI.getAttribute('my') === null);
 				outlineSetup.three.setAttribute('my', 'test');
-				viewLI.getAttribute('data-my').should.equal('test');
+				viewLI.getAttribute('my').should.equal('test');
 			});
 
 			it('should update when body text is changed', function() {

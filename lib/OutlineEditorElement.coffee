@@ -93,14 +93,14 @@ class OutlineEditorElement extends HTMLElement
     for eachName in item.attributeNames
       value = item.attribute(eachName)
       if value
-        li.setAttribute('data-' + eachName, value)
+        li.setAttribute(eachName, value)
 
     if level == undefined
       level = @_levelToHoistedItem(item)
 
     li.id = item.id
     li.className = @createItemClassString(item)
-    li.setAttribute('level', level)
+    li.setAttribute('data-level', level)
     li.appendChild(@createDIVForItemRow(item))
 
     @_idsToElements[item.id] = li

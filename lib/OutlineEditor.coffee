@@ -1167,13 +1167,13 @@ class OutlineEditor extends Model
     firstItem = selectedItems[0]
 
     if firstItem
-      if firstItem.hasAttribute('done')
+      if firstItem.hasAttribute('data-done')
         doneDate = undefined
 
       outline.beginUpdates()
       undoManager.beginUndoGrouping()
       for each in selectedItems
-        each.setAttribute('done', doneDate)
+        each.setAttribute('data-done', doneDate)
       undoManager.endUndoGrouping()
       outline.endUpdates()
 

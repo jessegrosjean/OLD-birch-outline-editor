@@ -150,7 +150,7 @@ outline-editor > ul {
 }
 
 .generate-gutter-levels(@n, @i: 0) when (@i =< @n) {
-  .bitem[level="@{i}"] {
+  .bitem[data-level="@{i}"] {
     > .bcontent > .bgutter {
       flex-basis: (@gutterWidthPerLevel * @i);
     }
