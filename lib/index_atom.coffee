@@ -21,7 +21,7 @@ module.exports = BirchOutliner =
     @subscriptions.add atom.workspace.addOpener (filePath) =>
       extension = path.extname(filePath).toLowerCase()
       switch extension
-        when '.outline'
+        when '.ftml'
           o = new Outline({
             filePath: filePath,
             load: true
