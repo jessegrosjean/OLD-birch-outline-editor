@@ -6,7 +6,8 @@ LIMoveAnimation = require './animations/LIMoveAnimation'
 OutlineChangeDelta = require './OutlineChangeDelta'
 OutlineEditorRange = require './OutlineEditorRange'
 ItemBodyEncoder = require './ItemBodyEncoder'
-EventDelegate = require './EventDelegate'
+ItemSerializer = require './ItemSerializer'
+EventRegistery = require './EventRegistery'
 {CompositeDisposable} = require 'atom'
 Velocity = require 'velocity-animate'
 Constants = require './Constants'
@@ -14,9 +15,7 @@ Util = require './Util'
 
 require './OutlineEditorElementSelectionMouseHandler'
 require './OutlineEditorElementHandleClickHandler'
-require './OutlineEditorElementHandleDragHandler'
 require './OutlineEditorElementBodyInputHandler'
-require './OutlineEditorElementDropHandler'
 
 class OutlineEditorElement extends HTMLElement
 
@@ -56,6 +55,17 @@ class OutlineEditorElement extends HTMLElement
     @appendChild(outlineEditorFocusElement)
     @outlineEditorFocusElement = outlineEditorFocusElement
 
+    # Register directly on this element because Atom app handles this event
+    # meaning that the event delegation path won't get called
+    @dragSubscription = EventRegistery.add this,
+      dragstart: @onDragStart
+      drag: @onDrag
+      dragend: @onDragEnd
+      dragenter: @onDragEnter
+      dragover: @onDragOver
+      drop: @onDrop
+      dragleave: @onDragLeave
+
     topListElement = document.createElement('UL')
     @appendChild(topListElement)
     @topListElement = topListElement
@@ -70,6 +80,7 @@ class OutlineEditorElement extends HTMLElement
     if @parentNode
       @parentNode.removeChild(this)
     @disableAnimationObserver.dispose()
+    @dragSubscription.dispose()
     @_idsToElements = null
 
   ###
@@ -117,9 +128,6 @@ class OutlineEditorElement extends HTMLElement
 
     if editor.hoistedItem() == item
       itemClass.push('bhoistedItem')
-
-    if editor.draggedItem() == item
-      itemClass.push('bdraggedItem')
 
     if editor.dropParentItem() == item
       itemClass.push('bdropParentItem')
@@ -379,9 +387,9 @@ class OutlineEditorElement extends HTMLElement
     itemViewLI = @itemViewLIForItem(item)
     if itemViewLI
       if item.hasAttribute(attributeName)
-        itemViewLI.setAttribute('data-' + attributeName, item.attribute(attributeName))
+        itemViewLI.setAttribute(attributeName, item.attribute(attributeName))
       else
-        itemViewLI.removeAttribute('data-' + attributeName)
+        itemViewLI.removeAttribute(attributeName)
 
   updateItemBody: (item) ->
     itemViewLI = @itemViewLIForItem(item)
@@ -760,9 +768,9 @@ class OutlineEditorElement extends HTMLElement
       @_extendingSelection = true
       @_extendingSelectionLastScrollTop = editor.outlineEditorElement.scrollTop
       @_extendSelectionDisposables = new CompositeDisposable(
-        EventDelegate.add('*', 'mouseup', @onDocumentMouseUp.bind(this)),
-        EventDelegate.add('.beditor', 'mousemove', Util.debounce(@onEditorMouseMove.bind(this))),
-        EventDelegate.add(this, 'scroll', Util.debounce(@onEditorScroll.bind(this)))
+        EventRegistery.add('*', 'mouseup', @onDocumentMouseUp.bind(this)),
+        EventRegistery.add('.beditor', 'mousemove', Util.debounce(@onEditorMouseMove.bind(this))),
+        EventRegistery.add(this, 'scroll', Util.debounce(@onEditorScroll.bind(this)))
       )
 
   onEditorMouseMove: (e) ->
@@ -807,6 +815,174 @@ class OutlineEditorElement extends HTMLElement
     @_extendSelectionDisposables = new CompositeDisposable
     @_extendingSelection = false
 
+  ###
+  Section: Drag and Drop
+  ###
+
+  onDragStart: (e) ->
+    item = @itemForViewNode(e.target)
+    li = @itemViewLIForItem(item)
+    liRect = li.getBoundingClientRect()
+    x = e.clientX - liRect.left
+    y = e.clientY - liRect.top
+
+    e.stopPropagation()
+    e.dataTransfer.effectAllowed = 'all'
+    e.dataTransfer.setDragImage(li, x, y)
+    e.dataTransfer.setData('application/json', JSON.stringify({ itemID: item.id, editorID: @id }))
+    ItemSerializer.writeItems([item], @editor, e.dataTransfer)
+
+    @editor._hackDragItemMouseOffset =
+      xOffset: x
+      yOffset: y
+    @editor.setDragState
+      draggedItem: item
+
+  onDrag: (e) ->
+    e.stopPropagation()
+    item = @itemForViewNode e.target
+    draggedItem = @_draggedItemForEvent e
+    if item != draggedItem
+      e.preventDefault()
+
+  onDragEnd: (e) ->
+    @editor.setDragState {}
+    e.stopPropagation()
+
+  onDragEnter: (e) ->
+    @onDragOver(e)
+
+  onDragOver: (e) ->
+    e.stopPropagation()
+    e.preventDefault()
+
+    draggedItem = @_draggedItemForEvent e
+    dropTarget = @_dropTargetForEvent e
+
+    if e.ctrlKey
+      e.dataTransfer.dropEffect = 'link'
+    else if e.altKey
+      e.dataTransfer.dropEffect = 'copy'
+    else
+      e.dataTransfer.dropEffect = 'move'
+
+    if @_isInvalidDrop(dropTarget, draggedItem) and e.dataTransfer.dropEffect == 'move'
+      e.dataTransfer.dropEffect = 'none'
+      dropTarget.parent = null
+      dropTarget.insertBefore = null
+
+    @editor.debouncedSetDragState
+      'draggedItem': draggedItem
+      'dropEffect' : e.dataTransfer.dropEffect
+      'dropParentItem' : dropTarget.parent
+      'dropInsertBeforeItem' : dropTarget.insertBefore
+
+  onDragLeave: (e) ->
+    @editor.debouncedSetDragState
+      'draggedItem': @_draggedItemForEvent e
+      'dropEffect' : e.dataTransfer.dropEffect
+
+  onDrop: (e) ->
+    e.stopPropagation();
+
+    # For some reason "dropEffect is always set to 'none' on e. So track
+    # it in store state instead.
+    dropEffect = @editor.dropEffect()
+    draggedItem = @_draggedItemForEvent e
+    dropParentItem = @editor.dropParentItem()
+    dropInsertBeforeItem = @editor.dropInsertBeforeItem()
+
+    #unless draggedItem
+      #Pasteboard.setClipboardEvent(e);
+      #draggedItem = Pasteboard.readNodes(editor.tree())[0];
+      #Pasteboard.setClipboardEvent(null);
+
+    if draggedItem and dropParentItem
+      insertNode
+      if dropEffect == 'move'
+        insertNode = draggedItem
+      else if dropEffect == 'copy'
+        insertNode = draggedItem.copyItem()
+      else if dropEffect == 'link'
+        console.log 'link'
+
+      if insertNode and insertNode != dropInsertBeforeItem
+        outline = dropParentItem.outline
+        undoManager = outline.undoManager
+
+        if insertNode.parent
+          if insertNode.outline == outline
+            compareTo = dropInsertBeforeItem ? dropInsertBeforeItem : dropParentItem.lastChild
+            unless compareTo
+              compareTo = dropParentItem
+
+            if insertNode.comparePosition(compareTo) & Node.DOCUMENT_POSITION_FOLLOWING
+              @scrollBy(-@itemViewLIForItem(insertNode).clientHeight)
+
+        moveStartOffset
+
+        if draggedItem == insertNode
+          viewLI = @itemViewLIForItem(draggedItem)
+          if viewLI
+            editorElementRect = @getBoundingClientRect()
+            viewLIRect = viewLI.getBoundingClientRect()
+            editorLITop = viewLIRect.top - editorElementRect.top
+            editorLILeft = viewLIRect.left - editorElementRect.left
+            editorX = e.clientX - editorElementRect.left
+            editorY = e.clientY - editorElementRect.top
+
+            if @editor._hackDragItemMouseOffset
+              editorX -= @editor._hackDragItemMouseOffset.xOffset
+              editorY -= @editor._hackDragItemMouseOffset.yOffset
+
+            moveStartOffset =
+              xOffset: editorX - editorLILeft
+              yOffset: editorY - editorLITop
+
+        @editor.moveItems([insertNode], dropParentItem, dropInsertBeforeItem, moveStartOffset)
+        undoManager.setActionName('Drag and Drop')
+
+    @editor.debouncedSetDragState({})
+
+  _draggedItemForEvent: (e) ->
+    @editor.draggedItem()
+    #try
+    #  draggedIDs = JSON.parse(e.dataTransfer.getData('application/json'))
+    #  editorID = draggedIDs.editorID
+    #  itemID = draggedIDs.itemID
+    #  if @id is editorID
+    #    return @editor.outline.itemForID itemID
+    #catch
+
+  _isInvalidDrop: (dropTarget, draggedItem) ->
+    return !draggedItem or !dropTarget.parent or (dropTarget.parent == draggedItem or draggedItem.contains(dropTarget.parent));
+
+  _dropTargetForEvent: (e) ->
+    picked = @pick(e.clientX, e.clientY)
+    itemCaretPosition = picked.itemCaretPosition
+
+    unless itemCaretPosition
+      return {}
+
+    pickedItem = itemCaretPosition.offsetItem
+    itemPickAffinity = itemCaretPosition.itemAffinity
+    newDropInserBeforeItem = null
+    newDropInsertAfterItem = null
+    newDropParent = null
+
+    if itemPickAffinity == Constants.ItemAffinityAbove or itemPickAffinity == Constants.ItemAffinityTopHalf
+      {} =
+        parent: pickedItem.parent
+        insertBefore: pickedItem
+    else
+      if pickedItem.firstChild and @editor.isExpanded(pickedItem)
+        {} =
+          parent: pickedItem
+          insertBefore: @editor.firstVisibleChild(pickedItem)
+      else
+        {} =
+          parent: pickedItem.parent
+          insertBefore: @editor.nextVisibleSibling(pickedItem)
 
   ###
   Section: Util
@@ -915,7 +1091,7 @@ stopEventPropagationAndGroupUndo = (commandListeners) ->
 Event and Command registration
 ###
 
-EventDelegate.add 'input[is="outline-editor-focus"]', stopEventPropagation(
+EventRegistery.add 'input[is="outline-editor-focus"]', stopEventPropagation(
   'cut': (e) -> @parentElement.editor.cutSelection(e.clipboardData)
   'copy': (e) -> @parentElement.editor.copySelection(e.clipboardData)
   'paste': (e) -> @parentElement.editor.pasteToSelection(e.clipboardData)

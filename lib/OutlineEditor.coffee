@@ -1182,7 +1182,7 @@ class OutlineEditor extends Model
   ###
 
   draggedItem: ->
-    @_dragState.draggedItem
+    @outline._draggedItemHack
 
   dropEffect: ->
     @_dragState.dropEffect
@@ -1207,6 +1207,7 @@ class OutlineEditor extends Model
       state.dropInsertAfterItem = @lastVisibleChild(state.dropParentItem)
 
     oldState = @_dragState
+    @outline._draggedItemHack = state.draggedItem
     @_dragState = state
 
     @_refreshIfDifferent(oldState.draggedItem, state.draggedItem)

@@ -19,12 +19,12 @@ class Outline
   updateMutations: null
   updateMutationObserver: null
   cachedText: null
-  encoding: null
   stoppedChangingDelay: 300
   stoppedChangingTimeout: null
   file: null
   fileConflict: false
   fileSubscriptions: null
+  serializedState: null
 
   @pathsToOutlines = {}
   @deserialize: (data) ->
@@ -46,12 +46,12 @@ class Outline
 
     @undoManager = undoManager = new UndoManager()
     @emitter = new Emitter()
-    @setEncoding(params?.encoding)
 
     @loaded = false
     @digestWhenLastPersisted = params?.digestWhenLastPersisted ? false
     @modifiedWhenLastPersisted = params?.modifiedWhenLastPersisted ? false
     @useSerializedText = @modifiedWhenLastPersisted isnt false
+    @serializedState = {}
 
     @updateMutationObserver = new MutationObserver (mutations) =>
       @updateMutations = @updateMutations.concat(mutations)
@@ -92,7 +92,6 @@ class Outline
     {} =
       deserializer: 'Outline'
       text: @getText()
-      encoding: @getEncoding()
       filePath: @getPath()
       modifiedWhenLastPersisted: @isModified()
       digestWhenLastPersisted: @file?.getDigest()
@@ -115,9 +114,6 @@ class Outline
 
   onDidChangePath: (callback) ->
     @emitter.on 'did-change-path', callback
-
-  onDidChangeEncoding: (callback) ->
-    @emitter.on 'did-change-encoding', callback
 
   onWillSave: (callback) ->
     @emitter.on 'will-save', callback
@@ -146,6 +142,16 @@ class Outline
 
   itemForID: (id) ->
     @outlineStore.getElementById(id)?._item
+
+  itemsForIDs: (ids) ->
+    return [] unless ids
+
+    items = []
+    for each in ids
+      each = @itemForID each
+      if each
+        items.push each
+    items
 
   items: ->
     @root.descendants
@@ -283,31 +289,12 @@ class Outline
 
     if filePath
       @file = new File(filePath)
-      @file.setEncoding(@getEncoding())
+      @file.setEncoding('utf8')
       @subscribeToFile()
     else
       @file = null
 
     @emitter.emit 'did-change-path', @getPath()
-
-  setEncoding: (encoding='utf8') ->
-    return if encoding is @getEncoding()
-
-    @encoding = encoding
-    if @file?
-      @file.setEncoding(encoding)
-      @emitter.emit 'did-change-encoding', encoding
-
-      unless @isModified()
-        @updateCachedDiskContents true, =>
-          @reload()
-          @undoManager.removeAllActions()
-    else
-      @emitter.emit 'did-change-encoding', encoding
-
-    return
-
-  getEncoding: -> @encoding ? @file?.getEncoding()
 
   getUri: ->
     @getPath()
@@ -338,9 +325,13 @@ class Outline
     @emitter.emit 'will-reload'
 
     try
+      @beginUpdates()
       @root.removeChildren(@root.children)
-      for each in ItemSerializer.itemsFromHTML(@cachedDiskContents, this)
+      items = ItemSerializer.itemsFromHTML(@cachedDiskContents, this)
+      @serializedState = items.metaState
+      for each in items
         @root.appendChild(each)
+      @endUpdates()
     catch error
       console.log error
 
