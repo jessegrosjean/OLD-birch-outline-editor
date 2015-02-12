@@ -25,22 +25,14 @@ class OutlineEditor extends Model
   atom.deserializers.add(this)
 
   @deserialize: (data) ->
-    new OutlineEditor(Outline.deserialize(data.outline))
+    new OutlineEditor(Outline.deserialize(data.outline), data)
 
-  constructor: (outline, hostElement) ->
+  constructor: (outline, params) ->
     id = shortid()
-    outlineEditorElement = new OutlineEditorElement().initialize(this)
-
-    outlineEditorElement.id = id
-    outlineEditorElement.classList.add('beditor')
-
-    if hostElement
-      hostElement.appendChild(outlineEditorElement)
 
     @emitter = new Emitter()
     @outline = null
     @_overrideIsFocused = false
-    @outlineEditorElement = outlineEditorElement
     @_selectionRange = new OutlineEditorRange(this)
     @_textModeExtendingFromSnapbackRange = null
     @_textModeTypingFormattingTags = {}
@@ -60,7 +52,19 @@ class OutlineEditor extends Model
 
     @outline = outline or new Outline
     @subscribeToOutline()
-    @setHoistedItemsStack([])
+
+    outlineEditorElement = new OutlineEditorElement().initialize(this)
+    outlineEditorElement.id = id
+    outlineEditorElement.classList.add('beditor')
+    @outlineEditorElement = outlineEditorElement
+    if params?.hostElement
+      params.hostElement.appendChild(outlineEditorElement)
+
+    @serializedState =
+      hoistedItemIDs: params?.hoistedItemIDs
+      expandedItemIDs: params?.expandedItemIDs
+
+    @loadSerializedState()
 
   copy: ->
     new OutlineEditor(@outline)
@@ -68,7 +72,17 @@ class OutlineEditor extends Model
   serialize: ->
     {} =
       deserializer: 'OutlineEditor'
+      hoistedItemIDs: (each.id for each in @_hoistStack)
+      expandedItemIDs: (each.id for each in @outline.items() when @isExpanded each)
       outline: @outline.serialize()
+
+  loadSerializedState: ->
+    hoistedItemIDs = @serializedState.hoistedItemIDs
+    expandedItemIDs = @serializedState.expandedItemIDs
+    unless expandedItemIDs
+      expandedItemIDs = @outline.serializedState.expandedItemIDs or []
+    @setExpanded (@outline.itemsForIDs expandedItemIDs), true
+    @setHoistedItemsStack @outline.itemsForIDs hoistedItemIDs
 
   subscribeToOutline: ->
     outline = @outline
@@ -83,8 +97,13 @@ class OutlineEditor extends Model
         atom.project.setPaths([path.dirname(@getPath())])
       @emitter.emit 'did-change-title', @getTitle()
 
-    @subscribe outline.onWillReload => @outlineEditorElement.disableAnimation()
-    @subscribe outline.onDidReload => @outlineEditorElement.enableAnimation()
+    @subscribe outline.onWillReload =>
+      @outlineEditorElement.disableAnimation()
+
+    @subscribe outline.onDidReload =>
+      @loadSerializedState()
+      @outlineEditorElement.enableAnimation()
+
     @subscribe outline.onDidDestroy => @destroy()
 
     @subscribe undoManager.onDidOpenUndoGroup () =>
@@ -150,9 +169,6 @@ class OutlineEditor extends Model
 
   onDidChange: (callback) ->
     @emitter.on 'did-change', callback
-
-  onDidChangeEncoding: (callback) ->
-    @outline.onDidChangeEncoding(callback)
 
   onDidChangeModified: (callback) ->
     @outline.onDidChangeModified(callback)

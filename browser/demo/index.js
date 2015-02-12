@@ -60,9 +60,9 @@ outline3.root.appendChild(outline3.createItem('five'));
 var container1 = document.getElementById('container1'),
 	container2 = document.getElementById('container2'),
 	container3 = document.getElementById('container3'),
-	editor1 = new OutlineEditor(outline, container1),
-	editor2 = new OutlineEditor(outline, container2),
-	editor3 = new OutlineEditor(outline3, container3);
+	editor1 = new OutlineEditor(outline, { hostElement: container1 }),
+	editor2 = new OutlineEditor(outline, { hostElement: container2 }),
+	editor3 = new OutlineEditor(outline3, { hostElement: container3 });
 	//keyMap1 = new KeyMap(editor1.shadowRoot, editor1.outlineEditorElement),
 	//keyMap2 = new KeyMap(editor2.shadowRoot, editor2.outlineEditorElement),
 	//keyMap3 = new KeyMap(editor3.shadowRoot, editor3.outlineEditorElement);
