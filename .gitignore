@@ -6,5 +6,6 @@ Thumbs.db
 .svn
 .nvm-version
 node_modules
+docs
 npm-debug.log
 debug.log

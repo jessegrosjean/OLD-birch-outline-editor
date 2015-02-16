@@ -1,3 +1,6 @@
+'body':
+  'alt-cmd-n': 'birch-outliner:new-outline'
+
 'outline-editor':
   # Platform Bindings
   'home': 'editor:move-to-first-character-of-line'
@@ -63,7 +66,7 @@
   'ctrl-cmd-left' : 'editor:outdent-selected-rows'
   'ctrl-cmd-right' : 'editor:indent-selected-rows'
 
-  'cmd-/': 'editor:toggle-line-comments'
+  'cmd-/': 'outline-editor:toggle-line-comments'
   'cmd-j': 'editor:join-lines'
   'cmd-D': 'editor:duplicate-lines'
   'cmd-L': 'editor:split-selections-into-lines'
@@ -84,14 +87,14 @@
   'cmd-k cmd-7': 'editor:fold-at-indent-level-7'
   'cmd-k cmd-8': 'editor:fold-at-indent-level-8'
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
-  'cmd-.': 'outline-editor:toggle-fold-items'
+  'cmd-.': 'outline-outline-editor:toggle-fold-items'
 
-  'cmd-b' : 'editor:toggle-bold'
-  'cmd-i' : 'editor:toggle-italic'
-  'cmd-u' : 'editor:toggle-underline'
-  'cmd-k' : 'editor:toggle-strikethrough'
+  'cmd-b' : 'outline-editor:toggle-bold'
+  'cmd-i' : 'outline-editor:toggle-italic'
+  'cmd-u' : 'outline-editor:toggle-underline'
+  'cmd-k' : 'outline-editor:toggle-strikethrough'
 
-  'cmd-d' : 'outline-editor:toggle-done'
+  'cmd-d' : 'outline-outline-editor:toggle-done'
 
 'outline-editor.itemMode':
   'right' : 'insertCaretAtEndOfLine',
@@ -105,6 +108,6 @@
   'f i' : 'outline-editor:hoist',
   'f o' : 'outline-editor:unhoist',
 
-  '.' : 'outline-editor:toggle-fold-items',
+  '.' : 'outline-outline-editor:toggle-fold-items',
 
-  'd' : 'outline-editor:toggle-done'
+  'd' : 'outline-outline-editor:toggle-done'
