@@ -11,6 +11,18 @@ Util = require './Util'
 Function::property = (prop, desc) ->
   Object.defineProperty @prototype, prop, desc
 
+# Essential: Represents a paragraph of text in an {Outline}.
+#
+# Items connect to other items to form a hiearchical outline structure.
+#
+# Items have name/value attributes that you can use to store assocaited data.
+# When storing your own values you should prefix the attribute name with
+# `data-`.
+#
+# Item text content is availible as plain text, and HTML string, and an
+# AttributedString.
+#
+# To create new items use {Outline::createItem}.
 module.exports =
 class Item
 
@@ -43,21 +55,37 @@ class Item
       else
         _bodyP(liOrRootUL).textContent = text
 
+  ###
+  Section: Properties
+  ###
+
+  # Public: Read-only unique and persistent {String} ID.
+  id: null
   @property 'id',
     get: -> @_liOrRootUL.id
 
+  # Public: Read-only parent {Item}.
+  parent: null
   @property 'parent',
     get: -> _parentLIOrRootUL(@_liOrRootUL)?._item
 
+  # Public: Read-only first child {Item}.
+  firstChild: null
   @property 'firstChild',
     get: -> _childrenUL(@_liOrRootUL, false)?.firstElementChild?._item
 
+  # Public: Read-only last child {Item}.
+  lastChild: null
   @property 'lastChild',
     get: -> _childrenUL(@_liOrRootUL, false)?.lastElementChild?._item
 
+  # Public: Read-only previous sibling {Item}.
+  previousSibling: null
   @property 'previousSibling',
     get: -> @_liOrRootUL.previousElementSibling?._item
 
+  # Public: Read-only next sibling {Item}.
+  nextSibling: null
   @property 'nextSibling',
     get: -> @_liOrRootUL.nextElementSibling?._item
 
@@ -69,12 +97,18 @@ class Item
   @property 'isRoot',
     get: -> @id == Constants.RootID
 
+  # Public: Read-only previous branch {Item}.
+  previousBranch: null
   @property 'previousBranch',
     get: -> @previousSibling or @previousItem
 
+  # Public: Read-only next branch {Item}.
+  nextBranch: null
   @property 'nextBranch',
     get: -> @lastDescendantOrSelf.nextItem
 
+  # Public: Read-only ancestor items {Array}.
+  ancestors: null
   @property 'ancestors',
     get: ->
       ancestors = []
@@ -84,6 +118,8 @@ class Item
         each = each.parent
       ancestors
 
+  # Public: Read-only descendant items {Array}.
+  descendants: null
   @property 'descendants',
     get: ->
       descendants = []
@@ -94,6 +130,8 @@ class Item
         each = each.nextItem
       return descendants
 
+  # Public: Read-only last descendant {Item}.
+  lastDescendant: null
   @property 'lastDescendant',
     get: ->
       each = @lastChild
@@ -104,6 +142,8 @@ class Item
   @property 'lastDescendantOrSelf',
     get: -> @lastDescendant or this
 
+  # Public: Read-only previous {Item} in outline order.
+  previousItem: null
   @property 'previousItem',
     get: ->
       previousSibling = @previousSibling
@@ -119,6 +159,8 @@ class Item
   @property 'previousItemOrRoot',
     get: -> @previousItem or @parent
 
+  # Public: Read-only next {Item} in outline order.
+  nextItem: null
   @property 'nextItem',
     get: ->
       firstChild = @firstChild
@@ -138,6 +180,8 @@ class Item
 
       null
 
+  # Public: Read-only {Boolean}
+  hasChildren: null
   @property 'hasChildren',
     get: ->
       ul = _childrenUL(@_liOrRootUL)
@@ -146,6 +190,8 @@ class Item
       else
         false
 
+  # Public: Read-only child items {Array}
+  children: null
   @property 'children',
     get: ->
       children = []
@@ -155,15 +201,24 @@ class Item
         each = each.nextSibling
       children
 
-  @property 'branchHTML',
-    get: -> @_liOrRootUL.outerHTML
+  # Public: Returns a duplicate of this item. Clones are always deep, the
+  # entire outline rooted at this item is also cloned.
+  cloneItem: ->
+    @outline.cloneItem(this)
 
-  copyItem: ->
-    @outline.copyItem(this)
-
+  # Public: Returns a {Boolean} value indicating whether an item is a
+  # descendant of this item.
+  #
+  # * `item`
   contains: (item) ->
     @_liOrRootUL.contains(item._liOrRootUL)
 
+  # Public: Compares the position of this item against another item in the
+  # outline.
+  #
+  # * `item` The {Item} to compare against.
+  #
+  # Returns the same bitmask as [Node.compareDocumentPosition()](https://developer.mozilla.org/en-US/docs/Web/API/Node.compareDocumentPosition)
   comparePosition: (item) ->
     @_liOrRootUL.compareDocumentPosition(item._liOrRootUL)
 
@@ -171,6 +226,8 @@ class Item
   Section: Attributes
   ###
 
+  # Public: Read-only {Array} of attribute names.
+  attributeNames: null
   @property 'attributeNames',
     get: ->
       namedItemMap = @_liOrRootUL.attributes
@@ -184,20 +241,32 @@ class Item
 
       attributeNames
 
+  # Public: Returns a {Boolean} value indicating whether the item has the
+  # specified attribute or not.
+  #
+  # * `name` The attribute name as a string.
   hasAttribute: (name) ->
-    assert.ok(name != 'id', 'id is reserved attribute name')
     @_liOrRootUL.hasAttribute(name)
 
-  attribute: (name) ->
-    assert.ok(name != 'id', 'id is reserved attribute name')
+  # Public: Returns the value of a specified attribute. If the given attribute
+  # does not exist, the value returned will either be null or "".
+  #
+  # * `name` The attribute name as a string.
+  getAttribute: (name) ->
     @_liOrRootUL.getAttribute(name) or undefined
 
+  # Public: Adds a new attribute or changes the value of an existing
+  # attribute. `id` is reserved, and excpetion is thrown if you set the `id`
+  # attribute.
+  #
+  # * `name` The attribute name as a string.
+  # * `value` The new attribute value.
   setAttribute: (name, value) ->
     outline = @outline
     isInOutline = @isInOutline
 
     if isInOutline
-      oldValue = @attribute(name)
+      oldValue = @getAttribute(name)
       outline.undoManager.registerUndoOperation =>
         @setAttribute(name, oldValue)
       outline.beginUpdates()
@@ -226,6 +295,8 @@ class Item
   Section: Body Text
   ###
 
+  # Public: Plain text content of this item.
+  bodyText: null
   @property 'bodyText',
     get: ->
       # Avoid creating attributed string if not already created. Syntax
@@ -238,6 +309,8 @@ class Item
     set: (text) ->
       @replaceBodyTextInRange(text, 0, @bodyText.length)
 
+  # Public: HTML text content of this item.
+  bodyHTML: null
   @property 'bodyHTML',
     get: -> _bodyP(@_liOrRootUL).innerHTML
     set: (html) ->
@@ -245,9 +318,13 @@ class Item
       p.innerHTML = html
       @attributedBodyText = ItemBodyEncoder.elementToAttributedString(p, true)
 
+  # Public: Length of body text.
+  bodyTextLength: null
   @property 'bodyTextLength',
     get: -> @bodyText.length
 
+  # Public: {AttributedString} text content of this item.
+  attributedBodyText: null
   @property 'attributedBodyText',
     get: ->
       if @isRoot
@@ -257,16 +334,41 @@ class Item
     set: (attributedText) ->
       @replaceBodyTextInRange(attributedText, 0, @bodyTextLength);
 
+  # Public: Returns an {AttributedString} substring of this item's body text.
+  #
+  # * `location` Substring's strart location.
+  # * `length` Length of substring to extract.
   attributedBodyTextSubstring: (location, length) ->
     @attributedBodyText.attributedSubstring(location, length)
 
+  # Public: Returns an {Object} with attribute values for an element with a
+  # given `tagName` at the given character index and by reference the
+  # range over which the element applies.
+  #
+  # - `tagName` Tag name of the element.
+  # - `index` The character index.
+  # - `effectiveRange` {Object} whose `location` and `length` properties will be set to effective range of element.
+  # - `longestEffectiveRange` {Object} whose `location` and `length` properties will be set to longest effective range of element.
   elementAtBodyTextIndex: (tagName, index, effectiveRange, longestEffectiveRange) ->
     assert(tagName == tagName.toUpperCase(), 'Tag Names Must be Uppercase')
     @attributedBodyText.attributeAtIndex(tagName, index, effectiveRange, longestEffectiveRange)
 
+  # Public: Returns an {Object} with keys for each element at the given
+  # character index, and by reference the range over which the elements apply.
+  #
+  # - `index` The character index.
+  # - `effectiveRange` {Object} whose `location` and `length` properties will be set to effective range of element.
+  # - `longestEffectiveRange` {Object} whose `location` and `length` properties will be set to longest effective range of element.
   elementsAtBodyTextIndex: (index, effectiveRange, longestEffectiveRange) ->
     @attributedBodyText.attributesAtIndex index, effectiveRange, longestEffectiveRange
 
+  # Public: Adds an element with the given tagName and attributes to the
+  # characters in the specified range.
+  #
+  # - `tagName` Tag name of the element.
+  # - `attributes` Element attributes.
+  # - `location` Start location character index.
+  # - `length` Range length.
   addElementInBodyTextRange: (tagName, attributes, location, length) ->
     elements = {}
     elements[tagName] = attributes
@@ -279,6 +381,12 @@ class Item
     changedText.addAttributesInRange(elements, 0, length)
     @replaceBodyTextInRange(changedText, location, length)
 
+  # Public: Removes the element with the tagName from the characters in the
+  # specified range.
+  #
+  # - `tagName` Tag name of the element.
+  # - `location` Start location character index.
+  # - `length` Range length.
   removeElementInBodyTextRange: (tagName, location, length) ->
     assert(tagName == tagName.toUpperCase(), 'Tag Names Must be Uppercase')
     @removeElementsInBodyTextRange([tagName], location, length)
@@ -295,6 +403,11 @@ class Item
 
   insertImageInBodyTextAtLocation: (location, image) ->
 
+  # Public: Replace body text in the given range.
+  #
+  # - `insertedText` {String} or {AttributedString}
+  # - `location` Start location character index.
+  # - `length` Range length.
   replaceBodyTextInRange: (insertedText, location, length) ->
     attributedBodyText = @attributedBodyText
     isInOutline = @isInOutline
@@ -357,9 +470,21 @@ class Item
   Section: Children
   ###
 
-  insertChildBefore: (child, referenceSibling) ->
-    @insertChildrenBefore([child], referenceSibling)
+  # Public: Insert the new child item before the referenced sibling in this
+  # item's list of children. If referenceSibling isn't defined the item is
+  # inserted at the end.
+  #
+  # * `insertedChild` The inserted child {Item}.
+  # * `referenceSibling` The referenced {Item} sibling.
+  insertChildBefore: (insertedChild, referenceSibling) ->
+    @insertChildrenBefore([insertedChild], referenceSibling)
 
+  # Public: Insert the new children before the referenced sibling
+  # in this item's list of children. If referenceSibling isn't defined the new
+  # children are inserted at the end.
+  #
+  # * `children` The array of {Items}'s to insert.
+  # * `referenceSibling` The referenced {Item} sibling.
   insertChildrenBefore: (children, referenceSibling) ->
     _aliasChildren = (children) ->
       aliases = []
@@ -407,12 +532,21 @@ class Item
 
     _childrenUL(@_liOrRootUL, true).insertBefore(documentFragment, referenceSiblingLI)
 
+  # Public: Append the new children to this item's list of children.
+  #
+  # * `children` The children to append.
   appendChildren: (children) ->
     @insertChildrenBefore(children)
 
+  # Public: Append the new child to this item's list of children.
+  #
+  # * `child` The child to append.
   appendChild: (child) ->
     @insertChildrenBefore([child])
 
+  # Public: Remove the children from this item's list of children.
+  #
+  # * `children` The array children {Items}'s to remove.
   removeChildren: (children) ->
     if not children.length
       return
@@ -482,11 +616,47 @@ class Item
       for each in siblingChildren
         each._liOrRootUL.parentNode.removeChild(each._liOrRootUL)
 
+  # Public: Remove the given child from this item's list of children.
+  #
+  # * `child` The child to remove.
   removeChild: (child) ->
     @removeChildren([child])
 
+  # Public: Remove this item from it's parent item if it has a parent.
   removeFromParent: ->
     @parent?.removeChild(this)
+
+  @coverItems: (items) ->
+    coverItems = []
+    itemIDs = {}
+
+    for each in items
+      itemIDs[each.id] = true
+
+    for each in items
+      p = each.parent
+      while p and not itemIDs[p.id]
+        p = p.parent
+      unless p
+        coverItems.push each
+
+    coverItems
+
+  @itemsWithAncestors: (items) ->
+    ancestorsAndItems = []
+    addedIDs = {}
+
+    for each in items
+      index = ancestorsAndItems.length
+      while each
+        if addedIDs[each.id]
+          continue
+        else
+          ancestorsAndItems.splice(index, 0, each)
+          addedIDs[each.id] = true
+        each = each.parent
+
+    ancestorsAndItems
 
   ###
   Section: Aliases
@@ -515,9 +685,11 @@ class Item
   Section: Debug
   ###
 
+  # Extended: Returns debug string for this item.
   toString: (indent) ->
     (indent or '') + '(' + @id + ') ' + @bodyHTML
 
+  # Extended: Returns debug string for this branch.
   branchToString: (indent) ->
     indent ?= ''
     results = [@toString(indent)]
@@ -525,41 +697,9 @@ class Item
       results.push(each.branchToString(indent + '    '))
     results.join('\n')
 
-  ###
-  Section: Static Methods
-  ###
-
-  @coverItems = (items) ->
-    coverItems = []
-    itemIDs = {}
-
-    for each in items
-      itemIDs[each.id] = true
-
-    for each in items
-      p = each.parent
-      while p and not itemIDs[p.id]
-        p = p.parent
-      unless p
-        coverItems.push each
-
-    coverItems
-
-  @itemsWithAncestors = (items) ->
-    ancestorsAndItems = []
-    addedIDs = {}
-
-    for each in items
-      index = ancestorsAndItems.length
-      while each
-        if addedIDs[each.id]
-          continue
-        else
-          ancestorsAndItems.splice(index, 0, each)
-          addedIDs[each.id] = true
-        each = each.parent
-
-    ancestorsAndItems
+  # Extended: Returns debug HTML string for this branch.
+  branchToHTML: ->
+    @_liOrRootUL.outerHTML
 
 ###
 Section: Util Functions

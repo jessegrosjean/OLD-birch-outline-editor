@@ -59,7 +59,7 @@ class OutlineEditorElement extends HTMLElement
 
     # Register directly on this element because Atom app handles this event
     # meaning that the event delegation path won't get called
-    @dragSubscription = EventRegistery.add this,
+    @dragSubscription = EventRegistery.listen this,
       dragstart: @onDragStart
       drag: @onDrag
       dragend: @onDragEnd
@@ -93,7 +93,7 @@ class OutlineEditorElement extends HTMLElement
     li = document.createElement('LI')
 
     for eachName in item.attributeNames
-      value = item.attribute(eachName)
+      value = item.getAttribute(eachName)
       if value
         li.setAttribute(eachName, value)
 
@@ -389,7 +389,7 @@ class OutlineEditorElement extends HTMLElement
     itemViewLI = @itemViewLIForItem(item)
     if itemViewLI
       if item.hasAttribute(attributeName)
-        itemViewLI.setAttribute(attributeName, item.attribute(attributeName))
+        itemViewLI.setAttribute(attributeName, item.getAttribute(attributeName))
       else
         itemViewLI.removeAttribute(attributeName)
 
@@ -770,12 +770,15 @@ class OutlineEditorElement extends HTMLElement
       @_extendingSelection = true
       @_extendingSelectionLastScrollTop = editor.outlineEditorElement.scrollTop
       @_extendSelectionDisposables = new CompositeDisposable(
-        EventRegistery.add('*', 'mouseup', @onDocumentMouseUp.bind(this)),
-        EventRegistery.add('.beditor', 'mousemove', Util.debounce(@onEditorMouseMove.bind(this))),
-        EventRegistery.add(this, 'scroll', Util.debounce(@onEditorScroll.bind(this)))
+        EventRegistery.listen(document, 'mouseup', @onDocumentMouseUp.bind(this)), # Listen to document otherwise will miss some mouse ups
+        EventRegistery.listen('.beditor', 'mousemove', Util.debounce(@onMouseMove.bind(this))),
+        EventRegistery.listen(this, 'scroll', Util.debounce(@onScroll.bind(this))) # Listen directly to self since scroll doesn't bubble
       )
 
-  onEditorMouseMove: (e) ->
+  onContextMenu: (e) ->
+    picked = @pick e.clientX, e.clientY
+
+  onMouseMove: (e) ->
     pick = @pick(e.clientX, e.clientY)
     caretPosition = pick.itemCaretPosition
 
@@ -784,7 +787,7 @@ class OutlineEditorElement extends HTMLElement
         e.preventDefault()
       @editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
-  onEditorScroll: (e) ->
+  onScroll: (e) ->
     lastScrollTop = @_extendingSelectionLastScrollTop
     scrollTop = @scrollTop
     item
@@ -861,6 +864,11 @@ class OutlineEditorElement extends HTMLElement
     draggedItem = @_draggedItemForEvent e
     dropTarget = @_dropTargetForEvent e
 
+    unless e.ctrlKey or e.altKey
+      e.dataTransfer.dropEffect = 'move'
+
+
+    ###
     if e.ctrlKey
       e.dataTransfer.dropEffect = 'link'
     else if e.altKey
@@ -872,6 +880,7 @@ class OutlineEditorElement extends HTMLElement
       e.dataTransfer.dropEffect = 'none'
       dropTarget.parent = null
       dropTarget.insertBefore = null
+    ###
 
     @editor.debouncedSetDragState
       'draggedItem': draggedItem
@@ -900,11 +909,15 @@ class OutlineEditorElement extends HTMLElement
       #Pasteboard.setClipboardEvent(null);
 
     if draggedItem and dropParentItem
+      console.log 'dropEffect: ' + dropEffect
+      console.log 'e.dataTransfer.dropEffect: ' + e.dataTransfer.dropEffect
+      console.log 'effectAllowed: ' + e.dataTransfer.effectAllowed
+
       insertNode
       if dropEffect == 'move'
         insertNode = draggedItem
       else if dropEffect == 'copy'
-        insertNode = draggedItem.copyItem()
+        insertNode = draggedItem.cloneItem()
       else if dropEffect == 'link'
         console.log 'link'
 
@@ -1093,11 +1106,14 @@ stopEventPropagationAndGroupUndo = (commandListeners) ->
 Event and Command registration
 ###
 
-EventRegistery.add 'input[is="outline-editor-focus"]', stopEventPropagation(
+EventRegistery.listen 'input[is="outline-editor-focus"]', stopEventPropagation(
   'cut': (e) -> @parentElement.editor.cutSelection(e.clipboardData)
   'copy': (e) -> @parentElement.editor.copySelection(e.clipboardData)
   'paste': (e) -> @parentElement.editor.pasteToSelection(e.clipboardData)
 )
+
+EventRegistery.listen 'outline-editor',
+  'contextmenu': (e) -> @onContextMenu(e)
 
 clipboardAsDatatransfer =
   getData: (type) -> atom.clipboard.read()
@@ -1137,13 +1153,13 @@ atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(
   'editor:demote-trailing-sibling-rows': -> @editor.demoteTrailingSiblingItems()
   'deleteItemsBackward': -> @editor.deleteItemsBackward()
   'deleteItemsForward': -> @editor.deleteItemsForward()
-  'editor:toggle-bold': -> @editor.toggleBold()
-  'editor:toggle-italic': -> @editor.toggleItalic()
-  'editor:toggle-underline': -> @editor.toggleUnderline()
-  'editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
+  'outline-editor:toggle-bold': -> @editor.toggleBold()
+  'outline-editor:toggle-italic': -> @editor.toggleItalic()
+  'outline-editor:toggle-underline': -> @editor.toggleUnderline()
+  'outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
-  'outline-editor:toggle-done': -> @editor.toggleDone()
+  'outline-outline-editor:toggle-done': -> @editor.toggleDone()
 )
 
 atom.commands.add 'outline-editor', stopEventPropagation(
@@ -1202,7 +1218,7 @@ atom.commands.add 'outline-editor', stopEventPropagation(
   'core:page-down': -> @editor.pageDown()
   'editor:fold-current-row': -> @editor.foldItems()
   'editor:unfold-current-row': -> @editor.unfoldItems()
-  'outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
+  'outline-outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
 
 )
 

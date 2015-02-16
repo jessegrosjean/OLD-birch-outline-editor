@@ -11,6 +11,44 @@ assert = require 'assert'
 Item = require './Item'
 Q = require 'q'
 
+# Essential: A mutable outline of {Item}'s.
+#
+# Use the outline to create new items, find existing items, and watch for
+# changes in the outline's items.
+#
+# Outlines are also responsible for loading and saving outlines to disk.
+#
+# Outlines internally uses a HTMLDocument to store the outline state using
+# a restricted set of HTML elements. As an example this outline:
+#
+# - one
+# - t**w**o
+#   - three
+#
+# Is stored like this:
+#
+# ```
+# <html>
+#   <body>
+#     <ul id="Birch.Root">
+#       <li id="my7pJv4v">
+#         <p>one</p>
+#       </li>
+#       <li id="mJ46JwEv">
+#         <p>t<b>w</b>o</p>
+#         <ul>
+#           <li id="QyLTkw4v">
+#             <p>three</p>
+#           </li>
+#         </ul>
+#       </li>
+#     </ul>
+#   </body>
+# </html>
+# ```
+#
+# You should not manipulate this structure directly, but you can
+# query it using {::evaluateXPath}.
 class Outline
   atom.deserializers.add(this)
 
@@ -39,6 +77,16 @@ class Outline
         Outline.pathsToOutlines[filePath] = outline
     outline
 
+  ###
+  Section: Construction
+  ###
+
+  # Public: Create a new outline with the given params.
+  #
+  # * `params` {Object}
+  #   * `load` A {Boolean}, `true` to asynchronously load the outline from disk
+  #     after initialization.
+  #   * `filePath` The filePath of loading from disk.
   constructor: (params) ->
     @outlineStore = @createOutlineStoreIfNeeded(params?.outlineStore)
 
@@ -102,33 +150,87 @@ class Outline
   Section: Event Subscription
   ###
 
+  # Public: Invoke the given callback synchronously when the content of the
+  # outline changes.
+  #
+  # * `callback` {Function} to be called when the outline changes.
+  #   * `event` {OutlineChange} with the following keys:
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChange: (callback) ->
     @emitter.on 'did-change', callback
 
   onDidStopChanging: (callback) ->
     @emitter.on 'did-stop-changing', callback
 
+  # Public: Invoke the given callback when the in-memory contents of the
+  # outline become in conflict with the contents of the file on disk.
+  #
+  # * `callback` {Function} to be called when the outline enters conflict.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidConflict: (callback) ->
     @emitter.on 'did-conflict', callback
 
+  # Public: Invoke the given callback when the value of {::isModified} changes.
+  #
+  # * `callback` {Function} to be called when {::isModified} changes.
+  #   * `modified` {Boolean} indicating whether the outline is modified.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeModified: (callback) ->
     @emitter.on 'did-change-modified', callback
 
+  # Public: Invoke the given callback when the value of {::getPath} changes.
+  #
+  # * `callback` {Function} to be called when the path changes.
+  #   * `path` {String} representing the outline's current path on disk.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangePath: (callback) ->
     @emitter.on 'did-change-path', callback
 
+  # Public: Invoke the given callback before the outline is saved to disk.
+  #
+  # * `callback` {Function} to be called before the outline is saved.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onWillSave: (callback) ->
     @emitter.on 'will-save', callback
 
+  # Public: Invoke the given callback after the outline is saved to disk.
+  #
+  # * `callback` {Function} to be called after the outline is saved.
+  #   * `event` {Object} with the following keys:
+  #     * `path` The path to which the outline was saved.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidSave: (callback) ->
     @emitter.on 'did-save', callback
 
+  # Public: Invoke the given callback before the outline is reloaded from the
+  # contents of its file on disk.
+  #
+  # * `callback` {Function} to be called before the outline is reloaded.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onWillReload: (callback) ->
     @emitter.on 'will-reload', callback
 
+  # Public: Invoke the given callback after the outline is reloaded from the
+  # contents of its file on disk.
+  #
+  # * `callback` {Function} to be called after the outline is reloaded.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidReload: (callback) ->
     @emitter.on 'did-reload', callback
 
+  # Public: Invoke the given callback when the outline is destroyed.
+  #
+  # * `callback` {Function} to be called when the outline is destroyed.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
 
@@ -138,10 +240,15 @@ class Outline
   Section: Reading Items
   ###
 
+  # Public: Determine whether the outline is empty.
+  #
+  # Returns a {Boolean}.
   isEmpty: ->
     firstChild = @root.firstChild
     not firstChild or (not firstChild.nextItem and firstChild.bodyTextLength == 0)
 
+  # Public: Returns {Item} for given id.
+  # * `id` {String} id.
   itemForID: (id) ->
     @outlineStore.getElementById(id)?._item
 
@@ -155,9 +262,21 @@ class Outline
         items.push each
     items
 
+  # Public: Returns an {Array} of all {Item}s in the outline (except for the
+  # root) in outline order.
   items: ->
     @root.descendants
 
+  # Public: XPath query internal HTML structure for matching {Items}.
+  #
+  # Items are considered to match if they, or if a node contained in their
+  # body text matches the XPath.
+  #
+  # Returns an {Array} of all {Item} matching the
+  # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
+  #
+  # - `xpathExpression` {String} xpath expression
+  # - `namespaceResolver` {String} xpath expression
   itemsForXPath: (xpathExpression, namespaceResolver) ->
     xpathResult = @evaluateXPath(xpathExpression, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE)
     each = xpathResult.iterateNext()
@@ -176,6 +295,21 @@ class Outline
 
     return items
 
+  # Public: XPath query internal HTML structure.
+  #
+  # This query evaluates on the underlying HTML store. All results are
+  # considered immutable. Please refere to the standard
+  # [document.evaluate](https://developer.mozilla.org/en-
+  # US/docs/Web/API/document.evaluate) documentation for more information.
+  #
+  # Returns an [XPathResult](https://developer.mozilla.org/en-
+  # US/docs/XPathResult) based on an [XPath](https://developer.mozilla.org/en-
+  # US/docs/Web/XPath) expression and other given parameters.
+  #
+  # - `xpathExpression`
+  # - `namespaceResolver`
+  # - `resultType`
+  # - `result`
   evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
     @outlineStore.evaluate(xpathExpression, @root._liOrRootUL, namespaceResolver, resultType, result)
 
@@ -183,11 +317,15 @@ class Outline
   Section: Creating and Mutating Items
   ###
 
+  # Public: Create a new item. The new item is owned by this outline, but is
+  # not yet inserted into it so it won't be visible until you insert it.
+  #
+  # - `text` {String} or {AttributedString}.
   createItem: (text, li, remapIDCallback) ->
     new Item(@, text, li or @createStoreLI(), remapIDCallback)
 
-  copyItem: (item) ->
-    assert.ok(not item.isRoot, 'Can not copy root')
+  cloneItem: (item) ->
+    assert.ok(not item.isRoot, 'Can not clone root')
     assert.ok(item.outline == @, 'Item must be owned by this outline')
     @createItem(null, item._liOrRootUL.cloneNode(true))
 
@@ -198,7 +336,7 @@ class Outline
 
   aliasItem: (item) ->
     assert.ok(!item.isRoot, 'Can not alias root item');
-    alias = @copyItem(item)
+    alias = @cloneItem(item)
     aliases = item._aliases
     end = item.nextBranch
     eachAlias = alias
@@ -255,14 +393,31 @@ class Outline
       outline.endUpdates()
 
   ###
+  Section: Undo
+  ###
+
+  # Essential: Undo the last change.
+  undo: ->
+    @undoManager.undo()
+
+  # Essential: Redo the last change.
+  redo: ->
+    @undoManager.redo()
+
+  ###
   Section: Updates
   ###
 
+  # Public: Returns {true} if outline is updating.
   isUpdating: -> @updateCount != 0
 
+  # Public: Begin grouping changes into a single {OutlineChange} event. Must
+  # later call {::endUpdates} to balance this call.
   beginUpdates: ->
     if ++@updateCount == 1 then @updateMutations = []
 
+  # Public: End grouping changes. Must call to balance a previous
+  # {::beginUpdates} call.
   endUpdates: ->
     if --@updateCount == 0
       updateMutations = @updateMutations;
@@ -278,14 +433,30 @@ class Outline
   Section: File Details
   ###
 
+  # Public: Determine if the in-memory contents of the outline differ from its
+  # contents on disk.
+  #
+  # If the outline is unsaved, always returns `true` unless the outline is empty.
+  #
+  # Returns a {Boolean}.
   isModified: ->
     @changeCount != 0
 
+  # Public: Determine if the in-memory contents of the outline conflict with the
+  # on-disk contents of its associated file.
+  #
+  # Returns a {Boolean}.
   isInConflict: -> @conflict
 
+  # Public: Get the path of the associated file.
+  #
+  # Returns a {String}.
   getPath: ->
     @file?.getPath()
 
+  # Public: Set the path for the outlines's associated file.
+  #
+  # * `filePath` A {String} representing the new file path
   setPath: (filePath) ->
     return if filePath == @getPath()
 
@@ -308,9 +479,13 @@ class Outline
   Section: File Content Operations
   ###
 
+  # Public: Save the outline.
   save: (editor) ->
     @saveAs @getPath(), editor
 
+  # Public: Save the outline at a specific path.
+  #
+  # * `filePath` The path to save at.
   saveAs: (filePath, editor) ->
     unless filePath then throw new Error("Can't save outline with no file path")
 
@@ -323,6 +498,9 @@ class Outline
     @emitModifiedStatusChanged(false)
     @emitter.emit 'did-save', {path: filePath}
 
+  # Public: Reload the outlines's contents from disk.
+  #
+  # Sets the outlines's content to the cached disk contents
   reload: ->
     @emitter.emit 'will-reload'
 

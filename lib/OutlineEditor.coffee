@@ -22,6 +22,26 @@ Item = require './Item'
 Util = require './Util'
 path = require 'path'
 
+# Public: This class represents all essential editing state for a single
+# {Outline}, including hoisted items, filtering items, expanded items, and
+# item selection.
+#
+# A single {Outline} can belong to multiple editors. For example, if the
+# same file is open in two different panes, Atom creates a separate editor for
+# each pane. If the outline is manipulated the changes are reflected in both
+# editors, but each maintains its own selection, expanded items, etc.
+#
+# ## Accessing OutlineEditor Instances
+#
+# The easiest way to get hold of `OutlineEditor` objects is by registering a callback
+# with `::observeOutlineEditors` on the `atom.workspace` global. Your callback will
+# then be called with all current editor instances and also when any editor is
+# created in the future.
+#
+# ```coffee
+# atom.workspace.observeOutlineEditors (editor) ->
+#   editor.insertItem('Hello World!')
+# ```
 module.exports =
 class OutlineEditor extends Model
   atom.deserializers.add(this)
@@ -160,6 +180,13 @@ class OutlineEditor extends Model
     @emitter.emit 'did-destroy'
 
   ###
+  Section: Properties
+  ###
+
+  # Public: The Edited {Outline}
+  outline: null
+
+  ###
   Section: Event Subscription
   ###
 
@@ -188,9 +215,13 @@ class OutlineEditor extends Model
   Section: Hoisting Items
   ###
 
+  # Public: Returns the current hoisted {Item}.
   hoistedItem: ->
     @_hoistStack[@_hoistStack.length - 1]
 
+  # Public: Push a new hoisted {Item}.
+  #
+  # - `item` {Item} to hoist.
   hoist: (item) ->
     item ?= @selectionRange().focusItem
     if item and item != @hoistedItem()
@@ -199,6 +230,7 @@ class OutlineEditor extends Model
       @setHoistedItemsStack(stack)
       @moveSelectionRange(@firstVisibleChild(item))
 
+  # Public: Pop the current hoisted {Item}.
   unhoist: ->
     stack = @_hoistStack.slice()
     lastHoisted = stack.pop()
@@ -239,9 +271,16 @@ class OutlineEditor extends Model
   Section: Expanding Items
   ###
 
+  # Public: Returns true if the item is expanded.
+  #
+  # - `item` {Item} to test.
   isExpanded: (item) ->
     return item and @editorState(item).expanded
 
+  # Public: Set expanded state of items.
+  #
+  # - `items` {Item} or {Array} of items.
+  # - `expanded` The {Boolean} expanded state.
   setExpanded: (items, expanded) ->
     items ?= @selectionRange().rangeItemsCover
 
@@ -363,6 +402,25 @@ class OutlineEditor extends Model
   Section: Item Visibility
   ###
 
+  # Public: Returns first visible {Item} in editor.
+  firstVisibleItem: ->
+    @nextVisibleItem(@hoistedItem())
+
+  # Public: Returns last visible {Item} in editor.
+  lastVisibleItem: ->
+    last = @hoistedItem().lastDescendantOrSelf
+    if @isVisible(last)
+      last
+    else
+      @previousVisibleItem(last)
+
+  # Public: Determine if an {Item} is visible. An item is visible if it
+  # descends from the current hoisted item, and it isn't filtered, and all
+  # ancestors up to hoisted node are expanded.
+  #
+  # - `item` {Item} to test.
+  #
+  # Returns {Boolean} indicating if item is visible.
   isVisible: (item) ->
     parent = item?.parent
     hoistedItem = @hoistedItem()
@@ -379,6 +437,9 @@ class OutlineEditor extends Model
     if @isVisible(item?.parent)
       item.parent
 
+  # Public: Returns previous visible sibling {Item} relative to given item.
+  #
+  # - `item` {Item}
   previousVisibleSibling: (item) ->
     item = item?.previousSibling
     while item
@@ -386,6 +447,9 @@ class OutlineEditor extends Model
         return item
       item = item.previousSibling
 
+  # Public: Returns next visible sibling {Item} relative to given item.
+  #
+  # - `item` {Item}
   nextVisibleSibling: (item) ->
     item = item?.nextSibling
     while item
@@ -393,16 +457,9 @@ class OutlineEditor extends Model
         return item
       item = item.nextSibling
 
-  firstVisibleItem: ->
-    @nextVisibleItem(@hoistedItem())
-
-  lastVisibleItem: ->
-    last = @hoistedItem().lastDescendantOrSelf
-    if @isVisible(last)
-      last
-    else
-      @previousVisibleItem(last)
-
+  # Public: Returns next visible {Item} relative to given item.
+  #
+  # - `item` {Item}
   nextVisibleItem: (item) ->
     item = item?.nextItem
     while item
@@ -410,6 +467,9 @@ class OutlineEditor extends Model
         return item
       item = item.nextItem
 
+  # Public: Returns previous visible {Item} relative to given item.
+  #
+  # - `item` {Item}
   previousVisibleItem: (item) ->
     item = item?.previousItem
     while item
@@ -417,12 +477,18 @@ class OutlineEditor extends Model
         return item
       item = item.previousItem
 
+  # Public: Returns first visible child {Item} relative to given item.
+  #
+  # - `item` {Item}
   firstVisibleChild: (item) ->
     firstChild = item?.firstChild
     if @isVisible(firstChild)
       return firstChild
     @nextVisibleSibling(firstChild)
 
+  # Public: Returns last visible child {Item} relative to given item.
+  #
+  # - `item` {Item}
   lastVisibleChild: (item) ->
     lastChild = item?.lastChild
     if @isVisible(lastChild)
@@ -436,6 +502,9 @@ class OutlineEditor extends Model
     else
       item
 
+  # Public: Returns previous visible branch {Item} relative to given item.
+  #
+  # - `item` {Item}
   previousVisibleBranch: (item) ->
     previousBranch = item?.previousBranch
     if @isVisible(previousBranch)
@@ -443,6 +512,9 @@ class OutlineEditor extends Model
     else
       @previousVisibleBranch(previousBranch)
 
+  # Public: Returns next visible branch {Item} relative to given item.
+  #
+  # - `item` {Item}
   nextVisibleBranch: (item) ->
     nextBranch = item?.nextBranch
     if @isVisible(nextBranch)
@@ -454,6 +526,7 @@ class OutlineEditor extends Model
   Section: Select Items
   ###
 
+  # Public: Returns {Boolean} indicating if this editor has focus.
   isFocused: ->
     if @_overrideIsFocused
       true
@@ -462,15 +535,21 @@ class OutlineEditor extends Model
       outlineEditorElement = @outlineEditorElement
       activeElement and (outlineEditorElement == activeElement or outlineEditorElement.contains(activeElement))
 
+  # Public: Returns {Boolean} indicating if given item is selected.
+  #
+  # - `item` {Item}
   isSelected: (item) ->
     @editorState(item).selected
 
+  # Public: Returns `true` if is selecting at item level.
   isItemMode: ->
     @_selectionRange.isItemMode
 
+  # Public: Returns `true` if is selecting at text level.
   isTextMode: ->
     @_selectionRange.isTextMode
 
+  # Public: Returns current {OutlineEditorRange}.
   selectionRange: ->
     @_selectionRange
 
@@ -483,6 +562,7 @@ class OutlineEditor extends Model
   setSelectionVerticalAnchor: (selectionVerticalAnchor) ->
     @_selectionVerticalAnchor = selectionVerticalAnchor
 
+  # Public: Focus this editor.
   focus: ->
     @outlineEditorElement.focus()
 
@@ -634,6 +714,12 @@ class OutlineEditor extends Model
         else
           @moveSelectionRange(item, 0, item, textLength)
 
+  # Public: Set a new selection range.
+  #
+  # - `focusItem` Selection focus {Item}
+  # - `focusOffset` Selection focus offset index. Or `undefined` when selecting at item level.
+  # - `anchorItem` Selection anchor {Item}
+  # - `anchorOffset` Selection anchor offset index. Or `undefined` when selecting at item level.
   moveSelectionRange: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
     @_textModeExtendingFromSnapbackRange = null
     @_updateSelectionRangeIfNeeded(@createOutlineEditorRange(focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity))
@@ -782,6 +868,11 @@ class OutlineEditor extends Model
   Section: Insert Items
   ###
 
+  # Public: Insert text at current selection. If is in text selection mode the
+  # current text selection will get replaced with this text. If in item
+  # selection mode a new item will get inserted.
+  #
+  # - `text` Text {String} or {AttributedString} to insert
   insertText: (insertedText) ->
     selectionRange = @selectionRange()
     undoManager = @outline.undoManager
@@ -823,7 +914,12 @@ class OutlineEditor extends Model
     else
       @insertItem()
 
-  insertItem: (text, above) ->
+  # Public: Insert item at current selection.
+  #
+  # Returns the new {Item}
+  #
+  # - `text` Text {String} or {AttributedString} of new item.
+  insertItem: (text, above=false) ->
     text ?= ''
     selectedItems = @selectionRange().rangeItems
     insertBefore
@@ -1239,9 +1335,11 @@ class OutlineEditor extends Model
   Section: Undo
   ###
 
+  # Essential: Undo the last change.
   undo: ->
     @outline.undoManager.undo()
 
+  # Essential: Redo the last change.
   redo: ->
     @outline.undoManager.redo()
 
@@ -1428,3 +1526,38 @@ class OutlineEditor extends Model
           range: range
 
     result
+
+###
+# Essential: Get all outline editors in the workspace.
+#
+# Returns an {Array} of {OutlineEditor}s.
+atom.workspace.getTextEditors = ->
+  @getPaneItems().filter (item) -> item instanceof OutlineEditor
+
+# Extended: Invoke the given callback when an outline editor is added to the
+# workspace.
+#
+# * `callback` {Function} to be called panes are added.
+#   * `event` {Object} with the following keys:
+#     * `outlineEditor` {OutlineEditor} that was added.
+#     * `pane` {Pane} containing the added outline editor.
+#     * `index` {Number} indicating the index of the added outline editor in its
+#        pane.
+#
+# Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+atom.workspace.onDidAddOutlineEditor = (callback) ->
+  @onDidAddPaneItem ({item, pane, index}) ->
+    callback({outlineEditor: item, pane, index}) if item instanceof OutlineEditor
+
+# Essential: Invoke the given callback with all current and future outline
+# editors in the workspace.
+#
+# * `callback` {Function} to be called with current and future outline editors.
+#   * `editor` An {OutlineEditor} that is present in {::getOutlineEditors} at the time
+#     of subscription or that is added at some later time.
+#
+# Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+atom.workspace.observeOutlineEditors = (callback) ->
+  callback(outlineEditor) for outlineEditor in @getOutlineEditors()
+  @onDidAddOutlineEditor ({outlineEditor}) -> callback(outlineEditor)
+###
