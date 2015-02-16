@@ -1,22 +1,16 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
-  'atom-text-editor': [
-    {
-      'label': 'Toggle birch-outliner'
-      'command': 'birch-outliner:toggle'
-    }
+  'outline-editor': [
+    { label: 'Bold', command: 'outline-editor:toggle-bold' }
+    { label: 'Italic', command: 'outline-editor:toggle-italic' }
+    { label: 'Underline', command: 'outline-editor:toggle-underline' }
+    { type: 'separator' }
   ]
 'menu': [
   {
-    'label': 'Packages'
-    'submenu': [
-      'label': 'birch-outliner'
-      'submenu': [
-        {
-          'label': 'Toggle'
-          'command': 'birch-outliner:toggle'
-        }
-      ]
+    label: 'File'
+    submenu: [
+      { label: 'New Outline', command: 'birch-outliner:new-outline' }
     ]
   }
 ]

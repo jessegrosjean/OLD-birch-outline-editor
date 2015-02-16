@@ -20,15 +20,21 @@ module.exports = BirchOutliner =
   activate: (state) ->
     @subscriptions = new CompositeDisposable
 
+    @subscriptions.add atom.commands.add 'atom-workspace', 'birch-outliner:new-outline': =>
+      atom.workspace.open('outline-editor://new-outline')
+
     @subscriptions.add atom.workspace.addOpener (filePath) =>
-      extension = path.extname(filePath).toLowerCase()
-      switch extension
-        when '.ftml'
-          o = new Outline({
-            filePath: filePath,
-            load: true
-          })
-          new OutlineEditor(o)
+      if filePath is 'outline-editor://new-outline'
+        new OutlineEditor
+      else
+        extension = path.extname(filePath).toLowerCase()
+        switch extension
+          when '.ftml'
+            o = new Outline({
+              filePath: filePath,
+              load: true
+            })
+            new OutlineEditor(o)
 
   deactivate: ->
     @subscriptions.dispose()
