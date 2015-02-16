@@ -24,7 +24,7 @@ describe('Outline', function() {
 
 	it('should copy item', function() {
 		var one = outlineSetup.one;
-		var oneCopy = outline.copyItem(one);
+		var oneCopy = outline.cloneItem(one);
 		oneCopy.isInOutline.should.be.false;
 		oneCopy.id.should.not.equal(one.id);
 		oneCopy.bodyText.should.equal('one');
@@ -131,7 +131,7 @@ describe('Outline', function() {
 			console.profileEnd();
 
 			console.time('Copy Many');
-			branch.copyItem();
+			branch.cloneItem();
 			console.timeEnd('Copy Many');
 
 			console.time('Remove Many');

@@ -17,12 +17,12 @@ class EventRegistery
   destroyed: ->
     @subscribers.dispose()
 
-  add: (target, eventType, callback, useCapture) ->
+  listen: (target, eventType, callback, useCapture=false) ->
     if typeof eventType is 'object'
       events = eventType
       disposable = new CompositeDisposable
       for eventType, callback of events
-        disposable.add @add(target, eventType, callback, useCapture)
+        disposable.add @listen(target, eventType, callback, useCapture)
       return disposable
 
     if typeof target is 'string'

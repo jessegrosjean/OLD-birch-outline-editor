@@ -180,12 +180,12 @@ describe('Item', function() {
 			var twoAlias = outlineSetup.two.aliasItem();
 
 			outlineSetup.two.setAttribute('hello', 'world');
-			outlineSetup.two.attribute('hello').should.equal('world');
-			twoAlias.attribute('hello').should.equal('world');
+			outlineSetup.two.getAttribute('hello').should.equal('world');
+			twoAlias.getAttribute('hello').should.equal('world');
 
 			twoAlias.setAttribute('hello', 'world!');
-			outlineSetup.two.attribute('hello').should.equal('world!');
-			twoAlias.attribute('hello').should.equal('world!');
+			outlineSetup.two.getAttribute('hello').should.equal('world!');
+			twoAlias.getAttribute('hello').should.equal('world!');
 		});
 
 		it('should keep aliased item children in sync on remove', function() {
