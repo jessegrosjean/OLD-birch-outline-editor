@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 OutlineEditor = require './OutlineEditor'
 {CompositeDisposable} = require 'atom'
 Outline = require './Outline'

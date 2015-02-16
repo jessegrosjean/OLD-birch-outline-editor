@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 {Emitter} = require 'atom'
 assert = require 'assert'
 

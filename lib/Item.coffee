@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 ItemBodyUndoOperation = require './ItemBodyUndoOperation'
 AttributedString = require './AttributedString'
 ItemBodyEncoder = require './ItemBodyEncoder'

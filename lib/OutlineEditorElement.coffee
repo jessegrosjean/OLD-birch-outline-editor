@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 OutlineEditorFocusElement = require './OutlineEditorFocusElement'
 ChildrenULAnimation = require './animations/ChildrenULAnimation'
 LIInsertAnimation = require './animations/LIInsertAnimation'

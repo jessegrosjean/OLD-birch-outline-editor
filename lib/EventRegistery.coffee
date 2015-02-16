@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 {Emitter, Disposable, CompositeDisposable} = require 'atom'
 matchesSelector = require 'matches-selector'
 {specificity} = require 'clear-cut'

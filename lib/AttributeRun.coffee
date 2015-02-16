@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 deepEqual = require 'deep-equal'
 
 module.exports =

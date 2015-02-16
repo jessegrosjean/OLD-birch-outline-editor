@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 OutlineEditorElement = require './OutlineEditorElement'
 OutlineChangeDelta = require './OutlineChangeDelta'
 OutlineEditorRange = require './OutlineEditorRange'

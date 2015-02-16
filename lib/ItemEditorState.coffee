@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 # If store item editor state inside individual items then stores no
 # longer need to manually update associated item sets. Instead they
 # just set these flags (keyed by editor ID). In particular, there's
