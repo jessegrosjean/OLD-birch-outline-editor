@@ -11,18 +11,21 @@ Util = require './Util'
 Function::property = (prop, desc) ->
   Object.defineProperty @prototype, prop, desc
 
-# Essential: Represents a paragraph of text in an {Outline}.
+# Essential: A paragraph of text in an {Outline}.
 #
-# Items connect to other items to form a hiearchical outline structure.
+# Items always belong to a particular outline. To create new items use
+# {Outline::createItem}.
 #
-# Items have name/value attributes that you can use to store assocaited data.
-# When storing your own values you should prefix the attribute name with
-# `data-`.
+# Items can contain other items as children to form a hiearchical outline
+# structure.
 #
-# Item text content is availible as plain text, and HTML string, and an
-# AttributedString.
+# Items have a single paragraph of body text. You can access it as plain text,
+# a HTML string, or an AttributedString. You can add formatting to make parts
+# of the text bold, italic, etc.
 #
-# To create new items use {Outline::createItem}.
+# You can assign item level attributes to items. For example you might store a
+# due date in the `data-due-date` attribute. Or store an item type in the
+# `data-type` attribute.
 module.exports =
 class Item
 
@@ -190,7 +193,7 @@ class Item
       else
         false
 
-  # Public: Read-only child items {Array}
+  # Public: Read-only child items {Array}.
   children: null
   @property 'children',
     get: ->
@@ -201,24 +204,28 @@ class Item
         each = each.nextSibling
       children
 
-  # Public: Returns a duplicate of this item. Clones are always deep, the
-  # entire outline rooted at this item is also cloned.
+  # Public: Deep clones this item.
+  #
+  # Returns a duplicate {Item}.
   cloneItem: ->
     @outline.cloneItem(this)
 
-  # Public: Returns a {Boolean} value indicating whether an item is a
-  # descendant of this item.
+  # Public: Determins if this item contains the given item.
   #
-  # * `item`
+  # - `item`
+  #
+  # Returns {Boolean}.
   contains: (item) ->
     @_liOrRootUL.contains(item._liOrRootUL)
 
   # Public: Compares the position of this item against another item in the
-  # outline.
+  # outline. See
+  # [Node.compareDocumentPosition()](https://developer.mozilla.org/en-
+  # US/docs/Web/API/Node.compareDocumentPosition) for more information.
   #
-  # * `item` The {Item} to compare against.
+  # - `item` The {Item} to compare against.
   #
-  # Returns the same bitmask as [Node.compareDocumentPosition()](https://developer.mozilla.org/en-US/docs/Web/API/Node.compareDocumentPosition)
+  # Returns a {Number} bitmask.
   comparePosition: (item) ->
     @_liOrRootUL.compareDocumentPosition(item._liOrRootUL)
 
@@ -226,7 +233,7 @@ class Item
   Section: Attributes
   ###
 
-  # Public: Read-only {Array} of attribute names.
+  # Public: Read-only {Array} of this item's attribute names.
   attributeNames: null
   @property 'attributeNames',
     get: ->
@@ -242,25 +249,24 @@ class Item
       attributeNames
 
   # Public: Returns a {Boolean} value indicating whether the item has the
-  # specified attribute or not.
+  # specified attribute.
   #
-  # * `name` The attribute name as a string.
+  # - `name` The {String} attribute name.
   hasAttribute: (name) ->
     @_liOrRootUL.hasAttribute(name)
 
-  # Public: Returns the value of a specified attribute. If the given attribute
+  # Public: Returns the value of the specified attribute. If the attribute
   # does not exist, the value returned will either be null or "".
   #
-  # * `name` The attribute name as a string.
+  # - `name` The {String} attribute name.
   getAttribute: (name) ->
     @_liOrRootUL.getAttribute(name) or undefined
 
   # Public: Adds a new attribute or changes the value of an existing
-  # attribute. `id` is reserved, and excpetion is thrown if you set the `id`
-  # attribute.
+  # attribute. `id` is reserved and should not be set.
   #
-  # * `name` The attribute name as a string.
-  # * `value` The new attribute value.
+  # - `name` The {String} attribute name.
+  # - `value` The new attribute value.
   setAttribute: (name, value) ->
     outline = @outline
     isInOutline = @isInOutline
@@ -295,7 +301,7 @@ class Item
   Section: Body Text
   ###
 
-  # Public: Plain text content of this item.
+  # Public: Body text as plain {String}.
   bodyText: null
   @property 'bodyText',
     get: ->
@@ -309,7 +315,7 @@ class Item
     set: (text) ->
       @replaceBodyTextInRange(text, 0, @bodyText.length)
 
-  # Public: HTML text content of this item.
+  # Public: Body text as HTML {String}.
   bodyHTML: null
   @property 'bodyHTML',
     get: -> _bodyP(@_liOrRootUL).innerHTML
@@ -323,7 +329,7 @@ class Item
   @property 'bodyTextLength',
     get: -> @bodyText.length
 
-  # Public: {AttributedString} text content of this item.
+  # Public: Body text as {AttributedString}.
   attributedBodyText: null
   @property 'attributedBodyText',
     get: ->
@@ -336,19 +342,21 @@ class Item
 
   # Public: Returns an {AttributedString} substring of this item's body text.
   #
-  # * `location` Substring's strart location.
-  # * `length` Length of substring to extract.
+  # - `location` Substring's strart location.
+  # - `length` Length of substring to extract.
   attributedBodyTextSubstring: (location, length) ->
     @attributedBodyText.attributedSubstring(location, length)
 
-  # Public: Returns an {Object} with attribute values for an element with a
-  # given `tagName` at the given character index and by reference the
-  # range over which the element applies.
+  # Public: Looks to see if there's an element with the given `tagName` at the
+  # given index. If there is then that element's attributes are returned and
+  # by reference the range over which the element applies.
   #
   # - `tagName` Tag name of the element.
   # - `index` The character index.
-  # - `effectiveRange` {Object} whose `location` and `length` properties will be set to effective range of element.
-  # - `longestEffectiveRange` {Object} whose `location` and `length` properties will be set to longest effective range of element.
+  # - `effectiveRange` (optional) {Object} whose `location` and `length` properties will be set to effective range of element.
+  # - `longestEffectiveRange` (optional) {Object} whose `location` and `length` properties will be set to longest effective range of element.
+  #
+  # Returns elements attribute values as an {Object} or {undefined}
   elementAtBodyTextIndex: (tagName, index, effectiveRange, longestEffectiveRange) ->
     assert(tagName == tagName.toUpperCase(), 'Tag Names Must be Uppercase')
     @attributedBodyText.attributeAtIndex(tagName, index, effectiveRange, longestEffectiveRange)
@@ -357,8 +365,16 @@ class Item
   # character index, and by reference the range over which the elements apply.
   #
   # - `index` The character index.
-  # - `effectiveRange` {Object} whose `location` and `length` properties will be set to effective range of element.
-  # - `longestEffectiveRange` {Object} whose `location` and `length` properties will be set to longest effective range of element.
+  # - `effectiveRange` (optional) {Object} whose `location` and `length` properties will be set to effective range of element.
+  # - `longestEffectiveRange` (optional) {Object} whose `location` and `length` properties will be set to longest effective range of element.
+  #
+  # ## Example
+  #
+  # Here's an example that prints out all elements in an item:
+  #
+  # ```
+  # todo 
+  # ```
   elementsAtBodyTextIndex: (index, effectiveRange, longestEffectiveRange) ->
     @attributedBodyText.attributesAtIndex index, effectiveRange, longestEffectiveRange
 
@@ -474,8 +490,8 @@ class Item
   # item's list of children. If referenceSibling isn't defined the item is
   # inserted at the end.
   #
-  # * `insertedChild` The inserted child {Item}.
-  # * `referenceSibling` The referenced {Item} sibling.
+  # - `insertedChild` The inserted child {Item}.
+  # - `referenceSibling` The referenced {Item} sibling.
   insertChildBefore: (insertedChild, referenceSibling) ->
     @insertChildrenBefore([insertedChild], referenceSibling)
 
@@ -483,8 +499,8 @@ class Item
   # in this item's list of children. If referenceSibling isn't defined the new
   # children are inserted at the end.
   #
-  # * `children` The array of {Items}'s to insert.
-  # * `referenceSibling` The referenced {Item} sibling.
+  # - `children` The array of {Items}'s to insert.
+  # - `referenceSibling` The referenced {Item} sibling.
   insertChildrenBefore: (children, referenceSibling) ->
     _aliasChildren = (children) ->
       aliases = []
@@ -534,19 +550,19 @@ class Item
 
   # Public: Append the new children to this item's list of children.
   #
-  # * `children` The children to append.
+  # - `children` The children to append.
   appendChildren: (children) ->
     @insertChildrenBefore(children)
 
   # Public: Append the new child to this item's list of children.
   #
-  # * `child` The child to append.
+  # - `child` The child to append.
   appendChild: (child) ->
     @insertChildrenBefore([child])
 
   # Public: Remove the children from this item's list of children.
   #
-  # * `children` The array children {Items}'s to remove.
+  # - `children` The array children {Items}'s to remove.
   removeChildren: (children) ->
     if not children.length
       return
@@ -618,7 +634,7 @@ class Item
 
   # Public: Remove the given child from this item's list of children.
   #
-  # * `child` The child to remove.
+  # - `child` The child to remove.
   removeChild: (child) ->
     @removeChildren([child])
 
