@@ -21,8 +21,8 @@ module.exports = {
 			{ test: /\.less$/, loader: "css-loader!autoprefixer-loader!less-loader" },
 
 
-			{ test: /\.js$/, exclude: /node_modules/, loader: '6to5-loader'},
-			{ test: /\.coffee$/, loader: "6to5-loader!coffee-loader" },
+			{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
+			{ test: /\.coffee$/, loader: "babel-loader!coffee-loader" },
 			{ test: /\.cson$/, loader: "cson-loader" },
 
 			// required for json

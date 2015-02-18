@@ -1,10 +1,11 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-{File, Color, Emitter, CompositeDisposable} = require 'atom'
+{Emitter, CompositeDisposable} = require 'atom'
 ItemSerializer = require './ItemSerializer'
 OutlineChange = require './OutlineChange'
 UndoManager = require './UndoManager'
 Constants = require './Constants'
+{File} = require 'pathwatcher'
 emissary = require 'emissary'
 shortid = require './shortid'
 assert = require 'assert'

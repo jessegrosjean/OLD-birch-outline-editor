@@ -42,15 +42,15 @@ module.exports = BirchOutliner =
     atom.workspace.getOutlineEditors = ->
       @getPaneItems().filter (item) -> item instanceof OutlineEditor
 
-    # Extended: Invoke the given callback when an outline editor is added to the
-    # workspace.
+    # Extended: Invoke the given callback when an outline editor is added to
+    # the workspace.
     #
     # * `callback` {Function} to be called panes are added.
     #   * `event` {Object} with the following keys:
     #     * `outlineEditor` {OutlineEditor} that was added.
     #     * `pane` {Pane} containing the added outline editor.
-    #     * `index` {Number} indicating the index of the added outline editor in its
-    #        pane.
+    #     * `index` {Number} indicating the index of the added outline editor
+    #       in its pane.
     #
     # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
     atom.workspace.onDidAddOutlineEditor = (callback) ->
