@@ -1,5 +1,6 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
+outlineEditorService = require './OutlineEditorService'
 OutlineEditor = require './OutlineEditor'
 {CompositeDisposable} = require 'atom'
 Outline = require './Outline'
@@ -16,6 +17,9 @@ module.exports = BirchOutliner =
     disableAnimation:
       type: 'boolean'
       default: true
+
+  outlineEditorService: ->
+    outlineEditorService
 
   activate: (state) ->
     @subscriptions = new CompositeDisposable
@@ -36,38 +40,9 @@ module.exports = BirchOutliner =
             })
             new OutlineEditor(o)
 
-    # Essential: Get all outline editors in the workspace.
-    #
-    # Returns an {Array} of {OutlineEditor}s.
-    atom.workspace.getOutlineEditors = ->
-      @getPaneItems().filter (item) -> item instanceof OutlineEditor
-
-    # Extended: Invoke the given callback when an outline editor is added to
-    # the workspace.
-    #
-    # * `callback` {Function} to be called panes are added.
-    #   * `event` {Object} with the following keys:
-    #     * `outlineEditor` {OutlineEditor} that was added.
-    #     * `pane` {Pane} containing the added outline editor.
-    #     * `index` {Number} indicating the index of the added outline editor
-    #       in its pane.
-    #
-    # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-    atom.workspace.onDidAddOutlineEditor = (callback) ->
-      @onDidAddPaneItem ({item, pane, index}) ->
-        callback({outlineEditor: item, pane, index}) if item instanceof OutlineEditor
-
-    # Essential: Invoke the given callback with all current and future outline
-    # editors in the workspace.
-    #
-    # * `callback` {Function} to be called with current and future outline editors.
-    #   * `editor` An {OutlineEditor} that is present in {::getOutlineEditors} at the time
-    #     of subscription or that is added at some later time.
-    #
-    # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-    atom.workspace.observeOutlineEditors = (callback) ->
-      callback(outlineEditor) for outlineEditor in @getOutlineEditors()
-      @onDidAddOutlineEditor ({outlineEditor}) -> callback(outlineEditor)
+    atom.workspace.getOutlineEditors = outlineEditorService.getOutlineEditors.bind(outlineEditorService)
+    atom.workspace.onDidAddOutlineEditor = outlineEditorService.onDidAddOutlineEditor.bind(outlineEditorService)
+    atom.workspace.observeOutlineEditors = outlineEditorService.observeOutlineEditors.bind(outlineEditorService)
 
   deactivate: ->
     @subscriptions.dispose()

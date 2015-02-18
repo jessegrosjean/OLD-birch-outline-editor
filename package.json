@@ -2,11 +2,18 @@
   "name": "birch-outliner",
   "main": "./lib/index_atom",
   "version": "0.0.0",
-  "description": "A short description of your package",
-  "repository": "https://github.com/atom/birch-outliner",
-  "license": "MIT",
+  "description": "Outline editor",
+  "license": "Commercial",
   "engines": {
     "atom": ">0.50.0"
+  },
+  "providedServices": {
+    "outine-editor-service": {
+      "description": "Outline Editor Service",
+      "versions": {
+        "1.0.0": "outlineEditorService"
+      }
+    }
   },
   "dependencies": {
     "clear-cut": "^0.3.0",
