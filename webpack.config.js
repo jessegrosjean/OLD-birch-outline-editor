@@ -41,6 +41,7 @@ module.exports = {
 		alias: {
 			birch: path.join(__dirname, "lib"),
 			atom: path.join(__dirname, "browser/atom"),
+			pathwatcher: path.join(__dirname, "browser/pathwatcher"),
 			specs: path.join(__dirname, "browser/specs"),
 		},
 		extensions: ['', '.webpack.js', '.web.js', '.js', '.coffee'],  // Look for *.coffee files when resolving modules
