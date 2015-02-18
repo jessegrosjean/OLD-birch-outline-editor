@@ -50,28 +50,28 @@ describe('Item', function() {
 		it('should get', function() {
 			outlineSetup.one.bodyText.should.equal('one');
 			outlineSetup.one.bodyHTML.should.equal('one');
-			outlineSetup.one.bodyTextLength.should.equal(3);
+			outlineSetup.one.bodyText.length.should.equal(3);
 		});
 
 		it('should get empy', function() {
 			var item = outline.createItem('');
 			item.bodyText.should.equal('');
 			item.bodyHTML.should.equal('');
-			item.bodyTextLength.should.equal(0);
+			item.bodyText.length.should.equal(0);
 		});
 
 		it('should get/set by Text', function() {
 			outlineSetup.one.bodyText = 'one <b>two</b> three';
 			outlineSetup.one.bodyText.should.equal('one <b>two</b> three');
 			outlineSetup.one.bodyHTML.should.equal('one &lt;b&gt;two&lt;/b&gt; three');
-			outlineSetup.one.bodyTextLength.should.equal(20);
+			outlineSetup.one.bodyText.length.should.equal(20);
 		});
 
 		it('should get/set by HTML', function() {
 			outlineSetup.one.bodyHTML = 'one <b>two</b> three';
 			outlineSetup.one.bodyText.should.equal('one two three');
 			outlineSetup.one.bodyHTML.should.equal('one <b>two</b> three');
-			outlineSetup.one.bodyTextLength.should.equal(13);
+			outlineSetup.one.bodyText.length.should.equal(13);
 		});
 
 		xit('should fill existing tag with replaced text if present', function() {
@@ -135,7 +135,7 @@ describe('Item', function() {
 
 				it('should not remove void tags that are empty', function() {
 					outlineSetup.one.bodyHTML = 'one <br><img> three';
-					outlineSetup.one.bodyTextLength.should.equal(12);
+					outlineSetup.one.bodyText.length.should.equal(12);
 					outlineSetup.one.bodyHTML.should.equal('one <br><img> three');
 				});
 
@@ -149,7 +149,7 @@ describe('Item', function() {
 					outlineSetup.one.bodyHTML = 'one <br><img> three';
 					outlineSetup.one.replaceBodyTextInRange('', 4, 1);
 					outlineSetup.one.bodyHTML.should.equal('one <img> three');
-					outlineSetup.one.bodyTextLength.should.equal(11);
+					outlineSetup.one.bodyText.length.should.equal(11);
 				});
 
 				xit('text content enocde <br> using "New Line Character"', function() {
@@ -180,12 +180,12 @@ describe('Item', function() {
 			var twoAlias = outlineSetup.two.aliasItem();
 
 			outlineSetup.two.setAttribute('hello', 'world');
-			outlineSetup.two.getAttribute('hello').should.equal('world');
-			twoAlias.getAttribute('hello').should.equal('world');
+			outlineSetup.two.attribute('hello').should.equal('world');
+			twoAlias.attribute('hello').should.equal('world');
 
 			twoAlias.setAttribute('hello', 'world!');
-			outlineSetup.two.getAttribute('hello').should.equal('world!');
-			twoAlias.getAttribute('hello').should.equal('world!');
+			outlineSetup.two.attribute('hello').should.equal('world!');
+			twoAlias.attribute('hello').should.equal('world!');
 		});
 
 		it('should keep aliased item children in sync on remove', function() {

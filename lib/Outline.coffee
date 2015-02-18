@@ -27,7 +27,7 @@ Q = require 'q'
 #
 # Is stored like this:
 #
-# ```
+# ```html
 # <html>
 #   <body>
 #     <ul id="Birch.Root">
@@ -49,6 +49,37 @@ Q = require 'q'
 #
 # You should not manipulate this structure directly, but you can
 # query it using {::evaluateXPath}.
+#
+# ## Examples
+#
+# Use XPath to get all items with bold text:
+#
+# Group multiple changes into a single {OutlineChange}:
+#
+# ```coffeescript
+# outline.beginUpdates()
+# root = outline.root
+# root.appendChild outline.createItem()
+# root.appendChild outline.createItem()
+# root.firstChild.bodyText = 'first'
+# root.lastChild.bodyText = 'last'
+# outline.endUpdates()
+# ```
+#
+# Watch for outline changes:
+#
+# ```coffeescript
+# disposable = outline.onDidChange (e) ->
+#   for delta in e.deltas
+#     switch delta.type
+#       when 'attributes'
+#         console.log delta.attributeName
+#       when 'bodyText'
+#         console.log delta.target.bodyText
+#       when 'children'
+#         console.log delta.addedItems
+#         console.log delta.removedItems
+# ```
 class Outline
   atom.deserializers.add(this)
 
@@ -66,28 +97,19 @@ class Outline
   fileSubscriptions: null
   serializedState: null
 
-  @pathsToOutlines = {}
-  @deserialize: (data) ->
-    filePath = data.filePath
-    outline = Outline.pathsToOutlines[filePath]
-    unless outline
-      data.load = true
-      outline = new Outline(data)
-      if filePath
-        Outline.pathsToOutlines[filePath] = outline
-    outline
-
   ###
   Section: Construction
   ###
 
   # Public: Create a new outline.
   constructor: (params) ->
+    Outline.idsToOutlines[@id = shortid()] = this
+
     @outlineStore = @createOutlineStoreIfNeeded(params?.outlineStore)
 
     @loadingLIUsedIDs = {}
     @root = @createItem(null, @outlineStore.getElementById(Constants.RootID))
-    @loadingLIUsedIDs = null;
+    @loadingLIUsedIDs = null
 
     @undoManager = undoManager = new UndoManager()
     @emitter = new Emitter()
@@ -100,14 +122,17 @@ class Outline
 
     @updateMutationObserver = new MutationObserver (mutations) =>
       @updateMutations = @updateMutations.concat(mutations)
-    @updateMutationObserver.observe(@outlineStore.getElementById(Constants.RootID), {
-      attributes: true,
-      childList: true,
-      characterData: true,
-      subtree: true,
-      attributeOldValue: true,
-      characterDataOldValue: true
-    })
+    @updateMutationObserver.observe(
+      @outlineStore.getElementById(Constants.RootID),
+      {
+        attributes: true,
+        childList: true,
+        characterData: true,
+        subtree: true,
+        attributeOldValue: true,
+        characterDataOldValue: true
+      }
+    )
 
     @undoSubscriptions = new CompositeDisposable(
       undoManager.onDidCloseUndoGroup =>
@@ -141,11 +166,45 @@ class Outline
       modifiedWhenLastPersisted: @isModified()
       digestWhenLastPersisted: @file?.getDigest()
 
+  @deserialize: (data) ->
+    filePath = data.filePath
+    outline = Outline.pathsToOutlines[filePath]
+    unless outline
+      data.load = true
+      outline = new Outline(data)
+      if filePath
+        Outline.pathsToOutlines[filePath] = outline
+    outline
+
+  ###
+  Section: Finding Outlines
+  ###
+
+  # Public: Read-only unique, but not persistent, {String} ID.
+  id: null
+
+  @idsToOutlines: {}
+  @pathsToOutlines: {}
+
+  # Public: Returns {Outline} with the given outline id.
+  #
+  # - `id` {String} outline id.
+  @outlineForID: (id) ->
+    Outline.idsToOutlines[id]
+
+  # Public: Returns {Outline} with the given file path.
+  #
+  # - `filePath` {String} outline file path.
+  @outlineForFilePath: (filePath) ->
+    Outline.pathsToOutlines[filePath]
+
   ###
   Section: Event Subscription
   ###
 
   # Public: Invoke the given callback when the outline changes.
+  #
+  # See {Outline} Examples for an example of subscribing to {OutlineChange}s.
   #
   # - `callback` {Function} to be called when the outline changes.
   #   - `event` {OutlineChange} event.
@@ -234,12 +293,16 @@ class Outline
   Section: Reading Items
   ###
 
-  # Public: Determine whether the outline is empty.
-  #
-  # Returns a {Boolean}.
+  # Public: Returns an {Array} of all {Item}s in the outline (except the
+  # root) in outline order.
+  items: ->
+    @root.descendants
+
   isEmpty: ->
     firstChild = @root.firstChild
-    not firstChild or (not firstChild.nextItem and firstChild.bodyTextLength == 0)
+    not firstChild or
+        (not firstChild.nextItem and
+        firstChild.bodyText.length == 0)
 
   # Public: Returns {Item} for given id.
   #
@@ -260,11 +323,6 @@ class Outline
         items.push each
     items
 
-  # Public: Returns an {Array} of all {Item}s in the outline (except the
-  # root) in outline order.
-  items: ->
-    @root.descendants
-
   # Public: XPath query internal HTML structure for matching {Items}.
   #
   # Items are considered to match if they, or if a node contained in their
@@ -276,7 +334,11 @@ class Outline
   # Returns an {Array} of all {Item} matching the
   # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
   itemsForXPath: (xpathExpression, namespaceResolver) ->
-    xpathResult = @evaluateXPath(xpathExpression, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE)
+    xpathResult = @evaluateXPath(
+      xpathExpression,
+      null,
+      XPathResult.ORDERED_NODE_ITERATOR_TYPE
+    )
     each = xpathResult.iterateNext()
     lastItem = undefined
     items = []
@@ -308,7 +370,13 @@ class Outline
   # US/docs/XPathResult) based on an [XPath](https://developer.mozilla.org/en-
   # US/docs/Web/XPath) expression and other given parameters.
   evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
-    @outlineStore.evaluate(xpathExpression, @root._liOrRootUL, namespaceResolver, resultType, result)
+    @outlineStore.evaluate(
+      xpathExpression,
+      @root._liOrRootUL,
+      namespaceResolver,
+      resultType,
+      result
+    )
 
   ###
   Section: Creating and Mutating Items
@@ -317,7 +385,7 @@ class Outline
   # Public: Create a new item. The new item is owned by this outline, but is
   # not yet inserted into it so it won't be visible until you insert it.
   #
-  # - `text` {String} or {AttributedString}.
+  # - `text` (optional) {String} or {AttributedString}.
   createItem: (text, li, remapIDCallback) ->
     new Item(@, text, li or @createStoreLI(), remapIDCallback)
 
@@ -332,7 +400,7 @@ class Outline
     @createItem(null, @outlineStore.importNode(item._liOrRootUL, true))
 
   aliasItem: (item) ->
-    assert.ok(!item.isRoot, 'Can not alias root item');
+    assert.ok(!item.isRoot, 'Can not alias root item')
     alias = @cloneItem(item)
     aliases = item._aliases
     end = item.nextBranch
@@ -354,7 +422,7 @@ class Outline
       if not prev or prev.nextSibling == each
         siblings.push(each)
       else
-        @removeSiblingsFromParent(siblings);
+        @removeSiblingsFromParent(siblings)
         siblings = [each]
       prev = each
 
@@ -417,13 +485,14 @@ class Outline
   # {::beginUpdates} call.
   endUpdates: ->
     if --@updateCount == 0
-      updateMutations = @updateMutations;
-      @updateMutations = null;
-      updateMutations = updateMutations.concat(@updateMutationObserver.takeRecords());
+      updateMutations = @updateMutations
+      @updateMutations = null
+
+      updateMutations = updateMutations.concat(@updateMutationObserver.takeRecords())
       if updateMutations.length > 0
         @cachedText = null
         @conflict = false if @conflict and !@isModified()
-        @emitter.emit('did-change', new OutlineChange(updateMutations));
+        @emitter.emit('did-change', new OutlineChange(updateMutations))
         @scheduleModifiedEvents()
 
   ###
@@ -433,7 +502,8 @@ class Outline
   # Public: Determine if the in-memory contents of the outline differ from its
   # contents on disk.
   #
-  # If the outline is unsaved, always returns `true` unless the outline is empty.
+  # If the outline is unsaved, always returns `true` unless the outline is
+  # empty.
   #
   # Returns a {Boolean}.
   isModified: ->
@@ -547,7 +617,10 @@ class Outline
         candidateID = null
 
   associateItemWithAlias: (item, newAlias) ->
-    assert.ok(newAlias._aliases == null, 'should only happen when item is first created')
+    assert.ok(
+      newAlias._aliases == null,
+      'should only happen when item is first created'
+    )
     itemAliases = item._aliases ?= []
     newAliases = newAlias._aliases = itemAliases.slice()
 
@@ -582,6 +655,7 @@ class Outline
 
   destroy: ->
     unless @destroyed
+      delete Outline.idsToOutlines[@id]
       delete Outline.pathsToOutlines[@getPath()]
       @updateMutationObserver.disconnect()
       @cancelStoppedChangingTimeout()
@@ -615,9 +689,9 @@ class Outline
       @conflict = true if @isModified()
       previousContents = @cachedDiskContents
 
-      # Synchrounously update the disk contents because the {File} has already cached them. If the
-      # contents updated asynchrounously multiple `conlict` events could trigger for the same disk
-      # contents.
+      # Synchrounously update the disk contents because the {File} has already
+      # cached them. If the contents updated asynchrounously multiple
+      # `conlict` events could trigger for the same disk contents.
       @updateCachedDiskContentsSync()
       return if previousContents == @cachedDiskContents
 
@@ -647,7 +721,10 @@ class Outline
       modifiedStatus = @isModified()
       @emitter.emit 'did-stop-changing'
       @emitModifiedStatusChanged(modifiedStatus)
-    @stoppedChangingTimeout = setTimeout(stoppedChangingCallback, @stoppedChangingDelay)
+    @stoppedChangingTimeout = setTimeout(
+      stoppedChangingCallback,
+      @stoppedChangingDelay
+    )
 
   emitModifiedStatusChanged: (modifiedStatus) ->
     return if modifiedStatus is @previousModifiedStatus

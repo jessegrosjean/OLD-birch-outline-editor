@@ -93,7 +93,7 @@ class OutlineEditorElement extends HTMLElement
     li = document.createElement('LI')
 
     for eachName in item.attributeNames
-      value = item.getAttribute(eachName)
+      value = item.attribute(eachName)
       if value
         li.setAttribute(eachName, value)
 
@@ -389,7 +389,7 @@ class OutlineEditorElement extends HTMLElement
     itemViewLI = @itemViewLIForItem(item)
     if itemViewLI
       if item.hasAttribute(attributeName)
-        itemViewLI.setAttribute(attributeName, item.getAttribute(attributeName))
+        itemViewLI.setAttribute(attributeName, item.attribute(attributeName))
       else
         itemViewLI.removeAttribute(attributeName)
 
@@ -439,7 +439,10 @@ class OutlineEditorElement extends HTMLElement
 
         if animate
           for eachChildLI in addedChildrenLIs
-            @_animateInsertLI(editor.outline.itemForID(eachChildLI.id), eachChildLI)
+            @_animateInsertLI(
+              editor.outline.itemForID(eachChildLI.id),
+              eachChildLI
+            )
 
   updateRefreshItemChildren: (item) ->
     itemViewLI = @itemViewLIForItem(item)
@@ -450,7 +453,10 @@ class OutlineEditorElement extends HTMLElement
         itemViewUL.parentNode.removeChild(itemViewUL)
         @_disconnectBranchIDs(itemViewUL)
 
-      itemViewUL = @createULForItemChildren(item, @_levelToHoistedItem(item) + 1)
+      itemViewUL = @createULForItemChildren(
+        item,
+        @_levelToHoistedItem(item) + 1
+      )
       if itemViewUL
         itemViewLI.appendChild(itemViewUL)
 
@@ -480,10 +486,15 @@ class OutlineEditorElement extends HTMLElement
       switch each.type
         when OutlineChangeDelta.AttributeChanged
           @updateItemAttribute(each.target, each.attributeName)
-        when OutlineChangeDelta.ContentChanged
+        when OutlineChangeDelta.BodyTextChanged
           @updateItemBody(each.target)
         when OutlineChangeDelta.ChildrenChanged
-          @updateItemChildren(each.target, each.removedItems, each.addedItems, each.nextSibling)
+          @updateItemChildren(
+            each.target,
+            each.removedItems,
+            each.addedItems,
+            each.nextSibling
+          )
         else
           throw 'Unexpected Change Type'
 

@@ -26,20 +26,20 @@ path = require 'path'
 # {Outline}, including hoisted items, filtering items, expanded items, and
 # item selection.
 #
-# A single {Outline} can belong to multiple editors. For example, if the
-# same file is open in two different panes, Atom creates a separate editor for
-# each pane. If the outline is manipulated the changes are reflected in both
+# A single {Outline} can belong to multiple editors. For example, if the same
+# file is open in two different panes, Atom creates a separate editor for each
+# pane. If the outline is manipulated the changes are reflected in both
 # editors, but each maintains its own selection, expanded items, etc.
 #
 # ## Accessing OutlineEditor Instances
 #
-# The easiest way to get hold of `OutlineEditor` objects is by registering a callback
-# with `::observeOutlineEditors` on the `atom.workspace` global. Your callback will
-# then be called with all current editor instances and also when any editor is
-# created in the future.
+# The easiest way to get hold of `OutlineEditor` objects is by registering a
+# callback with `::observeOutlineEditors` on the `atom.workspace` global. Your
+# callback will then be called with all current editor instances and also when
+# any editor is created in the future.
 #
-# ```coffee
-# atom.workspace.observeOutlineEditors (editor) ->
+# ```coffeescript
+# disposable = atom.workspace.observeOutlineEditors (editor) ->
 #   editor.insertItem('Hello World!')
 # ```
 module.exports =
@@ -523,7 +523,7 @@ class OutlineEditor extends Model
       @nextVisibleBranch(nextBranch)
 
   ###
-  Section: Select Items
+  Section: Focus
   ###
 
   # Public: Returns {Boolean} indicating if this editor has focus.
@@ -534,6 +534,14 @@ class OutlineEditor extends Model
       activeElement = @DOMGetActiveElement()
       outlineEditorElement = @outlineEditorElement
       activeElement and (outlineEditorElement == activeElement or outlineEditorElement.contains(activeElement))
+
+  # Public: Focus this editor.
+  focus: ->
+    @outlineEditorElement.focus()
+
+  ###
+  Section: Select Items
+  ###
 
   # Public: Returns {Boolean} indicating if given item is selected.
   #
@@ -561,10 +569,6 @@ class OutlineEditor extends Model
 
   setSelectionVerticalAnchor: (selectionVerticalAnchor) ->
     @_selectionVerticalAnchor = selectionVerticalAnchor
-
-  # Public: Focus this editor.
-  focus: ->
-    @outlineEditorElement.focus()
 
   moveBackward: ->
     @modifySelectionRange('move', 'backward', (if @isTextMode() then 'character' else 'paragraph'))
@@ -686,7 +690,7 @@ class OutlineEditor extends Model
   insertCaretAtEndOfLine: ->
     endItem = @selectionRange().endItem
     if endItem
-      @moveSelectionRange(endItem, endItem.bodyTextLength)
+      @moveSelectionRange(endItem, endItem.bodyText.length)
 
   selectLine: ->
     @moveSelectionRange(
@@ -708,7 +712,7 @@ class OutlineEditor extends Model
       endOffset = selectionRange.endOffset
 
       if item
-        textLength = item.bodyTextLength;
+        textLength = item.bodyText.length;
         if startOffset == 0 and endOffset == textLength
           @moveSelectionRange(item, undefined, item, undefined)
         else
@@ -916,9 +920,9 @@ class OutlineEditor extends Model
 
   # Public: Insert item at current selection.
   #
-  # Returns the new {Item}
+  # - `text` Text {String} or {AttributedString} for new item.
   #
-  # - `text` Text {String} or {AttributedString} of new item.
+  # Returns the new {Item}.
   insertItem: (text, above=false) ->
     text ?= ''
     selectedItems = @selectionRange().rangeItems
@@ -1118,7 +1122,7 @@ class OutlineEditor extends Model
         undoManager.beginUndoGrouping()
         outline.beginUpdates()
 
-        if 0 == startOffset && startItem != endItem && startItem == endItem.previousSibling && startItem.bodyTextLength == 0
+        if 0 == startOffset && startItem != endItem && startItem == endItem.previousSibling && startItem.bodyText.length == 0
           @moveSelectionRange(endItem, 0)
           endItem.replaceBodyTextInRange('', 0, endOffset)
           for each in selectionRange.rangeItems[...-1]
@@ -1268,7 +1272,7 @@ class OutlineEditor extends Model
       transform(selectionRange.startItem, selectionRange.startOffset, selectionRange.endOffset)
     else
       for each in selectionRange.rangeItems
-        transform(each, 0, each.bodyTextLength)
+        transform(each, 0, each.bodyText.length)
 
     undoManager.endUndoGrouping()
     outline.endUpdates()
@@ -1526,38 +1530,3 @@ class OutlineEditor extends Model
           range: range
 
     result
-
-###
-# Essential: Get all outline editors in the workspace.
-#
-# Returns an {Array} of {OutlineEditor}s.
-atom.workspace.getTextEditors = ->
-  @getPaneItems().filter (item) -> item instanceof OutlineEditor
-
-# Extended: Invoke the given callback when an outline editor is added to the
-# workspace.
-#
-# * `callback` {Function} to be called panes are added.
-#   * `event` {Object} with the following keys:
-#     * `outlineEditor` {OutlineEditor} that was added.
-#     * `pane` {Pane} containing the added outline editor.
-#     * `index` {Number} indicating the index of the added outline editor in its
-#        pane.
-#
-# Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-atom.workspace.onDidAddOutlineEditor = (callback) ->
-  @onDidAddPaneItem ({item, pane, index}) ->
-    callback({outlineEditor: item, pane, index}) if item instanceof OutlineEditor
-
-# Essential: Invoke the given callback with all current and future outline
-# editors in the workspace.
-#
-# * `callback` {Function} to be called with current and future outline editors.
-#   * `editor` An {OutlineEditor} that is present in {::getOutlineEditors} at the time
-#     of subscription or that is added at some later time.
-#
-# Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-atom.workspace.observeOutlineEditors = (callback) ->
-  callback(outlineEditor) for outlineEditor in @getOutlineEditors()
-  @onDidAddOutlineEditor ({outlineEditor}) -> callback(outlineEditor)
-###
