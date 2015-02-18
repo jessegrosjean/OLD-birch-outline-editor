@@ -380,7 +380,7 @@ class Outline
     )
 
   ###
-  Section: Creating and Mutating Items
+  Section: Creating Items
   ###
 
   # Public: Create a new item. The new item is owned by this outline, but is
@@ -459,19 +459,7 @@ class Outline
       outline.endUpdates()
 
   ###
-  Section: Undo
-  ###
-
-  # Essential: Undo the last change.
-  undo: ->
-    @undoManager.undo()
-
-  # Essential: Redo the last change.
-  redo: ->
-    @undoManager.redo()
-
-  ###
-  Section: Updates
+  Section: Grouping Changes
   ###
 
   # Public: Returns {true} if outline is updating.
@@ -495,6 +483,18 @@ class Outline
         @conflict = false if @conflict and !@isModified()
         @emitter.emit('did-change', new OutlineChange(updateMutations))
         @scheduleModifiedEvents()
+
+  ###
+  Section: Undo
+  ###
+
+  # Essential: Undo the last change.
+  undo: ->
+    @undoManager.undo()
+
+  # Essential: Redo the last change.
+  redo: ->
+    @undoManager.redo()
 
   ###
   Section: File Details

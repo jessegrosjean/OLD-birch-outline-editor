@@ -590,7 +590,7 @@ class OutlineEditorElement extends HTMLElement
     outline.endUpdates()
 
     if newParentNeedsExpand
-      editor.setExpanded(newParent, true)
+      editor.setExpanded(newParent)
 
     if shouldDisableRemoveInsertAndExpandAnimations
       @enableAnimation()

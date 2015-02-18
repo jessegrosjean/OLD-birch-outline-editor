@@ -19,7 +19,7 @@ describe('OutlineEditorElement', function() {
 			outlineSetup.one,
 			outlineSetup.two,
 			outlineSetup.five
-		], true)
+		]);
 	});
 
 	afterEach(function() {
@@ -64,12 +64,12 @@ describe('OutlineEditorElement', function() {
 			});
 
 			it('should not crash when offscreen item is changed', function() {
-				editor.setExpanded(outlineSetup.one, false);
+				editor.setCollapsed(outlineSetup.one);
 				outlineSetup.four.bodyText = 'one two three';
 			});
 
 			it('should not crash when child is added to offscreen item', function() {
-				editor.setExpanded(outlineSetup.one, false);
+				editor.setCollapsed(outlineSetup.one);
 				outlineSetup.four.appendChild(outline.createItem('Boo!'));
 			});
 		});
@@ -85,7 +85,7 @@ describe('OutlineEditorElement', function() {
 			it('should rendered expanded state', function() {
 				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
 				li.classList.contains('bexpandedItem').should.be.true;
-				editor.setExpanded(outlineSetup.one, false);
+				editor.setCollapsed(outlineSetup.one);
 				li.classList.contains('bexpandedItem').should.be.false;
 			});
 		});

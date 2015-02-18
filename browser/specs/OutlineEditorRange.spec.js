@@ -17,7 +17,7 @@ describe('OutlineEditorRange', function() {
 		editor.setExpanded([
 			outlineSetup.one,
 			outlineSetup.five
-		], true)
+		]);
 	});
 
 	afterEach(function() {

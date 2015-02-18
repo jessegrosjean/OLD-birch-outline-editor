@@ -35,12 +35,12 @@ describe('OutlineEditor', function() {
 
 	describe('Expanding', function() {
 		it('should make children of expanded visible', function() {
-			editor.setExpanded(outlineSetup.one, true);
+			editor.setExpanded(outlineSetup.one);
 			editor.isExpanded(outlineSetup.one).should.be.true;
 			editor.isVisible(outlineSetup.two).should.be.true;
 			editor.isVisible(outlineSetup.five).should.be.true;
 
-			editor.setExpanded(outlineSetup.one, false);
+			editor.setCollapsed(outlineSetup.one);
 			editor.isExpanded(outlineSetup.one).should.be.false;
 			editor.isVisible(outlineSetup.two).should.be.false;
 			editor.isVisible(outlineSetup.five).should.be.false;
@@ -149,7 +149,7 @@ describe('OutlineEditor', function() {
 
 			it('should focus item mode focus element when extending to item selection', function() {
 				editor.focus();
-				editor.setExpanded(outlineSetup.one, true);
+				editor.setExpanded(outlineSetup.one);
 				editor.moveSelectionRange(outlineSetup.two, 1);
 				editor.extendSelectionRange(outlineSetup.five, 3);
 				should(document.getSelection().focusNode === null);
@@ -205,7 +205,7 @@ describe('OutlineEditor', function() {
 		});
 
 		it('should delete backward by character joining with previous node', function() {
-			editor.setExpanded(outlineSetup.one, true);
+			editor.setExpanded(outlineSetup.one);
 			editor.moveSelectionRange(outlineSetup.two, 0);
 			editor.delete('backward', 'character');
 			outlineSetup.one.bodyText.should.equal('onetwo');
@@ -219,7 +219,7 @@ describe('OutlineEditor', function() {
 		});
 
 		it('should delete backward by word joining with previous node', function() {
-			editor.setExpanded(outlineSetup.one, true);
+			editor.setExpanded(outlineSetup.one);
 			editor.moveSelectionRange(outlineSetup.two, 0);
 			editor.delete('backward', 'word');
 			outlineSetup.one.bodyText.should.equal('two');
@@ -229,7 +229,7 @@ describe('OutlineEditor', function() {
 		});
 
 		it('should delete backward by word from empty line joining with previous node', function() {
-			editor.setExpanded(outlineSetup.one, true);
+			editor.setExpanded(outlineSetup.one);
 			outlineSetup.two.bodyText = '';
 			editor.moveSelectionRange(outlineSetup.two, 0);
 			editor.delete('backward', 'word');
@@ -240,7 +240,7 @@ describe('OutlineEditor', function() {
 		});
 
 		it('should delete forward by character joining with next node', function() {
-			editor.setExpanded(outlineSetup.one, true);
+			editor.setExpanded(outlineSetup.one);
 			editor.moveSelectionRange(outlineSetup.one, 3);
 			editor.delete('forward', 'character');
 			outlineSetup.one.bodyText.should.equal('onetwo');
@@ -251,7 +251,7 @@ describe('OutlineEditor', function() {
 
 
 		it('should delete forward by word joining with previous node', function() {
-			editor.setExpanded(outlineSetup.one, true);
+			editor.setExpanded(outlineSetup.one);
 			editor.moveSelectionRange(outlineSetup.one, 3);
 			editor.delete('forward', 'word');
 			outlineSetup.one.bodyText.should.equal('one');

@@ -103,7 +103,7 @@ class OutlineEditor extends Model
     expandedItemIDs = @serializedState.expandedItemIDs
     unless expandedItemIDs
       expandedItemIDs = @outline.serializedState.expandedItemIDs or []
-    @setExpanded (@outline.itemsForIDs expandedItemIDs), true
+    @setExpanded (@outline.itemsForIDs expandedItemIDs)
     @setHoistedItemsStack @outline.itemsForIDs hoistedItemIDs
 
   subscribeToOutline: ->
@@ -170,7 +170,7 @@ class OutlineEditor extends Model
       if eachDelta.type == OutlineChangeDelta.ChildrenChanged
         targetItem = eachDelta.target
         if not targetItem.hasChildren
-          @setExpanded(targetItem, false)
+          @setCollapsed targetItem
 
   destroyed: ->
     @unsubscribe()
@@ -180,34 +180,79 @@ class OutlineEditor extends Model
     @emitter.emit 'did-destroy'
 
   ###
-  Section: Properties
+  Section: Model
   ###
 
-  # Public: The Edited {Outline}
+  # Public: The {Outline} that is being edited.
   outline: null
 
   ###
   Section: Event Subscription
   ###
 
+  # Essential: Calls your `callback` when the editor's oultine title has
+  # changed.
+  #
+  # * `callback` {Function}
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeTitle: (callback) ->
     @emitter.on 'did-change-title', callback
 
+  # Essential: Calls your `callback` when the editor's outline path, and
+  # therefore title, has changed.
+  #
+  # * `callback` {Function}
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangePath: (callback) ->
     @outline.onDidChangePath(callback)
 
+  # Public: Invoke the given callback when the editor's outline changes.
+  #
+  # See {Outline} Examples for an example of subscribing to {OutlineChange}s.
+  #
+  # - `callback` {Function} to be called when the outline changes.
+  #   - `event` {OutlineChange} event.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChange: (callback) ->
-    @emitter.on 'did-change', callback
+    @outline.onDidChange(callback)
 
+  # Extended: Calls your `callback` when the result of {::isModified} changes.
+  #
+  # * `callback` {Function}
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeModified: (callback) ->
     @outline.onDidChangeModified(callback)
 
+  # Extended: Calls your `callback` when the editor's outline's underlying
+  # file changes on disk at a moment when the result of {::isModified} is
+  # true.
+  #
+  # * `callback` {Function}
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidConflict: (callback) ->
     @outline.onDidConflict(callback)
 
+  # Public: Invoke the given callback after the editor's outline is saved to
+  # disk.
+  #
+  # * `callback` {Function} to be called after the buffer is saved.
+  #   * `event` {Object} with the following keys:
+  #     * `path` The path to which the buffer was saved.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidSave: (callback) ->
     @outline.onDidSave(callback)
 
+  # Public: Invoke the given callback when the editor is destroyed.
+  #
+  # * `callback` {Function} to be called when the editor is destroyed.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
 
@@ -277,11 +322,25 @@ class OutlineEditor extends Model
   isExpanded: (item) ->
     return item and @editorState(item).expanded
 
-  # Public: Set expanded state of items.
+  # Public: Returns true if the item is collapsed.
+  #
+  # - `item` {Item} to test.
+  isCollapsed: (item) ->
+    return item and not @editorState(item).expanded
+
+  # Public: Expand the given items in this editor.
   #
   # - `items` {Item} or {Array} of items.
-  # - `expanded` The {Boolean} expanded state.
   setExpanded: (items, expanded) ->
+    @_setExpandedState items, true
+
+  # Public: Collapse the given items in this editor.
+  #
+  # - `items` {Item} or {Array} of items.
+  setCollapsed: (items) ->
+    @_setExpandedState items, false
+
+  _setExpandedState: (items, expanded) ->
     items ?= @selectionRange().rangeItemsCover
 
     if not typechecker.isArray(items)
@@ -350,7 +409,7 @@ class OutlineEditor extends Model
       foldItems = (each for each in items when each.hasChildren and @isExpanded(each) != expand)
 
     if foldItems.length
-      @setExpanded(foldItems, expand)
+      @_setExpandedState foldItems, expand
 
   toggleFullyExpandItems: (items) ->
     @toggleFoldItems items, true
@@ -432,6 +491,32 @@ class OutlineEditor extends Model
     return true unless @_itemFilterPath
     itemState = @editorState(item)
     itemState.matched or itemState.matchedAncestor
+
+  # Public: Make the given item visible in the outline, expanding ancestors,
+  # removing filter, and unhoisting as needed.
+  #
+  # - `item` {Item} to make visible.
+  makeVisible: (item) ->
+    assert.ok(
+      item.isInOutline and (item.outline is @outline),
+      'Item must be in this outline'
+    )
+
+    return if @isVisible item
+
+    hoistedItem = @hoistedItem()
+    while not hoistedItem.contains item
+      @unhoist()
+      hoistedItem = @hoistedItem()
+
+    parentsToExpand = []
+    eachParent = item.parent
+    while eachParent != hoistedItem
+      if @isCollapsed eachParent
+        parentsToExpand.push eachParent
+      eachParent = eachParent.parent
+
+    @setExpanded parentsToExpand
 
   visibleParent: (item) ->
     if @isVisible(item?.parent)
@@ -721,9 +806,9 @@ class OutlineEditor extends Model
   # Public: Set a new selection range.
   #
   # - `focusItem` Selection focus {Item}
-  # - `focusOffset` Selection focus offset index. Or `undefined` when selecting at item level.
-  # - `anchorItem` Selection anchor {Item}
-  # - `anchorOffset` Selection anchor offset index. Or `undefined` when selecting at item level.
+  # - `focusOffset` (optional) Selection focus offset index. Or `undefined` when selecting at item level.
+  # - `anchorItem` (optional) Selection anchor {Item}
+  # - `anchorOffset` (optional) Selection anchor offset index. Or `undefined` when selecting at item level.
   moveSelectionRange: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
     @_textModeExtendingFromSnapbackRange = null
     @_updateSelectionRangeIfNeeded(@createOutlineEditorRange(focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity))
