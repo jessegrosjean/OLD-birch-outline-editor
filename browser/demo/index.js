@@ -1,5 +1,4 @@
 var OutlineEditor = require('birch/OutlineEditor'),
-	Extensions = require('birch/Extensions'),
 	Outline = require('birch/Outline'),
 	date = new Date(),
 	count = 1;
