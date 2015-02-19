@@ -6,7 +6,7 @@ LIInsertAnimation = require './animations/LIInsertAnimation'
 LIRemoveAnimation = require './animations/LIRemoveAnimation'
 LIMoveAnimation = require './animations/LIMoveAnimation'
 OutlineChangeDelta = require './OutlineChangeDelta'
-OutlineEditorRange = require './OutlineEditorRange'
+OutlineEditorSelection = require './OutlineEditorSelection'
 ItemBodyEncoder = require './ItemBodyEncoder'
 ItemSerializer = require './ItemSerializer'
 EventRegistery = require './EventRegistery'
@@ -39,7 +39,7 @@ class OutlineEditorElement extends HTMLElement
     @editor = editor
     @_animationDisabled = 0
     @_animationContexts = [Constants.DefaultItemAnimactionContext]
-    @_maintainOutlineEditorRange = null
+    @_maintainOutlineEditorSelection = null
     @_animations = {}
     @_idsToElements = {}
     @_extendingSelection = false
@@ -125,7 +125,7 @@ class OutlineEditorElement extends HTMLElement
 
     if editor.isSelected(item)
       itemClass.push('bselectedItem')
-      if editor.selectionRange().isTextMode
+      if editor.selection.isTextMode
         itemClass.push('bselectedItemWithTextSelection')
 
     if editor.hoistedItem() == item
@@ -547,7 +547,7 @@ class OutlineEditorElement extends HTMLElement
     editor = @editor
     outline = editor.outline
     animate = @isAnimationEnabled()
-    savedSelectionRange = editor.selectionRange()
+    savedSelectionRange = editor.selection
     hoistedItem = editor.hoistedItem()
     context = @animationContext()
     animations = @_animations
@@ -749,7 +749,7 @@ class OutlineEditorElement extends HTMLElement
       if focusItem
         focusOffset = @nodeOffsetToItemOffset(selection.focusNode, selection.focusOffset)
         anchorOffset = @nodeOffsetToItemOffset(selection.anchorNode, selection.anchorOffset)
-        return new OutlineEditorRange(
+        return new OutlineEditorSelection(
           @editor,
           focusItem,
           focusOffset,
@@ -757,7 +757,7 @@ class OutlineEditorElement extends HTMLElement
           anchorOffset
         )
 
-    new OutlineEditorRange(@editor)
+    new OutlineEditorSelection(@editor)
 
   beginExtendSelectionInteraction: (e) ->
     editor = @editor
@@ -794,7 +794,7 @@ class OutlineEditorElement extends HTMLElement
     caretPosition = pick.itemCaretPosition
 
     if caretPosition
-      if e.target.tagName == 'P' and caretPosition.offsetItem != @editor.selectionRange().anchorItem
+      if e.target.tagName == 'P' and caretPosition.offsetItem != @editor.selection.anchorItem
         e.preventDefault()
       @editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
@@ -820,7 +820,7 @@ class OutlineEditorElement extends HTMLElement
     editor = @editor
     editor._disableScrollToSelection = false
     editor._disableSyncDOMSelectionToEditor = false
-    selectionRange = editor.selectionRange()
+    selectionRange = editor.selection
 
     if selectionRange.isTextMode
       editor.moveSelectionRange(@editorRangeFromDOMSelection()) # Read in selection from double-click, etc.

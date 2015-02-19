@@ -7,7 +7,8 @@
 //
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
-//@import "ui-variables";
+@import "ui-variables";
+@import "syntax-variables";
 
 @fontFamily: 'Open Sans', Helvetica;
 @fontSize: 16px;
@@ -16,45 +17,10 @@
 @itemPadding: @fontSize / 4.0;
 @gutterWidthPerLevel: @fontSize * 1.5;
 
-// Base color for things "on" the paper.
-@inkColor: black;
-
-// Paper contains text the content.
-@paperColor: white;
-@deskColor: lightgray;
-
-// Color used to indicate clickable interface elements (similar to iOS 7 tint color)
-@interfaceColor: default;
-
-// Color used to indicate something. Such as when mouse is over a link.
-@indicatedColor: #007aff;
-
-// Default text color
-@textColor: @inkColor;
-
-// Secondary text color is used for text content that's not primary. For example
-@secondaryPercent: 0.5;
-@secondaryTextColor: mix(@textColor, @paperColor, percentage(@secondaryPercent));
-
-@selectionColor: #B0D6FD;
-@secondarySelectionColor: mix(@selectionColor, @paperColor, percentage(0.15));
-
-@handleColor: mix(@textColor, @paperColor, percentage(0.25));
-@loadedHandleColor: @textColor;
-
-// Colors used to indicate folded regions
-@foldColor: @textColor;
-@foldedLineColor: @secondaryTextColor;
-
-// Color to indicate errors
-@errorColor: rgb(75%,20%,20%);
-
-body {
-  background: grey;
-}
-
 ::selection {
-  background: @selectionColor;
+  // fade is to work around
+  // http://stackoverflow.com/questions/14970891/css-selection-color-behaving-strangely-on-chrome
+  background-color: fade(@syntax-selection-color, 99%);
 }
 
 #textIteratorIFrame {
@@ -64,18 +30,12 @@ body {
 
 outline-editor {
   cursor: text;
-  color: @inkColor;
-  background: @deskColor;
+  color: @syntax-text-color;
+  background-color: @syntax-background-color;
   font-family: @fontFamily;
   font-size: @fontSize;
   line-height: @lineHeight;
-
-  position: absolute;
-  top: 0rem;
-  bottom: 0rem;
-  left: 0rem;
-  right: 0rem;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   user-select: none;
 }
@@ -99,7 +59,6 @@ input[is="outline-editor-focus"] {
 outline-editor > ul {
   margin: 0 auto;
   padding: 0;
-  background: @paperColor;
   overflow: hidden;
   min-height: 100%;
   position: relative;
@@ -127,7 +86,7 @@ outline-editor > ul {
   padding: 0;
 //	padding-left: @gutterWidthPerLevel / 2.0;
 //	margin-left: @gutterWidthPerLevel / 2.0;
-//	border-left: 1px dashed mix(@textColor, @paperColor, percentage(0.1));
+//	border-left: 1px dashed mix(@syntax-text-color, @syntax-background-color, percentage(0.1));
 }
 
 //.bitem[level="0"] > .bchildren {
@@ -159,7 +118,7 @@ outline-editor > ul {
   /*.bselectedItem[level="@{i}"] > .bcontent > .bbody::after {
     pointer-events: none;
     position: absolute;
-    background: @selectionColor;
+    background: @syntax-selection-color;
     top: -@itemMargin / 2.0;
     bottom: -@itemMargin / 2.0;
     left: @gutterWidthPerLevel * @i;
@@ -192,7 +151,7 @@ outline-editor > ul {
 .generate-gutter-levels(20);
 
 .bbody {
-  color: @textColor;
+  color: @syntax-text-color;
   flex: 1 1 auto;
   display: inline;
   user-select: text;
@@ -211,23 +170,23 @@ outline-editor > ul {
 //
 
 .bselectedItem > .bcontent > .bbody {
-  background: @selectionColor;
+  background-color: @syntax-selection-color;
 }
 
 .bselectedItem:not(.bselectedItemWithTextSelection) > .bcontent *::selection {
-  background: transparent;
+  background-color: transparent;
 }
 
 .bselectedItemWithTextSelection > .bcontent > .bbody {
-  background: none;
+  background-color: transparent;
 }
 
 .bsimulatedSelectionCursor {
-  background: @textColor;
+  background-color: @syntax-text-color;
 }
 
 .bsimulatedSelection {
-  background: @selectionColor;
+  background-color: @syntax-selection-color;
 }
 
 //
@@ -243,7 +202,7 @@ outline-editor > ul {
   background: none;
   text-align: center;
   user-select: none;
-  color: @handleColor;
+  color: @syntax-invisible-character-color;
 }
 
 .bitemHandle:focus, .bselectionHandle:focus {
@@ -252,7 +211,7 @@ outline-editor > ul {
 }
 
 .bhasChildren:not(.bexpandedItem) > .bcontent > .bgutter > .bitemHandle {
-  color: @loadedHandleColor;
+  color: @syntax-text-color;
 }
 
 .bitemHandle::after {
@@ -332,6 +291,6 @@ outline-editor > ul {
 }
 
 .bitem[data-done] > .bcontent > .bbody {
-  //opacity: 0.25;
+  opacity: 0.25;
   text-decoration: line-through;
 }

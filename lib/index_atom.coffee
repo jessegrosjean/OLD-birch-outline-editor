@@ -11,6 +11,7 @@ atom.views.addViewProvider OutlineEditor, (model) ->
   model.outlineEditorElement
 
 module.exports = BirchOutliner =
+  globalOutlineEditorStyleSheet: null
   subscriptions: null
 
   config:
@@ -43,6 +44,34 @@ module.exports = BirchOutliner =
     atom.workspace.getOutlineEditors = outlineEditorService.getOutlineEditors.bind(outlineEditorService)
     atom.workspace.onDidAddOutlineEditor = outlineEditorService.onDidAddOutlineEditor.bind(outlineEditorService)
     atom.workspace.observeOutlineEditors = outlineEditorService.observeOutlineEditors.bind(outlineEditorService)
+
+    #@initializeGlobalOutlineEditorStyleSheet()
+    #@observeTextEditorFontConfig()
+
+  ###
+  initializeGlobalOutlineEditorStyleSheet: ->
+    atom.styles.addStyleSheet('outline-editor {}', sourcePath: 'global-outline-editor-styles')
+    @globalOutlineEditorStyleSheet = document.head.querySelector('style[source-path="global-outline-editor-styles"]').sheet
+
+  observeTextEditorFontConfig: ->
+    @subscriptions.add atom.config.observe 'editor.fontSize', @setOutlineEditorFontSize.bind(this)
+    @subscriptions.add atom.config.observe 'editor.fontFamily', @setOutlineEditorFontFamily.bind(this)
+    @subscriptions.add atom.config.observe 'editor.lineHeight', @setOutlineEditorLineHeight.bind(this)
+
+  setOutlineEditorFontSize: (fontSize) ->
+    @updateGlobalOutlineEditorStyle('font-size', fontSize + 'px')
+
+  setOutlineEditorFontFamily: (fontFamily) ->
+    @updateGlobalOutlineEditorStyle('font-family', fontFamily)
+
+  setOutlineEditorLineHeight: (lineHeight) ->
+    @updateGlobalOutlineEditorStyle('line-height', lineHeight)
+
+  updateGlobalOutlineEditorStyle: (property, value) ->
+    debugger
+    editorRule = @globalOutlineEditorStyleSheet.cssRules[0]
+    editorRule.style[property] = value
+  ###
 
   deactivate: ->
     @subscriptions.dispose()

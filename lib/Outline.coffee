@@ -17,43 +17,13 @@ Q = require 'q'
 # Use outlines to create new items, find existing items, and watch for changes
 # in items. Outlines also coordinate loading and saving items.
 #
-# Internally outlines uses a HTMLDocument to store the outline data using a
-# restricted (ftml) set of HTML elements. Each item's data is stored in a `LI`
-# and each items body text is wrapped in a `P` in that `LI`. This format is
-# also used by default when saving outlines to disk.
-#
-# - one
-# - t**w**o
-#   - three
-#
-# Is stored like this:
-#
-# ```html
-# <html>
-#   <body>
-#     <ul id="Birch.Root">
-#       <li id="my7pJv4v">
-#         <p>one</p>
-#       </li>
-#       <li id="mJ46JwEv">
-#         <p>t<b>w</b>o</p>
-#         <ul>
-#           <li id="QyLTkw4v">
-#             <p>three</p>
-#           </li>
-#         </ul>
-#       </li>
-#     </ul>
-#   </body>
-# </html>
-# ```
-#
-# You should not manipulate this structure directly, but you can
-# query it using {::evaluateXPath}.
+# Internally outlines uses a HTMLDocument with a restricted (Folding Text
+# Markup Language) set of HTML to store the underlying outline data. You
+# should never modify the content of this HTMLDocument directly, but you can
+# query it using {::evaluateXPath}. Read more about [Folding Text Markup
+# Language]().
 #
 # ## Examples
-#
-# Use XPath to get all items with bold text:
 #
 # Group multiple changes into a single {OutlineChange}:
 #
@@ -80,6 +50,13 @@ Q = require 'q'
 #       when 'children'
 #         console.log delta.addedItems
 #         console.log delta.removedItems
+# ```
+#
+# Use XPath to list all items with bold text:
+#
+# ```coffeescript
+# for each in outline.itemsForXPath('//li/p//b')
+#   console.log each
 # ```
 class Outline
   atom.deserializers.add(this)
@@ -187,13 +164,13 @@ class Outline
   @idsToOutlines: {}
   @pathsToOutlines: {}
 
-  # Public: Returns {Outline} with the given outline id.
+  # Public: Returns existing {Outline} instance with the given outline id.
   #
   # - `id` {String} outline id.
   @outlineForID: (id) ->
     Outline.idsToOutlines[id]
 
-  # Public: Returns {Outline} with the given file path.
+  # Public: Returns existing {Outline} instance with the given file path.
   #
   # - `filePath` {String} outline file path.
   @outlineForFilePath: (filePath) ->
@@ -324,61 +301,6 @@ class Outline
         items.push each
     items
 
-  # Public: XPath query internal HTML structure for matching {Items}.
-  #
-  # Items are considered to match if they, or if a node contained in their
-  # body text matches the XPath.
-  #
-  # - `xpathExpression` {String} xpath expression
-  # - `namespaceResolver` (optional) {String}
-  #
-  # Returns an {Array} of all {Item} matching the
-  # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
-  itemsForXPath: (xpathExpression, namespaceResolver) ->
-    xpathResult = @evaluateXPath(
-      xpathExpression,
-      null,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE
-    )
-    each = xpathResult.iterateNext()
-    lastItem = undefined
-    items = []
-
-    while each
-      while each and not each._item
-        each = each.parentNode
-      if each
-        eachItem = each._item
-        if eachItem != lastItem
-          items.push(eachItem)
-          lastItem = eachItem
-      each = xpathResult.iterateNext()
-
-    return items
-
-  # Public: XPath query internal HTML structure.
-  #
-  # - `xpathExpression` {String} xpath expression
-  # - `namespaceResolver` (optional)
-  # - `resultType` (optional)
-  # - `result` (optional)
-  #
-  # This query evaluates on the underlying HTMLDocument. Please refere to the
-  # standard [document.evaluate](https://developer.mozilla.org/en-
-  # US/docs/Web/API/document.evaluate) documentation for details.
-  #
-  # Returns an [XPathResult](https://developer.mozilla.org/en-
-  # US/docs/XPathResult) based on an [XPath](https://developer.mozilla.org/en-
-  # US/docs/Web/XPath) expression and other given parameters.
-  evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
-    @outlineStore.evaluate(
-      xpathExpression,
-      @root._liOrRootUL,
-      namespaceResolver,
-      resultType,
-      result
-    )
-
   ###
   Section: Creating Items
   ###
@@ -457,6 +379,65 @@ class Outline
     if isInOutline
       undoManager.enableUndoRegistration()
       outline.endUpdates()
+
+  ###
+  Section: Querying Items
+  ###
+
+  # Public: XPath query internal HTML structure for matching {Items}.
+  #
+  # Items are considered to match if they, or if a node contained in their
+  # body text matches the XPath.
+  #
+  # - `xpathExpression` {String} xpath expression
+  # - `namespaceResolver` (optional) {String}
+  #
+  # Returns an {Array} of all {Item} matching the
+  # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
+  itemsForXPath: (xpathExpression, namespaceResolver) ->
+    xpathResult = @evaluateXPath(
+      xpathExpression,
+      null,
+      XPathResult.ORDERED_NODE_ITERATOR_TYPE
+    )
+    each = xpathResult.iterateNext()
+    lastItem = undefined
+    items = []
+
+    while each
+      while each and not each._item
+        each = each.parentNode
+      if each
+        eachItem = each._item
+        if eachItem != lastItem
+          items.push(eachItem)
+          lastItem = eachItem
+      each = xpathResult.iterateNext()
+
+    return items
+
+  # Public: XPath query internal HTML structure.
+  #
+  # - `xpathExpression` {String} xpath expression
+  # - `namespaceResolver` (optional)
+  # - `resultType` (optional)
+  # - `result` (optional)
+  #
+  # This query evaluates on the underlying HTMLDocument. Please refere to the
+  # standard [document.evaluate](https://developer.mozilla.org/en-
+  # US/docs/Web/API/document.evaluate) documentation for details.
+  #
+  # Returns an [XPathResult](https://developer.mozilla.org/en-
+  # US/docs/XPathResult) based on an [XPath](https://developer.mozilla.org/en-
+  # US/docs/Web/XPath) expression and other given parameters.
+  evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
+    @outlineStore.evaluate(
+      xpathExpression,
+      @root._liOrRootUL,
+      namespaceResolver,
+      resultType,
+      result
+    )
 
   ###
   Section: Grouping Changes

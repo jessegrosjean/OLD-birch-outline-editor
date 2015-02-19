@@ -81,38 +81,38 @@ describe('OutlineEditor', function() {
 
 	describe('Selection', function() {
 		it('should be empty by default', function() {
-			editor.selectionRange().rangeItems.should.eql([]);
+			editor.selection.rangeItems.should.eql([]);
 		});
 
 		it('should select item', function() {
 			editor.moveSelectionRange(outlineSetup.one);
-			editor.selectionRange().rangeItems.should.eql([outlineSetup.one]);
-			editor.selectionRange().isItemMode.should.be.true;
-			editor.selectionRange().focusItem.should.equal(outlineSetup.one);
-			editor.selectionRange().anchorItem.should.equal(outlineSetup.one);
-			should(editor.selectionRange().focusOffset === undefined);
-			should(editor.selectionRange().anchorOffset === undefined);
+			editor.selection.rangeItems.should.eql([outlineSetup.one]);
+			editor.selection.isItemMode.should.be.true;
+			editor.selection.focusItem.should.equal(outlineSetup.one);
+			editor.selection.anchorItem.should.equal(outlineSetup.one);
+			should(editor.selection.focusOffset === undefined);
+			should(editor.selection.anchorOffset === undefined);
 		});
 
 		it('should select item text', function() {
 			editor.moveSelectionRange(outlineSetup.one, 1);
-			editor.selectionRange().rangeItems.should.eql([outlineSetup.one]);
-			editor.selectionRange().isTextMode.should.be.true;
+			editor.selection.rangeItems.should.eql([outlineSetup.one]);
+			editor.selection.isTextMode.should.be.true;
 		});
 
 		it('should extend text selection', function() {
 			editor.moveSelectionRange(outlineSetup.one, 1);
 			editor.extendSelectionRange(outlineSetup.one, 3);
-			editor.selectionRange().isTextMode.should.be.true;
-			editor.selectionRange().focusOffset.should.equal(3);
-			editor.selectionRange().anchorOffset.should.equal(1);
+			editor.selection.isTextMode.should.be.true;
+			editor.selection.focusOffset.should.equal(3);
+			editor.selection.anchorOffset.should.equal(1);
 		});
 
 		it('should null/undefined selection if invalid', function() {
 			editor.moveSelectionRange(outlineSetup.one, 4);
-			editor.selectionRange().isValid.should.be.false;
-			should(editor.selectionRange().focusItem === null);
-			should(editor.selectionRange().focusOffset === undefined);
+			editor.selection.isValid.should.be.false;
+			should(editor.selection.focusItem === null);
+			should(editor.selection.focusOffset === undefined);
 		});
 
 		describe('Focus', function() {
@@ -209,8 +209,8 @@ describe('OutlineEditor', function() {
 			editor.moveSelectionRange(outlineSetup.two, 0);
 			editor.delete('backward', 'character');
 			outlineSetup.one.bodyText.should.equal('onetwo');
-			editor.selectionRange().focusItem.should.eql(outlineSetup.one);
-			editor.selectionRange().focusOffset.should.eql(3);
+			editor.selection.focusItem.should.eql(outlineSetup.one);
+			editor.selection.focusOffset.should.eql(3);
 			outlineSetup.two.isInOutline.should.be.false;
 			outlineSetup.three.isInOutline.should.be.true;
 			outlineSetup.three.parent.should.eql(outlineSetup.one);
@@ -223,8 +223,8 @@ describe('OutlineEditor', function() {
 			editor.moveSelectionRange(outlineSetup.two, 0);
 			editor.delete('backward', 'word');
 			outlineSetup.one.bodyText.should.equal('two');
-			editor.selectionRange().focusItem.should.eql(outlineSetup.one);
-			editor.selectionRange().focusOffset.should.eql(0);
+			editor.selection.focusItem.should.eql(outlineSetup.one);
+			editor.selection.focusOffset.should.eql(0);
 			outlineSetup.two.isInOutline.should.be.false;
 		});
 
@@ -234,8 +234,8 @@ describe('OutlineEditor', function() {
 			editor.moveSelectionRange(outlineSetup.two, 0);
 			editor.delete('backward', 'word');
 			outlineSetup.one.bodyText.should.equal('');
-			editor.selectionRange().focusItem.should.eql(outlineSetup.one);
-			editor.selectionRange().focusOffset.should.eql(0);
+			editor.selection.focusItem.should.eql(outlineSetup.one);
+			editor.selection.focusOffset.should.eql(0);
 			outlineSetup.two.isInOutline.should.be.false;
 		});
 
@@ -244,8 +244,8 @@ describe('OutlineEditor', function() {
 			editor.moveSelectionRange(outlineSetup.one, 3);
 			editor.delete('forward', 'character');
 			outlineSetup.one.bodyText.should.equal('onetwo');
-			editor.selectionRange().focusItem.should.eql(outlineSetup.one);
-			editor.selectionRange().focusOffset.should.eql(3);
+			editor.selection.focusItem.should.eql(outlineSetup.one);
+			editor.selection.focusOffset.should.eql(3);
 			outlineSetup.two.isInOutline.should.be.false;
 		});
 
@@ -255,8 +255,8 @@ describe('OutlineEditor', function() {
 			editor.moveSelectionRange(outlineSetup.one, 3);
 			editor.delete('forward', 'word');
 			outlineSetup.one.bodyText.should.equal('one');
-			editor.selectionRange().focusItem.should.eql(outlineSetup.one);
-			editor.selectionRange().focusOffset.should.eql(3);
+			editor.selection.focusItem.should.eql(outlineSetup.one);
+			editor.selection.focusOffset.should.eql(3);
 			outlineSetup.two.isInOutline.should.be.false;
 		});
 	});
