@@ -1,8 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-Function::property = (prop, desc) ->
-  Object.defineProperty @prototype, prop, desc
-
 ItemBodyUndoOperation = require './ItemBodyUndoOperation'
 AttributedString = require './AttributedString'
 ItemBodyEncoder = require './ItemBodyEncoder'
@@ -38,7 +35,7 @@ Util = require './Util'
 # Add body text formatting:
 #
 # ```coffeescript
-# item = @createItem('Hello World!')
+# item = outline.createItem('Hello World!')
 # item.addElementInBodyTextRange('B', {}, 6, 5)
 # item.addElementInBodyTextRange('I', {}, 0, 11)
 # ```
@@ -95,12 +92,12 @@ class Item
 
   # Public: Read-only unique and persistent {String} ID.
   id: null
-  @property 'id',
+  Object.defineProperty @::, 'id',
     get: -> @_liOrRootUL.id
 
   # Public: Read-only {Array} of this item's attribute names.
   attributeNames: null
-  @property 'attributeNames',
+  Object.defineProperty @::, 'attributeNames',
     get: ->
       namedItemMap = @_liOrRootUL.attributes
       length = namedItemMap.length
@@ -172,7 +169,7 @@ class Item
 
   # Public: Body text as plain text {String}.
   bodyText: null
-  @property 'bodyText',
+  Object.defineProperty @::, 'bodyText',
     get: ->
       # Avoid creating attributed string if not already created. Syntax
       # highlighting will call this method for each displayed node, so try
@@ -186,7 +183,7 @@ class Item
 
   # Public: Body text as HTML {String}.
   bodyHTML: null
-  @property 'bodyHTML',
+  Object.defineProperty @::, 'bodyHTML',
     get: -> _bodyP(@_liOrRootUL).innerHTML
     set: (html) ->
       p = @_liOrRootUL.ownerDocument.createElement('P')
@@ -195,7 +192,7 @@ class Item
 
   # Public: Body text as {AttributedString}.
   attributedBodyText: null
-  @property 'attributedBodyText',
+  Object.defineProperty @::, 'attributedBodyText',
     get: ->
       if @isRoot
         return new AttributedString
@@ -381,54 +378,54 @@ class Item
 
   # Public: Read-only true if is root {Item}.
   isRoot: null
-  @property 'isRoot',
+  Object.defineProperty @::, 'isRoot',
     get: -> @id == Constants.RootID
 
   # Public: Read-only true if item is part of owning {Outline}
   isInOutline: null
-  @property 'isInOutline',
+  Object.defineProperty @::, 'isInOutline',
     get: ->
       li = @_liOrRootUL
       li.ownerDocument.contains(li);
 
   # Public: Read-only parent {Item}.
   parent: null
-  @property 'parent',
+  Object.defineProperty @::, 'parent',
     get: -> _parentLIOrRootUL(@_liOrRootUL)?._item
 
   # Public: Read-only first child {Item}.
   firstChild: null
-  @property 'firstChild',
+  Object.defineProperty @::, 'firstChild',
     get: -> _childrenUL(@_liOrRootUL, false)?.firstElementChild?._item
 
   # Public: Read-only last child {Item}.
   lastChild: null
-  @property 'lastChild',
+  Object.defineProperty @::, 'lastChild',
     get: -> _childrenUL(@_liOrRootUL, false)?.lastElementChild?._item
 
   # Public: Read-only previous sibling {Item}.
   previousSibling: null
-  @property 'previousSibling',
+  Object.defineProperty @::, 'previousSibling',
     get: -> @_liOrRootUL.previousElementSibling?._item
 
   # Public: Read-only next sibling {Item}.
   nextSibling: null
-  @property 'nextSibling',
+  Object.defineProperty @::, 'nextSibling',
     get: -> @_liOrRootUL.nextElementSibling?._item
 
   # Public: Read-only previous branch {Item}.
   previousBranch: null
-  @property 'previousBranch',
+  Object.defineProperty @::, 'previousBranch',
     get: -> @previousSibling or @previousItem
 
   # Public: Read-only next branch {Item}.
   nextBranch: null
-  @property 'nextBranch',
+  Object.defineProperty @::, 'nextBranch',
     get: -> @lastDescendantOrSelf.nextItem
 
   # Public: Read-only ancestor items {Array}.
   ancestors: null
-  @property 'ancestors',
+  Object.defineProperty @::, 'ancestors',
     get: ->
       ancestors = []
       each = @parent
@@ -439,7 +436,7 @@ class Item
 
   # Public: Read-only descendant items {Array}.
   descendants: null
-  @property 'descendants',
+  Object.defineProperty @::, 'descendants',
     get: ->
       descendants = []
       end = @nextBranch
@@ -451,19 +448,19 @@ class Item
 
   # Public: Read-only last descendant {Item}.
   lastDescendant: null
-  @property 'lastDescendant',
+  Object.defineProperty @::, 'lastDescendant',
     get: ->
       each = @lastChild
       while each?.lastChild
         each = each.lastChild
       each
 
-  @property 'lastDescendantOrSelf',
+  Object.defineProperty @::, 'lastDescendantOrSelf',
     get: -> @lastDescendant or this
 
   # Public: Read-only previous {Item} in outline order.
   previousItem: null
-  @property 'previousItem',
+  Object.defineProperty @::, 'previousItem',
     get: ->
       previousSibling = @previousSibling
       if previousSibling
@@ -475,12 +472,12 @@ class Item
         else
           parent
 
-  @property 'previousItemOrRoot',
+  Object.defineProperty @::, 'previousItemOrRoot',
     get: -> @previousItem or @parent
 
   # Public: Read-only next {Item} in outline order.
   nextItem: null
-  @property 'nextItem',
+  Object.defineProperty @::, 'nextItem',
     get: ->
       firstChild = @firstChild
       if firstChild
@@ -501,7 +498,7 @@ class Item
 
   # Public: Read-only {Boolean}
   hasChildren: null
-  @property 'hasChildren',
+  Object.defineProperty @::, 'hasChildren',
     get: ->
       ul = _childrenUL(@_liOrRootUL)
       if ul
@@ -511,7 +508,7 @@ class Item
 
   # Public: Read-only child items {Array}.
   children: null
-  @property 'children',
+  Object.defineProperty @::, 'children',
     get: ->
       children = []
       each = @firstChild
@@ -745,10 +742,10 @@ class Item
   Section: Aliases
   ###
 
-  @property 'isAliased',
+  Object.defineProperty @::, 'isAliased',
     get: -> @_aliases != null
 
-  @property 'aliases',
+  Object.defineProperty @::, 'aliases',
     get: -> @_aliases
 
   aliasItem: ->
