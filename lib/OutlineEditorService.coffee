@@ -7,7 +7,7 @@ Item = require './Item'
 
 # Essential: This is the Atom [services
 # API](https://atom.io/docs/latest/creating-a-package#interacting-with-other-
-# packages-via-services) object vended for `outline-editor-service`. Please
+# packages-via-services) object vended for `birch-outline-editor-service`. Please
 # see the [Package Tutorial](Package%20Tutorial) to learn how to build a
 # package that uses this service.
 class OutlineEditorService
@@ -40,6 +40,14 @@ class OutlineEditorService
   # Returns an {Array} of {OutlineEditor}s.
   @getOutlineEditors: ->
     atom.workspace.getPaneItems().filter (item) -> item instanceof OutlineEditor
+
+  # Essential: Get the active item if it is an {OutlineEditor}.
+  #
+  # Returns an {OutlineEditor} or `undefined` if the current active item is
+  # not an {OutlineEditor}.
+  @getActiveOutlineEditor: ->
+    activeItem = atom.workspace.getActivePaneItem()
+    activeItem if activeItem instanceof OutlineEditor
 
   # Essential: Get all outline editors for a given outine the workspace.
   #

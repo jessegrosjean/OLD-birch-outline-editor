@@ -1128,14 +1128,14 @@ EventRegistery.listen 'input[is="outline-editor-focus"]', stopEventPropagation(
   'paste': (e) -> @parentElement.editor.pasteToSelection(e.clipboardData)
 )
 
-EventRegistery.listen 'outline-editor',
+EventRegistery.listen 'birch-outline-editor',
   'contextmenu': (e) -> @onContextMenu(e)
 
 clipboardAsDatatransfer =
   getData: (type) -> atom.clipboard.read()
   setData: (type, data) -> atom.clipboard.write(data)
 
-atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(
+atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'core:cut': (e) ->
     @editor.cutSelection clipboardAsDatatransfer
   'core:copy': (e) ->
@@ -1144,7 +1144,7 @@ atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(
     @editor.pasteToSelection clipboardAsDatatransfer
 )
 
-atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(
+atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'core:undo': -> @editor.undo()
   'core:redo': -> @editor.redo()
   'editor:newline': -> @editor.insertNewline()
@@ -1175,10 +1175,10 @@ atom.commands.add 'outline-editor', stopEventPropagationAndGroupUndo(
   'outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
-  'outline-outline-editor:toggle-done': -> @editor.toggleDone()
+  'outline-editor:toggle-done': -> @editor.toggleDone()
 )
 
-atom.commands.add 'outline-editor', stopEventPropagation(
+atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'core:cancel': -> @editor.selectLine()
   'core:move-backward': -> @editor.moveBackward()
   'core:select-backward': -> @editor.moveBackwardAndModifySelection()
@@ -1234,8 +1234,8 @@ atom.commands.add 'outline-editor', stopEventPropagation(
   'core:page-down': -> @editor.pageDown()
   'editor:fold-current-row': -> @editor.foldItems()
   'editor:unfold-current-row': -> @editor.unfoldItems()
-  'outline-outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
+  'outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
 
 )
 
-module.exports = document.registerElement 'outline-editor', prototype: OutlineEditorElement.prototype
+module.exports = document.registerElement 'birch-outline-editor', prototype: OutlineEditorElement.prototype

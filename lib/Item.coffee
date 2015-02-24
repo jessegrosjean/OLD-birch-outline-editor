@@ -536,8 +536,14 @@ class Item
   comparePosition: (item) ->
     @_liOrRootUL.compareDocumentPosition(item._liOrRootUL)
 
-  @coverItems: (items) ->
-    coverItems = []
+  # Public: Given an array of items determines and returns the common
+  # ancestors of those items.
+  #
+  # - `items` {Array} of {Items}.
+  #
+  # Returns a {Array} of common ancestor {Items}.
+  @commonAncestors: (items) ->
+    commonAncestors = []
     itemIDs = {}
 
     for each in items
@@ -548,9 +554,9 @@ class Item
       while p and not itemIDs[p.id]
         p = p.parent
       unless p
-        coverItems.push each
+        commonAncestors.push each
 
-    coverItems
+    commonAncestors
 
   @itemsWithAncestors: (items) ->
     ancestorsAndItems = []

@@ -568,7 +568,7 @@ OutlineEditorSelection.prototype._calculateRangeItems = function(overRideRangeIt
   }
 
   this.rangeItems = rangeItems;
-  this.rangeItemsCover = Item.coverItems(rangeItems);
+  this.rangeItemsCover = Item.commonAncestors(rangeItems);
   this.startItem = rangeItems[0];
   this.endItem = rangeItems[rangeItems.length - 1];
 

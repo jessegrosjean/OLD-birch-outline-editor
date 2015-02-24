@@ -1,6 +1,6 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
-  'outline-editor': [
+  'birch-outline-editor': [
     { label: 'Bold', command: 'outline-editor:toggle-bold' }
     { label: 'Italic', command: 'outline-editor:toggle-italic' }
     { label: 'Underline', command: 'outline-editor:toggle-underline' }

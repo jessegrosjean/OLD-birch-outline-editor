@@ -1,7 +1,7 @@
 'body':
   'alt-cmd-n': 'birch-outline-editor:new-outline'
 
-'outline-editor':
+'birch-outline-editor':
   # Platform Bindings
   'home': 'editor:move-to-first-character-of-line'
   'end': 'editor:move-to-end-of-screen-line'
@@ -87,16 +87,16 @@
   'cmd-k cmd-7': 'editor:fold-at-indent-level-7'
   'cmd-k cmd-8': 'editor:fold-at-indent-level-8'
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
-  'cmd-.': 'outline-outline-editor:toggle-fold-items'
+  'cmd-.': 'outline-editor:toggle-fold-items'
 
   'cmd-b' : 'outline-editor:toggle-bold'
   'cmd-i' : 'outline-editor:toggle-italic'
   'cmd-u' : 'outline-editor:toggle-underline'
   'cmd-k' : 'outline-editor:toggle-strikethrough'
 
-  'cmd-d' : 'outline-outline-editor:toggle-done'
+  'cmd-d' : 'outline-editor:toggle-done'
 
-'outline-editor.itemMode':
+'birch-outline-editor.itemMode':
   'right' : 'insertCaretAtEndOfLine',
   'left' : 'insertCaretAtBeginingOfLine',
   'i' : 'insertCaretAtBeginingOfLine',
@@ -108,6 +108,6 @@
   'f i' : 'outline-editor:hoist',
   'f o' : 'outline-editor:unhoist',
 
-  '.' : 'outline-outline-editor:toggle-fold-items',
+  '.' : 'outline-editor:toggle-fold-items',
 
-  'd' : 'outline-outline-editor:toggle-done'
+  'd' : 'outline-editor:toggle-done'

@@ -350,7 +350,7 @@ class OutlineEditor extends Model
           @outlineEditorElement.updateItemExpanded(each)
     else
       # for better animations
-      for each in Item.coverItems(items)
+      for each in Item.commonAncestors(items)
         if @isExpanded(each) != expanded
           @editorState(each).expanded = expanded
           @outlineEditorElement.updateItemExpanded(each)
@@ -394,7 +394,7 @@ class OutlineEditor extends Model
       expand = not @isExpanded((each for each in items when each.hasChildren)[0])
 
     if fully
-      for each in Item.coverItems(items) when each.hasChildren and @isExpanded(each) != expand
+      for each in Item.commonAncestors(items) when each.hasChildren and @isExpanded(each) != expand
         foldItems.push each
         foldItems.push each for each in each.descendants when each.hasChildren and @isExpanded(each) != expand
     else

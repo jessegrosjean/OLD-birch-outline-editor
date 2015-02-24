@@ -11,7 +11,7 @@
     "birch-outine-editor-service": {
       "description": "Birch Outline Editor Service",
       "versions": {
-        "1.0.0": "birchOutlineEditorService"
+        "0.0.1": "birchOutlineEditorService"
       }
     }
   },

@@ -39,7 +39,7 @@ describe('Item', function() {
 	});
 
 	it('should calculate cover items', function() {
-		Item.coverItems([
+		Item.commonAncestors([
 			outlineSetup.three,
 			outlineSetup.five,
 			outlineSetup.six,

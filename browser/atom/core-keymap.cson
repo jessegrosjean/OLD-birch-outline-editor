@@ -1,4 +1,4 @@
-'outline-editor':
+'birch-outline-editor':
 
   'tab' : 'editor:indent-selected-rows'
   'alt-tab' : 'editor:insert-tab-ignoring-field-editor'
@@ -108,6 +108,6 @@
   'ctrl-alt-cmd-left' : 'editor:promote-child-rows'
   'ctrl-alt-cmd-right' : 'editor:demote-trailing-sibling-rows'
 
-'outline-editor.itemMode':
+'birch-outline-editor.itemMode':
   'backspace' : 'deleteItemsBackward'
   'delete' : 'deleteItemsForward'
