@@ -17,7 +17,7 @@ module.exports = BirchOutlineEditor =
   config:
     disableAnimation:
       type: 'boolean'
-      default: true
+      default: false
 
   birchOutlineEditorService: ->
     outlineEditorService
@@ -33,7 +33,6 @@ module.exports = BirchOutlineEditor =
         new OutlineEditor
       else
         extension = path.extname(filePath).toLowerCase()
-        debugger
         switch extension
           when '.oeml'
             o = new Outline({

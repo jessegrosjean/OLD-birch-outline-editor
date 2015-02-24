@@ -19,7 +19,22 @@ and testing directly in Atom.
 First download and install [Atom](https://atom.io/).
 
 The birch outliner package is not public so you will need to install it
-manually. Once you've downloaded the package
+manually. These are the steps to manually install Birch:
+
+1. Open Atom and choose the menu Atom > Install Shell Commands.
+
+2. Download the birch-outliner-package.
+
+3. Go into the birch-outliner-package using Terminal app and do `apm install`
+   followed by `apm link`. The install command installs Birch dependencies, and
+   then the link command links the package into Atoms startup process.
+
+4. Restart Atom and you should see a new menu item File > New Outline. Use
+   that to create a new outline, press "Return" to create a new item and start
+   typing.
+
+5. Once birch is installed when you open a file ending with `.oeml` in Atom it
+   will be opened in the Birch outline editor.
 
 ## New UI
 
