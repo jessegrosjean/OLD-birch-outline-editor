@@ -1,8 +1,8 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-OutlineEditorElement = require './OutlineEditorElement'
-OutlineChangeDelta = require './OutlineChangeDelta'
 OutlineEditorSelection = require './OutlineEditorSelection'
+OutlineEditorElement = require './OutlineEditorElement'
+Mutation = require './Mutation'
 AttributedString = require './AttributedString'
 {Emitter, CompositeDisposable} = require 'atom'
 ItemBodyEncoder = require './ItemBodyEncoder'
@@ -27,21 +27,12 @@ path = require 'path'
 # filtering items, expanded items, and item selection.
 #
 # A single {Outline} can belong to multiple editors. For example, if the same
-# file is open in two different panes, Atom creates a separate editor for each
-# pane. If the outline is manipulated the changes are reflected in both
+# outline is open in two different panes, Atom creates a separate editor for
+# each pane. If the outline is manipulated the changes are reflected in both
 # editors, but each maintains its own selection, expanded items, etc.
 #
-# ## Accessing OutlineEditor Instances
-#
 # The easiest way to get hold of `OutlineEditor` objects is by registering a
-# callback with `::observeOutlineEditors` on the `atom.workspace` global. Your
-# callback will then be called with all current editor instances and also when
-# any editor is created in the future.
-#
-# ```coffeescript
-# disposable = atom.workspace.observeOutlineEditors (editor) ->
-#   editor.insertItem('Hello World!')
-# ```
+# callback with `::observeOutlineEditors` through the {OutlineEditorService}.
 module.exports =
 class OutlineEditor extends Model
   atom.deserializers.add(this)
@@ -154,9 +145,9 @@ class OutlineEditor extends Model
   outlineDidChange: (e) ->
     if @itemFilterPath()
       hoistedItem = @hoistedItem()
-      for eachDelta in e.deltas
-        if eachDelta.type == OutlineChangeDelta.ChildrenChanged
-          for eachItem in eachDelta.addedItems
+      for eachMutation in e.mutations
+        if eachMutation.type == Mutation.ChildrenChanged
+          for eachItem in eachMutation.addedItems
             if hoistedItem.contains(eachItem)
               @_addItemFilterPathMatch(eachItem)
 
@@ -166,9 +157,9 @@ class OutlineEditor extends Model
     @moveSelectionRange(selectionRange)
     @_overrideIsFocused = false
 
-    for eachDelta in e.deltas
-      if eachDelta.type == OutlineChangeDelta.ChildrenChanged
-        targetItem = eachDelta.target
+    for eachMutation in e.mutations
+      if eachMutation.type == Mutation.ChildrenChanged
+        targetItem = eachMutation.target
         if not targetItem.hasChildren
           @setCollapsed targetItem
 
@@ -210,10 +201,11 @@ class OutlineEditor extends Model
 
   # Public: Invoke the given callback when the editor's outline changes.
   #
-  # See {Outline} Examples for an example of subscribing to {OutlineChange}s.
+  # See {Outline} Examples for an example of subscribing to these events.
   #
   # - `callback` {Function} to be called when the outline changes.
-  #   - `event` {OutlineChange} event.
+  #   - `event` {Object} with following keys:
+  #     - `mutations` {Array} of {Mutation}s.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChange: (callback) ->

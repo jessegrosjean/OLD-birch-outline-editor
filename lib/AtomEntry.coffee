@@ -10,7 +10,7 @@ path = require 'path'
 atom.views.addViewProvider OutlineEditor, (model) ->
   model.outlineEditorElement
 
-module.exports = BirchOutliner =
+module.exports = BirchOutlineEditor =
   globalOutlineEditorStyleSheet: null
   subscriptions: null
 
@@ -19,13 +19,13 @@ module.exports = BirchOutliner =
       type: 'boolean'
       default: true
 
-  outlineEditorService: ->
+  birchOutlineEditorService: ->
     outlineEditorService
 
   activate: (state) ->
     @subscriptions = new CompositeDisposable
 
-    @subscriptions.add atom.commands.add 'atom-workspace', 'birch-outliner:new-outline': =>
+    @subscriptions.add atom.commands.add 'atom-workspace', 'birch-outline-editor:new-outline': =>
       atom.workspace.open('outline-editor://new-outline')
 
     @subscriptions.add atom.workspace.addOpener (filePath) =>
@@ -33,8 +33,9 @@ module.exports = BirchOutliner =
         new OutlineEditor
       else
         extension = path.extname(filePath).toLowerCase()
+        debugger
         switch extension
-          when '.ftml'
+          when '.oeml'
             o = new Outline({
               filePath: filePath,
               load: true

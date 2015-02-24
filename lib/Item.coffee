@@ -423,7 +423,7 @@ class Item
   Object.defineProperty @::, 'nextBranch',
     get: -> @lastDescendantOrSelf.nextItem
 
-  # Public: Read-only ancestor items {Array}.
+  # Public: Read-only {Array} of ancestor {Items}.
   ancestors: null
   Object.defineProperty @::, 'ancestors',
     get: ->
@@ -434,7 +434,7 @@ class Item
         each = each.parent
       ancestors
 
-  # Public: Read-only descendant items {Array}.
+  # Public: Read-only {Array} of descendant {Items}.
   descendants: null
   Object.defineProperty @::, 'descendants',
     get: ->
@@ -458,7 +458,7 @@ class Item
   Object.defineProperty @::, 'lastDescendantOrSelf',
     get: -> @lastDescendant or this
 
-  # Public: Read-only previous {Item} in outline order.
+  # Public: Read-only previous {Item} in the outline.
   previousItem: null
   Object.defineProperty @::, 'previousItem',
     get: ->
@@ -475,7 +475,7 @@ class Item
   Object.defineProperty @::, 'previousItemOrRoot',
     get: -> @previousItem or @parent
 
-  # Public: Read-only next {Item} in outline order.
+  # Public: Read-only next {Item} in the outline.
   nextItem: null
   Object.defineProperty @::, 'nextItem',
     get: ->
@@ -496,7 +496,7 @@ class Item
 
       null
 
-  # Public: Read-only {Boolean}
+  # Public: Read-only has children {Boolean}.
   hasChildren: null
   Object.defineProperty @::, 'hasChildren',
     get: ->
@@ -506,7 +506,7 @@ class Item
       else
         false
 
-  # Public: Read-only child items {Array}.
+  # Public: Read-only {Array} of child {Items}.
   children: null
   Object.defineProperty @::, 'children',
     get: ->

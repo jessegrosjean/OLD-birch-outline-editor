@@ -2,9 +2,9 @@
 
 {Emitter, CompositeDisposable} = require 'atom'
 ItemSerializer = require './ItemSerializer'
-OutlineChange = require './OutlineChange'
 UndoManager = require './UndoManager'
 Constants = require './Constants'
+Mutation = require './Mutation'
 {File} = require 'pathwatcher'
 emissary = require 'emissary'
 shortid = require './shortid'
@@ -12,20 +12,19 @@ assert = require 'assert'
 Item = require './Item'
 Q = require 'q'
 
-# Essential: A mutable outline of {Item}'s.
+# Essential: A mutable outline of {Item}s.
 #
 # Use outlines to create new items, find existing items, and watch for changes
 # in items. Outlines also coordinate loading and saving items.
 #
-# Internally outlines uses a HTMLDocument with a restricted (Folding Text
-# Markup Language) set of HTML to store the underlying outline data. You
-# should never modify the content of this HTMLDocument directly, but you can
-# query it using {::evaluateXPath}. Read more about [Folding Text Markup
-# Language]().
+# Internally outlines uses a {HTMLDocument} to store the underlying outline
+# data. You should never modify the content of this HTMLDocument directly, but
+# you can query it using {::evaluateXPath}. The structure of this document is
+# described in [Outline Editor Markup Language](outline_editor_markup_language).
 #
 # ## Examples
 #
-# Group multiple changes into a single {OutlineChange}:
+# Group multiple changes:
 #
 # ```coffeescript
 # outline.beginUpdates()
@@ -41,21 +40,21 @@ Q = require 'q'
 #
 # ```coffeescript
 # disposable = outline.onDidChange (e) ->
-#   for delta in e.deltas
-#     switch delta.type
+#   for mutation in e.mutations
+#     switch mutation.type
 #       when 'attributes'
-#         console.log delta.attributeName
+#         console.log mutation.attributeName
 #       when 'bodyText'
-#         console.log delta.target.bodyText
+#         console.log mutation.target.bodyText
 #       when 'children'
-#         console.log delta.addedItems
-#         console.log delta.removedItems
+#         console.log mutation.addedItems
+#         console.log mutation.removedItems
 # ```
 #
 # Use XPath to list all items with bold text:
 #
 # ```coffeescript
-# for each in outline.itemsForXPath('//li/p//b')
+# for each in outline.itemsForXPath('//b')
 #   console.log each
 # ```
 class Outline
@@ -182,10 +181,11 @@ class Outline
 
   # Public: Invoke the given callback when the outline changes.
   #
-  # See {Outline} Examples for an example of subscribing to {OutlineChange}s.
+  # See {Outline} Examples for an example of subscribing to this event.
   #
   # - `callback` {Function} to be called when the outline changes.
-  #   - `event` {OutlineChange} event.
+  #   - `event` {Object} with following keys:
+  #     - `mutations` {Array} of {Mutation}s.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChange: (callback) ->
@@ -443,11 +443,11 @@ class Outline
   Section: Grouping Changes
   ###
 
-  # Public: Returns {true} if outline is updating.
+  # Public: Returns {Boolean} true if outline is updating.
   isUpdating: -> @updateCount != 0
 
-  # Public: Begin grouping changes into a single {OutlineChange} event. Must
-  # later call {::endUpdates} to balance this call.
+  # Public: Begin grouping changes. Must later call {::endUpdates} to balance
+  # this call.
   beginUpdates: ->
     if ++@updateCount == 1 then @updateMutations = []
 
@@ -457,12 +457,12 @@ class Outline
     if --@updateCount == 0
       updateMutations = @updateMutations
       @updateMutations = null
-
       updateMutations = updateMutations.concat(@updateMutationObserver.takeRecords())
       if updateMutations.length > 0
         @cachedText = null
         @conflict = false if @conflict and !@isModified()
-        @emitter.emit('did-change', new OutlineChange(updateMutations))
+        event = { mutations: Mutation.createFromDOMMutations updateMutations }
+        @emitter.emit('did-change', event)
         @scheduleModifiedEvents()
 
   ###

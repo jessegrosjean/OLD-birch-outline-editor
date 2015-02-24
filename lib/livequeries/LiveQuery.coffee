@@ -3,7 +3,7 @@
 {Emitter, CompositeDisposable} = require 'atom'
 debounce = require 'debounce'
 
-# Public: A live query.
+# Private: A live query.
 module.exports =
 class OutlineLiveQuery
 
@@ -40,6 +40,9 @@ class OutlineLiveQuery
 
   # Public: Read-only xpath expression.
   xpathExpression: null
+
+  # Public: Read-only xpath expression syntax error.
+  xpathExpressionError: null
 
   # Public: Set new xpath expression and schedule an update if the query is
   # started.

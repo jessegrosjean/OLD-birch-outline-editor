@@ -4,7 +4,7 @@ LiveQuery = require './LiveQuery'
 OutlineLiveQuery = require './OutlineLiveQuery'
 {CompositeDisposable} = require 'atom'
 
-# Public: A live query over all {Outline}s in a {Workspace}.
+# A live query over all {Outline}s in a {Workspace}.
 module.exports =
 class WorkspaceLiveQuery extends LiveQuery
 
@@ -76,11 +76,19 @@ class WorkspaceLiveQuery extends LiveQuery
     return unless @started
 
     @results = []
+    @xpathExpressionError = null
 
     for id, queryInfo of @outlineIDsToQueryInfo
       query = queryInfo.query
-      @results.push
-        outline: query.outline
-        results: query.results
+      if query.results is null
+        @results = null
+        @xpathExpressionError = query.xpathExpressionError
+        @emitter.emit 'did-change', @results
+        return
+
+      if query.results.length
+        @results.push
+          outline: query.outline
+          results: query.results
 
     @emitter.emit 'did-change', @results

@@ -2,38 +2,47 @@
 
 assert = require 'assert'
 
-# Public: Outline Change Delta.
+# Public: A record of a single change in a target {Item}.
 #
-# Represents a single change in a target {Item}. There are three types of
-# changes that can occure: an attribute changed, the body text changed, or the
-# item's children changed.
-#
-# See {Outline} Examples for an example of subscribing to {OutlineChange}s.
-class OutlineChangeDelta
+# A new mutation is created to record each attribute set, body text change,
+# and child item's update. Use {Outline::onDidChange} to recive this mutation
+# records so you can track whats changed as an outline is edited.
+class Mutation
 
-  # Public: Read-only type of change. `attributes`, 'bodyText', or 'children'.
-  type: null
-
-  # Public: Read-only target {Item} of change.
+  # Public: Read-only {Item} target of the change delta.
   target: null
 
-  # Public: Read-only {Item} children added to target.
+  # Public: Read-only type of change. `attributes`, `bodyText`, or `children`.
+  type: null
+
+  # Public: Read-only {Array} of child {Item}s added to the target.
   addedItems: null
 
-  # Public: Read-only {Item} children removed from target.
+  # Public: Read-only {Array} of child {Item}s removed from the target.
   removedItems: null
 
-  # Public: Read-only previous sibling of the added or removed Items, or null.
+  # Public: Read-only previous sibling {Item} of the added or removed Items,
+  # or null.
   previousSibling: null
 
-  # Public: Read-only next sibling of the added or removed Items, or null.
+  # Public: Read-only next sibling {Item} of the added or removed Items, or
+  # null.
   nextSibling: null
 
-  # Public: Read-only name of changed attribute, or null.
+  # Public: Read-only name of changed attribute in the target {Item}, or null.
   attributeName: null
 
-  # Public: Read-only previous value of changed attribute, or null.
+  # Public: Read-only previous value of changed attribute in the target
+  # {Item}, or null.
   attributeOldValue: null
+
+  @createFromDOMMutations: (mutationRecords) ->
+    results = []
+    for mutationRecord in mutationRecords
+      mutationRecord = Mutation.createFromDOMMutation(mutationRecord)
+      if mutationRecord
+        results.push mutationRecord
+    results
 
   constructor: (mutation) ->
     @_mutation = mutation
@@ -45,11 +54,11 @@ function error() {
   throw 'Unexpected Mutation: ' + mutation;
 };
 
-OutlineChangeDelta.createFromDOMMutation = function(mutation) {
+Mutation.createFromDOMMutation = function(mutation) {
   var type = mutation.type,
     target = mutation.target,
     targetTag = target.tagName,
-    delta = new OutlineChangeDelta(mutation);
+    delta = new Mutation(mutation);
 
   delta.target = _item(target);
 
@@ -66,13 +75,13 @@ OutlineChangeDelta.createFromDOMMutation = function(mutation) {
 
   if (targetTag === 'LI') {
     if (type === 'attributes') {
-      delta.type = OutlineChangeDelta.AttributeChanged;
+      delta.type = Mutation.AttributeChanged;
       delta.attributeName = mutation.attributeName;
       delta.attributeOldValue = mutation.attributeOldValue;
     } else if (type === 'childList') {
       if (mutation.removedNodes.length === 1 && mutation.addedNodes.length === 1 && mutation.addedNodes[0].tagName === 'P') {
         // updating bodyP through replacement
-        delta.type = OutlineChangeDelta.BodyTextChanged;
+        delta.type = Mutation.BodyTextChanged;
       } else {
         return null; // adding 'UL' ... ignore, li children will be added separate
       }
@@ -102,7 +111,7 @@ OutlineChangeDelta.createFromDOMMutation = function(mutation) {
 
     delta.previousSibling = _item(mutation.previousSibling);
     delta.nextSibling = _item(mutation.nextSibling);
-    delta.type = OutlineChangeDelta.ChildrenChanged;
+    delta.type = Mutation.ChildrenChanged;
   } else {
     throw 'Unexpected';
   }
@@ -120,9 +129,9 @@ function _item(xmlNode) {
   return null;
 };
 
-OutlineChangeDelta.AttributeChanged = 'attribute';
-OutlineChangeDelta.BodyTextChanged = 'bodyText';
-OutlineChangeDelta.ChildrenChanged = 'children';
+Mutation.AttributeChanged = 'attribute';
+Mutation.BodyTextChanged = 'bodyText';
+Mutation.ChildrenChanged = 'children';
 
-module.exports = OutlineChangeDelta;
+module.exports = Mutation;
 `

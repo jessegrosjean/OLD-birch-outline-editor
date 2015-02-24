@@ -10,7 +10,7 @@
   {
     label: 'File'
     submenu: [
-      { label: 'New Outline', command: 'birch-outliner:new-outline' }
+      { label: 'New Outline', command: 'birch-outline-editor:new-outline' }
     ]
   }
 ]

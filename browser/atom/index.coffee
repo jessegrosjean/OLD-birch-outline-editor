@@ -8,9 +8,9 @@ load styles and keybindings
 {Emitter, Disposable, CompositeDisposable} = require './event-kit/lib/event-kit'
 CommandRegistry = require './command-registry'
 KeymapManager = require './atom-keymap/lib/keymap-manager'
-cssTextFunction = require '../../styles/birch-outliner.less'
+cssTextFunction = require '../../styles/birch-outline-editor.less'
 coreKeymap = require './core-keymap.cson'
-birchKeymap = require '../../keymaps/birch-outliner.cson'
+birchKeymap = require '../../keymaps/birch-outline-editor.cson'
 commands = new CommandRegistry
 keymaps = new KeymapManager
 

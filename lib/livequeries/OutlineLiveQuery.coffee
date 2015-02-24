@@ -3,7 +3,7 @@
 LiveQuery = require './LiveQuery'
 {CompositeDisposable} = require 'atom'
 
-# Public: A live query over an {Outline}.
+# A live query over an {Outline}.
 module.exports =
 class OutlineLiveQuery extends LiveQuery
 
@@ -33,6 +33,7 @@ class OutlineLiveQuery extends LiveQuery
       @scheduleRun()
     @querySubscriptions.add @outline.onDidChangePath (path) =>
       @scheduleRun()
+    @run()
 
   stopQuery: ->
     return unless @started
@@ -43,9 +44,14 @@ class OutlineLiveQuery extends LiveQuery
 
   run: ->
     return unless @started
+    try
+      @xpathExpressionError = null
+      @results = @outline.itemsForXPath(
+        @xpathExpression,
+        @namespaceResolver
+      )
+    catch error
+      @xpathExpressionError = error
+      @results = null
 
-    @results = @outline.itemsForXPath(
-      @xpathExpression,
-      @namespaceResolver
-    )
     @emitter.emit 'did-change', @results

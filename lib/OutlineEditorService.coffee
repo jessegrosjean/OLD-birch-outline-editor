@@ -5,37 +5,11 @@ OutlineEditor = require './OutlineEditor'
 Outline = require './Outline'
 Item = require './Item'
 
-# Essential: This is the service object provided by the `outline-editor-
-# service`.
-#
-# Atom allows packages to interact with each other through a [services
+# Essential: This is the Atom [services
 # API](https://atom.io/docs/latest/creating-a-package#interacting-with-other-
-# packages-via-services). If you want to write a package that enhances the
-# outline editor your package should subscribe to the `outline-editor-service`
-# as show below. It will then have access a OutlineEditorService instance.
-#
-# ## Subscribe to the Outline Editor Service
-#
-# Subscribe in your packages `package.json`:
-#
-# ```json
-# "consumedServices": {
-#   "outine-editor-service": {
-#     "versions": {
-#       "^1.0.0": "consumeOutlineEditorService"
-#     }
-#   }
-# }
-# ```
-#
-# Implement the service's callback in your main module:
-#
-# ```coffeescript
-# consumeOutlineEditorService: (outlineEditorService) ->
-#   @outlineEditorService = outlineEditorService
-#   new Disposable =>
-#     @outlineEditorService = null
-# ```
+# packages-via-services) object vended for `outline-editor-service`. Please
+# see the [Package Tutorial](Package%20Tutorial) to learn how to build a
+# package that uses this service.
 class OutlineEditorService
 
   ###
@@ -51,10 +25,10 @@ class OutlineEditorService
   # Public: {OutlineEditor} Class
   @OutlineEditor: OutlineEditor
 
-  # Public: {OutlineLiveQuery} Class
+  # Private: {OutlineLiveQuery} Class
   @OutlineLiveQuery: OutlineLiveQuery
 
-  # Public: {WorkspaceLiveQuery} Class
+  # Private: {WorkspaceLiveQuery} Class
   @WorkspaceLiveQuery: WorkspaceLiveQuery
 
   ###
@@ -104,77 +78,5 @@ class OutlineEditorService
   @observeOutlineEditors: (callback) ->
     callback(outlineEditor) for outlineEditor in @getOutlineEditors()
     @onDidAddOutlineEditor ({outlineEditor}) -> callback(outlineEditor)
-
-  ###
-
-  # Public: Live XPath query all {Outlines}.
-  #
-  # Items are considered to match if they, or if a node contained in their
-  # body text matches the XPath.
-  #
-  # - `xpathExpression` {String} xpath expression
-  # - `namespaceResolver` (optional) {String}
-  # - `callback` {Function}
-  @scheduleLiveQuery: (xpathExpression, namespaceResolver, callback) ->
-    if @liveQueries.length == 0
-      @_beginObservingOutlinesForLiveQueries()
-
-    liveQuery =
-      xpathExpression: xpathExpression
-      namespaceResolver: namespaceResolver
-      callback: callback
-
-    new Disposable =>
-      @liveQueries.splice(@liveQueries.indexOf(liveQuery), 1)
-      if @liveQueries.length == 0
-        @_endObservingOutlinesForLiveQueries()
-
-  @liveQueries: []
-  @liveQueryOutlines: []
-  @liveQueryOutlinesSubscription: null
-
-  @_beginObservingOutlinesForLiveQueries: ->
-    @liveQueryOutlinesSubscription = new CompositeDisposable
-    @liveQueryOutlinesSubscription.add @observeOutlineEditors (editor) =>
-      @_observeOutline editor.outline
-    @scheduleRunLiveQuery()
-
-  @_endObservingOutlinesForLiveQueries: ->
-    @liveQueryOutlinesSubscription.dispose()
-    @liveQueryOutlinesSubscription = null
-    @liveQueryOutlines = []
-
-  @_observeOutline: (outline) ->
-    unless outline in @liveQueryOutlines
-      changedSubscription = outline.onDidChange (e) =>
-        @scheduleRunLiveQuery()
-
-      changedPathSubscription = outline.onDidChangePath (path) =>
-        @scheduleRunLiveQuery()
-
-      destroyedSubscription = outline.onDidDestroy =>
-        changedSubscription.dispose()
-        destroyedSubscription.dispose()
-        @liveQueryOutlines.splice(@liveQueryOutlines.indexOf(outline), 1)
-        @scheduleRunLiveQuery()
-
-      @liveQueryOutlinesSubscription.add changedSubscription
-      @liveQueryOutlinesSubscription.add changedPathSubscription
-      @liveQueryOutlinesSubscription.add destroyedSubscription
-      @liveQueryOutlines.push outline
-      @scheduleRunLiveQuery()
-
-  @_runLiveQueries: ->
-    for eachQuery in @liveQueries
-      queryResults = []
-      for eachOutline in @liveQueryOutlines
-        queryResults.push
-          outline: eachOutline
-          matchingItems: eachOutline.itemsForXPath(
-            eachQuery.xpathExpression,
-            eachQuery.namespaceResolver
-          )
-      eachQuery.callback(queryResults)
-  ###
 
 module.exports = OutlineEditorService

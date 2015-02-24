@@ -1,5 +1,5 @@
 'body':
-  'alt-cmd-n': 'birch-outliner:new-outline'
+  'alt-cmd-n': 'birch-outline-editor:new-outline'
 
 'outline-editor':
   # Platform Bindings

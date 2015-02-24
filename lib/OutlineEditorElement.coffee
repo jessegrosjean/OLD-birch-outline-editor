@@ -1,13 +1,14 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
+OutlineEditorQueryFieldElement  = require './OutlineEditorQueryFieldElement'
 OutlineEditorFocusElement = require './OutlineEditorFocusElement'
 ChildrenULAnimation = require './animations/ChildrenULAnimation'
 LIInsertAnimation = require './animations/LIInsertAnimation'
 LIRemoveAnimation = require './animations/LIRemoveAnimation'
-LIMoveAnimation = require './animations/LIMoveAnimation'
-OutlineChangeDelta = require './OutlineChangeDelta'
 OutlineEditorSelection = require './OutlineEditorSelection'
+LIMoveAnimation = require './animations/LIMoveAnimation'
 ItemBodyEncoder = require './ItemBodyEncoder'
+Mutation = require './Mutation'
 ItemSerializer = require './ItemSerializer'
 EventRegistery = require './EventRegistery'
 {CompositeDisposable} = require 'atom'
@@ -53,9 +54,13 @@ class OutlineEditorElement extends HTMLElement
     @appendChild(animationLayerElement)
     @animationLayerElement = animationLayerElement
 
-    outlineEditorFocusElement = new OutlineEditorFocusElement()
+    outlineEditorFocusElement = new OutlineEditorFocusElement
     @appendChild(outlineEditorFocusElement)
     @outlineEditorFocusElement = outlineEditorFocusElement
+
+    outlineEditorQueryFieldElement = new OutlineEditorQueryFieldElement
+    #@appendChild(outlineEditorQueryFieldElement)
+
 
     # Register directly on this element because Atom app handles this event
     # meaning that the event delegation path won't get called
@@ -72,8 +77,8 @@ class OutlineEditorElement extends HTMLElement
     @appendChild(topListElement)
     @topListElement = topListElement
 
-    @disableAnimationOverride = atom.config.get 'birch-outliner.disableAnimation'
-    @disableAnimationObserver = atom.config.observe 'birch-outliner.disableAnimation', (newValue) =>
+    @disableAnimationOverride = atom.config.get 'birch-outline-editor.disableAnimation'
+    @disableAnimationObserver = atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
       @disableAnimationOverride = newValue
 
     this
@@ -481,14 +486,14 @@ class OutlineEditorElement extends HTMLElement
         if animate
           @_animateExpandUL(item, newViewUL)
 
-  outlineDidChange: (outlineChangeEvent) ->
-    for each in outlineChangeEvent.deltas
+  outlineDidChange: (e) ->
+    for each in e.mutations
       switch each.type
-        when OutlineChangeDelta.AttributeChanged
+        when Mutation.AttributeChanged
           @updateItemAttribute(each.target, each.attributeName)
-        when OutlineChangeDelta.BodyTextChanged
+        when Mutation.BodyTextChanged
           @updateItemBody(each.target)
-        when OutlineChangeDelta.ChildrenChanged
+        when Mutation.ChildrenChanged
           @updateItemChildren(
             each.target,
             each.removedItems,
