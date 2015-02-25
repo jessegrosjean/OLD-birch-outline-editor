@@ -26,10 +26,10 @@ module.exports = BirchOutlineEditor =
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add atom.commands.add 'atom-workspace', 'birch-outline-editor:new-outline': =>
-      atom.workspace.open('outline-editor://new-outline')
+      atom.workspace.open('birch-outline-editor://new-outline')
 
     @subscriptions.add atom.workspace.addOpener (filePath) =>
-      if filePath is 'outline-editor://new-outline'
+      if filePath is 'birch-outline-editor://new-outline'
         new OutlineEditor
       else
         extension = path.extname(filePath).toLowerCase()

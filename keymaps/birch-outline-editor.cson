@@ -66,7 +66,7 @@
   'ctrl-cmd-left' : 'editor:outdent-selected-rows'
   'ctrl-cmd-right' : 'editor:indent-selected-rows'
 
-  'cmd-/': 'outline-editor:toggle-line-comments'
+  'cmd-/': 'birch-outline-editor:toggle-line-comments'
   'cmd-j': 'editor:join-lines'
   'cmd-D': 'editor:duplicate-lines'
   'cmd-L': 'editor:split-selections-into-lines'
@@ -87,14 +87,14 @@
   'cmd-k cmd-7': 'editor:fold-at-indent-level-7'
   'cmd-k cmd-8': 'editor:fold-at-indent-level-8'
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
-  'cmd-.': 'outline-editor:toggle-fold-items'
+  'cmd-.': 'birch-outline-editor:toggle-fold-items'
 
-  'cmd-b' : 'outline-editor:toggle-bold'
-  'cmd-i' : 'outline-editor:toggle-italic'
-  'cmd-u' : 'outline-editor:toggle-underline'
-  'cmd-k' : 'outline-editor:toggle-strikethrough'
+  'cmd-b' : 'birch-outline-editor:toggle-bold'
+  'cmd-i' : 'birch-outline-editor:toggle-italic'
+  'cmd-u' : 'birch-outline-editor:toggle-underline'
+  'cmd-k' : 'birch-outline-editor:toggle-strikethrough'
 
-  'cmd-d' : 'outline-editor:toggle-done'
+  'cmd-d' : 'birch-outline-editor:toggle-done'
 
 'birch-outline-editor.itemMode':
   'right' : 'insertCaretAtEndOfLine',
@@ -105,9 +105,9 @@
   'o' : 'editor:newline',
   'O' : 'editor:newline-above',
 
-  'f i' : 'outline-editor:hoist',
-  'f o' : 'outline-editor:unhoist',
+  'f i' : 'birch-outline-editor:hoist',
+  'f o' : 'birch-outline-editor:unhoist',
 
-  '.' : 'outline-editor:toggle-fold-items',
+  '.' : 'birch-outline-editor:toggle-fold-items',
 
-  'd' : 'outline-editor:toggle-done'
+  'd' : 'birch-outline-editor:toggle-done'

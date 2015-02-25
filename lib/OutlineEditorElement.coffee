@@ -501,7 +501,7 @@ class OutlineEditorElement extends HTMLElement
             each.nextSibling
           )
         else
-          throw 'Unexpected Change Type'
+          throw new Error 'Unexpected Change Type'
 
   ###
   Section: Animations
@@ -1169,13 +1169,13 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'editor:demote-trailing-sibling-rows': -> @editor.demoteTrailingSiblingItems()
   'deleteItemsBackward': -> @editor.deleteItemsBackward()
   'deleteItemsForward': -> @editor.deleteItemsForward()
-  'outline-editor:toggle-bold': -> @editor.toggleBold()
-  'outline-editor:toggle-italic': -> @editor.toggleItalic()
-  'outline-editor:toggle-underline': -> @editor.toggleUnderline()
-  'outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
+  'birch-outline-editor:toggle-bold': -> @editor.toggleBold()
+  'birch-outline-editor:toggle-italic': -> @editor.toggleItalic()
+  'birch-outline-editor:toggle-underline': -> @editor.toggleUnderline()
+  'birch-outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
-  'outline-editor:toggle-done': -> @editor.toggleDone()
+  'birch-outline-editor:toggle-done': -> @editor.toggleDone()
 )
 
 atom.commands.add 'birch-outline-editor', stopEventPropagation(
@@ -1220,8 +1220,8 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:select-line': -> @editor.selectLine()
   'insertCaretAtBeginingOfLine': -> @editor.insertCaretAtBeginingOfLine()
   'insertCaretAtEndOfLine': -> @editor.insertCaretAtEndOfLine()
-  'outline-editor:hoist': -> @editor.hoist()
-  'outline-editor:unhoist': -> @editor.unhoist()
+  'birch-outline-editor:hoist': -> @editor.hoist()
+  'birch-outline-editor:unhoist': -> @editor.unhoist()
   'editor:scroll-to-top': -> @editor.scrollToBeginningOfDocument()
   'editor:scroll-to-bottom': -> @editor.scrollToEndOfDocument()
   'editor:scroll-to-selection': -> @editor.centerSelectionInVisibleArea()
@@ -1234,7 +1234,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'core:page-down': -> @editor.pageDown()
   'editor:fold-current-row': -> @editor.foldItems()
   'editor:unfold-current-row': -> @editor.unfoldItems()
-  'outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
+  'birch-outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
 
 )
 

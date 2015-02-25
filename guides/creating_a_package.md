@@ -33,7 +33,7 @@ you'll need to edit your `package.json` to include:
 "consumedServices": {
   "birch-outine-editor-service": {
     "versions": {
-      "^1.0.0": "consumeBirchOutlineEditorService"
+      "^0.0.1": "consumeBirchOutlineEditorService"
     }
   }
 },
