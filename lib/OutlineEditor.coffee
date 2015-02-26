@@ -181,7 +181,7 @@ class OutlineEditor extends Model
   Section: Event Subscription
   ###
 
-  # Essential: Calls your `callback` when the editor's oultine title has
+  # Essential: Calls your `callback` when the editor's outline title has
   # changed.
   #
   # * `callback` {Function}
@@ -680,9 +680,11 @@ class OutlineEditor extends Model
   moveDownAndModifySelection: ->
     @modifySelectionRange('extend', 'down', (if @isTextMode() then 'line' else 'paragraph'), true)
 
+  # Public: Move selection left.
   moveLeft: ->
     @modifySelectionRange('move', 'left', (if @isTextMode() then 'character' else 'paragraph'))
 
+  # Public: Move selection left and modify selection.
   moveLeftAndModifySelection: ->
     @modifySelectionRange('extend', 'left', (if @isTextMode() then 'character' else 'paragraph'))
 
@@ -702,6 +704,7 @@ class OutlineEditor extends Model
   moveToBeginningOfParagraphAndModifySelection: ->
     @modifySelectionRange('extend', 'backward', 'paragraphboundary')
 
+  # Public: Move selection to next start of paragraph.
   moveParagraphBackward: ->
     if @isTextMode()
       @modifySelectionRange('move', 'backward', 'character')
@@ -709,6 +712,7 @@ class OutlineEditor extends Model
     else
       @modifySelectionRange('move', 'backward', 'paragraph')
 
+  # Public: Move selection to next start of paragraph and modify selection.
   moveParagraphBackwardAndModifySelection: ->
     if @isTextMode()
       @modifySelectionRange('extend', 'backward', 'character')
@@ -716,36 +720,47 @@ class OutlineEditor extends Model
     else
       @modifySelectionRange('extend', 'backward', 'paragraph')
 
+  # Public: Move selection word left.
   moveWordLeft: ->
     @modifySelectionRange('move', 'left', (if @isTextMode() then 'word' else 'paragraph'))
 
+  # Public: Move selection word left and modify selection.
   moveWordLeftAndModifySelection: ->
     @modifySelectionRange('extend', 'left', (if @isTextMode() then 'word' else 'paragraph'))
 
+  # Public: Move selection right.
   moveRight: ->
     @modifySelectionRange('move', 'right', (if @isTextMode() then 'character' else 'paragraph'))
 
+  # Public: Move selection right and modify selection.
   moveRightAndModifySelection: ->
     @modifySelectionRange('extend', 'right', (if @isTextMode() then 'character' else 'paragraph'))
 
+  # Public: Move selection word right.
   moveWordRight: ->
     @modifySelectionRange('move', 'right', (if @isTextMode() then 'word' else 'paragraph'))
 
+  # Public: Move selection word right and modify selection.
   moveWordRightAndModifySelection: ->
     @modifySelectionRange('extend', 'right', (if @isTextMode() then 'word' else 'paragraph'))
 
+  # Public: Move selection to end of line.
   moveToEndOfLine: ->
     @modifySelectionRange('move', 'forward', 'lineboundary')
 
+  # Public: Move selection to end of line and modify selection.
   moveToEndOfLineAndModifySelection: ->
     @modifySelectionRange('extend', 'forward', 'lineboundary')
 
+  # Public: Move selection to end of paragraph.
   moveToEndOfParagraph: ->
     @modifySelectionRange('move', 'forward', 'paragraphboundary')
 
+  # Public: Move selection to end of paragraph and modify selection.
   moveToEndOfParagraphAndModifySelection: ->
     @modifySelectionRange('extend', 'forward', 'paragraphboundary')
 
+  # Public: Move selection to next end of paragraph.
   moveParagraphForward: ->
     if @isTextMode()
       @modifySelectionRange('move', 'forward', 'character')
@@ -753,6 +768,7 @@ class OutlineEditor extends Model
     else
       @modifySelectionRange('move', 'forward', 'paragraph')
 
+  # Public: Move selection to next end of paragraph and modify selection.
   moveParagraphForwardAndModifySelection: ->
     if @isTextMode()
       @modifySelectionRange('extend', 'forward', 'character')
@@ -760,15 +776,19 @@ class OutlineEditor extends Model
     else
       @modifySelectionRange('extend', 'forward', 'paragraph')
 
+  # Public: Move selection to begining of document.
   moveToBeginningOfDocument: ->
     @modifySelectionRange('move', 'backward', 'documentboundary')
 
+  # Public: Move selection to begining of document and modify selection.
   moveToBeginningOfDocumentAndModifySelection: ->
     @modifySelectionRange('extend', 'backward', 'documentboundary')
 
+  # Public: Move selection to end of document.
   moveToEndOfDocument: ->
     @modifySelectionRange('move', 'forward', 'documentboundary')
 
+  # Public: Move selection to end of document and modify selection.
   moveToEndOfDocumentAndModifySelection: ->
     @modifySelectionRange('extend', 'forward', 'documentboundary')
 
@@ -790,6 +810,7 @@ class OutlineEditor extends Model
       undefined
     )
 
+  # Public: Select all.
   selectAll: ->
     if @isItemMode()
       @_disableScrollToSelection = true
