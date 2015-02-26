@@ -244,12 +244,9 @@ birch-outline-editor > ul {
   height: @dropBallDiameter;
   margin: -(@itemPadding + @dropBallRadius) 0 0 -@dropBallDiameter;
   content: "";
-  // data-uri isn't working since I upated npm... try again later in next update I guess
-  //background-image: data-uri('image/svg+xml;charset=UTF-8', 'dropindicator.svg');
-  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMDByZW0iIGhlaWdodD0iMC41cmVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJPGcgaWQ9ImRyb3BJbmRpY2F0b3IiPgoJCTxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDA3YWZmIiBzdHJva2Utd2lkdGg9IjIiIGN4PSI0IiBjeT0iNCIgcj0iMy4wIiAvPgoJCTxsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwN2FmZiIgc3Ryb2tlLXdpZHRoPSIyIiB4MT0iNyIgeTE9IjQiIHgyPSIxMDAwMCIgeTI9IjQiIC8+Cgk8L2c+Cjwvc3ZnPg==);
+  background-image: url('data:image/svg+xml;utf8,<svg width="10000rem" height="0.5rem" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g id="dropIndicator"><circle fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" cx="4" cy="4" r="3.0" /><line fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" x1="7" y1="4" x2="10000" y2="4" /></g></svg>');
   background-repeat: no-repeat;
 }
-
 
 .bdropInsertAfterItem > .bcontent > .bbody::after {
   margin: (@itemPadding - @dropBallRadius) 0 0 -@dropBallDiameter;
