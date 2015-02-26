@@ -12,8 +12,8 @@ Util = require './Util'
 #
 # Items cannot be instantiated directly, instead use {Outline::createItem}.
 #
-# Items may contain other child items to form a hiearchical outline structure.
-# When you move an item all of it's children are moved with it.
+# Items may contain other child items to form a hierarchical outline structure.
+# When you move an item all of its children are moved with it.
 #
 # Items have a single paragraph of body text. You can access it as plain text,
 # a HTML string, or an AttributedString. You can add formatting to make parts
@@ -128,7 +128,7 @@ class Item
     @_liOrRootUL.getAttribute(name) or undefined
 
   # Public: Adds a new attribute or changes the value of an existing
-  # attribute. `id` is reserved and an exception is thrown if your try to set
+  # attribute. `id` is reserved and an exception is thrown if you try to set
   # it.
   #
   # - `name` The {String} attribute name.
@@ -517,7 +517,7 @@ class Item
         each = each.nextSibling
       children
 
-  # Public: Determins if this item contains the given item.
+  # Public: Determines if this item contains the given item.
   #
   # - `item` The {Item} to check for containment.
   #

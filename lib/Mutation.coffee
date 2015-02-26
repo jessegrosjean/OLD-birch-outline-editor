@@ -5,8 +5,8 @@ assert = require 'assert'
 # Public: A record of a single change in a target {Item}.
 #
 # A new mutation is created to record each attribute set, body text change,
-# and child item's update. Use {Outline::onDidChange} to recive this mutation
-# records so you can track whats changed as an outline is edited.
+# and child item's update. Use {Outline::onDidChange} to receive this mutation
+# record so you can track what has changed as an outline is edited.
 class Mutation
 
   # Public: Read-only {Item} target of the change delta.

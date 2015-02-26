@@ -1353,6 +1353,9 @@ class OutlineEditor extends Model
   toggleStrikethrough: ->
     @_toggleFormattingTag 'S'
 
+  editLink: ->
+    @_toggleFormattingTag 'A',
+      href: 'http://www.apple.com'
 
   _toggleFormattingTag: (tagName, attributes={}) ->
     selectionRange = @selection

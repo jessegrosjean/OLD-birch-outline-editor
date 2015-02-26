@@ -17,10 +17,11 @@ Q = require 'q'
 # Use outlines to create new items, find existing items, and watch for changes
 # in items. Outlines also coordinate loading and saving items.
 #
-# Internally outlines uses a {HTMLDocument} to store the underlying outline
-# data. You should never modify the content of this HTMLDocument directly, but
-# you can query it using {::evaluateXPath}. The structure of this document is
-# described in [Outline Editor Markup Language](outline_editor_markup_language).
+# Internally a {HTMLDocument} is used to store the underlying outline data.
+# You should never modify the content of this HTMLDocument directly, but you
+# can query it using {::evaluateXPath}. The structure of this document is
+# described in [Outline Editor Markup
+# Language](outline_editor_markup_language).
 #
 # ## Examples
 #
@@ -386,8 +387,8 @@ class Outline
 
   # Public: XPath query internal HTML structure for matching {Items}.
   #
-  # Items are considered to match if they, or if a node contained in their
-  # body text matches the XPath.
+  # Items are considered to match if they, or a node contained in their body
+  # text, matches the XPath.
   #
   # - `xpathExpression` {String} xpath expression
   # - `namespaceResolver` (optional) {String}
@@ -423,7 +424,7 @@ class Outline
   # - `resultType` (optional)
   # - `result` (optional)
   #
-  # This query evaluates on the underlying HTMLDocument. Please refere to the
+  # This query evaluates on the underlying HTMLDocument. Please refer to the
   # standard [document.evaluate](https://developer.mozilla.org/en-
   # US/docs/Web/API/document.evaluate) documentation for details.
   #
@@ -547,9 +548,9 @@ class Outline
     @emitModifiedStatusChanged(false)
     @emitter.emit 'did-save', {path: filePath}
 
-  # Public: Reload the outlines's contents from disk.
+  # Public: Reload the outline's contents from disk.
   #
-  # Sets the outlines's content to the cached disk contents
+  # Sets the outline's content to the cached disk contents.
   reload: ->
     @emitter.emit 'will-reload'
 
@@ -671,7 +672,7 @@ class Outline
       @conflict = true if @isModified()
       previousContents = @cachedDiskContents
 
-      # Synchrounously update the disk contents because the {File} has already
+      # Synchronously update the disk contents because the {File} has already
       # cached them. If the contents updated asynchrounously multiple
       # `conlict` events could trigger for the same disk contents.
       @updateCachedDiskContentsSync()
