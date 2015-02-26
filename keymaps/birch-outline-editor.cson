@@ -92,6 +92,7 @@
   'cmd-b' : 'birch-outline-editor:toggle-bold'
   'cmd-i' : 'birch-outline-editor:toggle-italic'
   'cmd-u' : 'birch-outline-editor:toggle-underline'
+  'cmd-C' : 'birch-outline-editor:toggle-code'
   'cmd-k' : 'birch-outline-editor:toggle-strikethrough'
 
   'cmd-d' : 'birch-outline-editor:toggle-done'
