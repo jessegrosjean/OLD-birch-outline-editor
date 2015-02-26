@@ -1173,6 +1173,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'birch-outline-editor:toggle-italic': -> @editor.toggleItalic()
   'birch-outline-editor:toggle-underline': -> @editor.toggleUnderline()
   'birch-outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
+  'birch-outline-editor:toggle-code': -> @editor.toggleCode()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
   'birch-outline-editor:toggle-done': -> @editor.toggleDone()

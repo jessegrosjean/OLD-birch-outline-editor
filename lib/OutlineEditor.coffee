@@ -1326,10 +1326,14 @@ class OutlineEditor extends Model
   toggleUnderline: ->
     @_toggleFormattingTag('U')
 
-  toggleStrikethrough: ->
-    @_toggleFormattingTag('S')
+  toggleCode: ->
+    @_toggleFormattingTag('CODE')
 
-  _toggleFormattingTag: (tagName) ->
+  toggleStrikethrough: ->
+    @_toggleFormattingTag 'S'
+
+
+  _toggleFormattingTag: (tagName, attributes={}) ->
     selectionRange = @selection
     startItem = selectionRange.startItem
 
@@ -1337,16 +1341,11 @@ class OutlineEditor extends Model
       @toggleTypingFormattingTag(tagName)
     else if startItem
       tagAttributes = startItem.elementAtBodyTextIndex(tagName, selectionRange.startOffset or 0)
-      addingTag
-
-      if tagAttributes == undefined
-        addingTag = true
-      else
-        addingTag = false
+      addingTag = tagAttributes is undefined
 
       @_transformSelectedText (eachItem, start, end) ->
         if (addingTag)
-          eachItem.addElementInBodyTextRange(tagName, null, start, end - start)
+          eachItem.addElementInBodyTextRange(tagName, attributes, start, end - start)
         else
           eachItem.removeElementInBodyTextRange(tagName, start, end - start)
 
