@@ -144,7 +144,7 @@ class Outline
       modifiedWhenLastPersisted: @isModified()
       digestWhenLastPersisted: @file?.getDigest()
 
-  @deserialize: (data) ->
+  @deserialize: (data={}) ->
     filePath = data.filePath
     outline = Outline.pathsToOutlines[filePath]
     unless outline
