@@ -1,8 +1,8 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
 OutlineEditorSelection = require './OutlineEditorSelection'
+LinkEditorElement = require './elements/LinkEditorElement'
 OutlineEditorElement = require './OutlineEditorElement'
-Mutation = require './Mutation'
 AttributedString = require './AttributedString'
 {Emitter, CompositeDisposable} = require 'atom'
 ItemBodyEncoder = require './ItemBodyEncoder'
@@ -13,6 +13,7 @@ Velocity = require 'velocity-animate'
 shallowCopy = require 'shallow-copy'
 typechecker = require 'typechecker'
 Constants = require './Constants'
+Mutation = require './Mutation'
 Outline = require './Outline'
 shortid = require './shortid'
 {Model} = require 'theorist'
@@ -163,6 +164,8 @@ class OutlineEditor extends Model
         if not targetItem.hasChildren
           @setCollapsed targetItem
 
+    @_updateBackgroundMessage()
+
   destroyed: ->
     @unsubscribe()
     @outline.release(@outlineEditorElement.id)
@@ -269,10 +272,11 @@ class OutlineEditor extends Model
 
   # Public: Pop the current hoisted {Item}.
   unhoist: ->
-    stack = @_hoistStack.slice()
-    lastHoisted = stack.pop()
-    @setHoistedItemsStack(stack)
-    @moveSelectionRange(lastHoisted)
+    unless @hoistedItem().isRoot
+      stack = @_hoistStack.slice()
+      lastHoisted = stack.pop()
+      @setHoistedItemsStack(stack)
+      @moveSelectionRange(lastHoisted)
 
   setHoistedItemsStack: (newHoistedItems) ->
     oldHoistedItem = @hoistedItem()
@@ -303,6 +307,13 @@ class OutlineEditor extends Model
       @outlineEditorElement.updateHoistedItem(oldHoistedItem, newHoistedItem)
 
     @_revalidateSelectionRange()
+    @_updateBackgroundMessage()
+
+  _updateBackgroundMessage: ->
+    if @firstVisibleItem()
+      @outlineEditorElement.setBackgroundMessage ''
+    else
+      @outlineEditorElement.setBackgroundMessage 'Press <b>Return</b> to create a new item.'
 
   ###
   Section: Expanding Items
@@ -792,16 +803,6 @@ class OutlineEditor extends Model
   moveToEndOfDocumentAndModifySelection: ->
     @modifySelectionRange('extend', 'forward', 'documentboundary')
 
-  insertCaretAtBeginingOfLine: ->
-    startItem = @selection.startItem
-    if startItem
-      @moveSelectionRange(startItem, 0)
-
-  insertCaretAtEndOfLine: ->
-    endItem = @selection.endItem
-    if endItem
-      @moveSelectionRange(endItem, endItem.bodyText.length)
-
   selectLine: ->
     @moveSelectionRange(
       @selection.focusItem,
@@ -809,25 +810,6 @@ class OutlineEditor extends Model
       @selection.anchorItem,
       undefined
     )
-
-  # Public: Select all.
-  selectAll: ->
-    if @isItemMode()
-      @_disableScrollToSelection = true
-      @moveSelectionRange(@firstVisibleItem(), undefined, @lastVisibleItem(), undefined)
-      @_disableScrollToSelection = false
-    else
-      selectionRange = @selection
-      item = selectionRange.anchorItem
-      startOffset = selectionRange.startOffset
-      endOffset = selectionRange.endOffset
-
-      if item
-        textLength = item.bodyText.length;
-        if startOffset == 0 and endOffset == textLength
-          @moveSelectionRange(item, undefined, item, undefined)
-        else
-          @moveSelectionRange(item, 0, item, textLength)
 
   # Public: Set a new selection range.
   #
@@ -871,6 +853,25 @@ class OutlineEditor extends Model
 
     if maintainVertialAnchor
       @setSelectionVerticalAnchor(saved)
+
+  # Public: Select all children of the current {::hoistedItem} item.
+  selectAll: ->
+    if @isItemMode()
+      @_disableScrollToSelection = true
+      @moveSelectionRange(@firstVisibleItem(), undefined, @lastVisibleItem(), undefined)
+      @_disableScrollToSelection = false
+    else
+      selectionRange = @selection
+      item = selectionRange.anchorItem
+      startOffset = selectionRange.startOffset
+      endOffset = selectionRange.endOffset
+
+      if item
+        textLength = item.bodyText.length;
+        if startOffset == 0 and endOffset == textLength
+          @moveSelectionRange(item, undefined, item, undefined)
+        else
+          @moveSelectionRange(item, 0, item, textLength)
 
   createOutlineEditorSelection: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
     new OutlineEditorSelection(this, focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity)
@@ -976,15 +977,17 @@ class OutlineEditor extends Model
 
     classList = outlineEditorElement.classList
     if currentSelection.isTextMode
-      if classList.contains('itemMode')
-        classList.remove('itemMode')
+      if classList.contains('outlineMode')
+        classList.remove('outlineMode')
       if not classList.contains('textMode')
         classList.add('textMode')
-    else if (currentSelection.isItemMode)
+    else
       if classList.contains('textMode')
         classList.remove('textMode')
-      if not classList.contains('itemMode')
-        classList.add('itemMode')
+      if not classList.contains('outlineMode')
+        classList.add('outlineMode')
+
+    outlineEditorElement.updateSimulatedCursor()
 
   ###
   Section: Insert Items
@@ -1354,17 +1357,65 @@ class OutlineEditor extends Model
     @_toggleFormattingTag 'S'
 
   editLink: ->
-    @_toggleFormattingTag 'A',
-      href: 'http://www.apple.com'
+    # Ugly mess... move lots of this logic into LinkEditorElement
+    selection = @selection
+    focusItem = selection.focusItem
+    linkAttributes
+
+    unless focusItem
+      return
+
+    if selection.isCollapsed
+      longestRange = {}
+      linkAttributes = focusItem.elementAtBodyTextIndex('A', selection.focusOffset, null, longestRange)
+      if linkAttributes?.href != undefined
+        @moveSelectionRange(focusItem, longestRange.location, focusItem, longestRange.end)
+        selection = @selection
+    else
+      linkAttributes = focusItem.elementAtBodyTextIndex('A', selection.focusOffset or 0)
+
+    birchLinkEditor = document.createElement 'birch-link-editor'
+    birchLinkEditor.setAttribute 'label', 'Link destination:'
+    birchLinkEditor.setAttribute 'text', linkAttributes?.href or 'http://'
+    birchLinkEditor.setValidator (text) ->
+      validUrl = require 'valid-url'
+      unless validUrl.isUri text
+        if text
+          'This does not look like a valid link.'
+        else
+          'This link will be removed.'
+
+    editLinkPanel = atom.workspace.addModalPanel
+      item: birchLinkEditor
+      visible: true
+    birchLinkEditor.focus()
+
+    subscriptions = new CompositeDisposable
+    subscriptions.add birchLinkEditor.onConfirm =>
+      subscriptions.dispose()
+      editLinkPanel.destroy()
+      linkText = birchLinkEditor.getAttribute 'text'
+      @_transformSelectedText (eachItem, start, end) ->
+        if linkText
+          eachItem.addElementInBodyTextRange('A', href: linkText, start, end - start)
+        else
+          eachItem.removeElementInBodyTextRange('A', start, end - start)
+      @focus()
+      @moveSelectionRange selection
+
+    subscriptions.add birchLinkEditor.onCancel =>
+      subscriptions.dispose()
+      editLinkPanel.destroy()
+      @focus()
+      @moveSelectionRange selection
 
   _toggleFormattingTag: (tagName, attributes={}) ->
-    selectionRange = @selection
-    startItem = selectionRange.startItem
+    startItem = @selection.startItem
 
-    if selectionRange.isCollapsed
+    if @selection.isCollapsed
       @toggleTypingFormattingTag(tagName)
     else if startItem
-      tagAttributes = startItem.elementAtBodyTextIndex(tagName, selectionRange.startOffset or 0)
+      tagAttributes = startItem.elementAtBodyTextIndex(tagName, @selection.startOffset or 0)
       addingTag = tagAttributes is undefined
 
       @_transformSelectedText (eachItem, start, end) ->
@@ -1372,6 +1423,20 @@ class OutlineEditor extends Model
           eachItem.addElementInBodyTextRange(tagName, attributes, start, end - start)
         else
           eachItem.removeElementInBodyTextRange(tagName, start, end - start)
+
+  clearFormatting: ->
+    selection = @selection
+    if selection.isCollapsed
+      longestRange = {}
+      focusItem = selection.focusItem
+      elements = focusItem.elementsAtBodyTextIndex(selection.focusOffset, null, longestRange)
+      unless Object.keys(elements).length
+        return
+      @moveSelectionRange(focusItem, longestRange.location, focusItem, longestRange.end)
+
+    @_transformSelectedText (eachItem, start, end) ->
+      string = new AttributedString eachItem.bodyText.substring(start, end)
+      eachItem.replaceBodyTextInRange string, start, end - start
 
   upperCase: ->
     @_transformSelectedText (item, start, end) ->

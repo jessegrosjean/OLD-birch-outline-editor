@@ -6,7 +6,7 @@
 
   'backspace' : 'core:backspace'
   'shift-backspace' : 'core:backspace'
-  'ctrl-backspace' : 'core:backspace-decomposing-previous-character'
+  #'ctrl-backspace' : 'core:backspace-decomposing-previous-character'
   'ctrl-alt-backspace' : 'editor:delete-to-beginning-of-word'
   'alt-backspace' : 'editor:delete-to-beginning-of-word'
   'cmd-backspace' : 'editor:delete-to-beginning-of-line'
@@ -105,9 +105,9 @@
   'ctrl-cmd-down' : 'editor:move-line-down'
   'ctrl-cmd-left' : 'editor:outdent-selected-rows'
   'ctrl-cmd-right' : 'editor:indent-selected-rows'
-  'ctrl-alt-cmd-left' : 'editor:promote-child-rows'
-  'ctrl-alt-cmd-right' : 'editor:demote-trailing-sibling-rows'
+  'ctrl-alt-cmd-left' : 'birch-outline-editor:promote-child-items'
+  'ctrl-alt-cmd-right' : 'birch-outline-editor:demote-trailing-sibling-items'
 
-'birch-outline-editor.itemMode':
+'birch-outline-editor.outlineMode':
   'backspace' : 'deleteItemsBackward'
   'delete' : 'deleteItemsForward'

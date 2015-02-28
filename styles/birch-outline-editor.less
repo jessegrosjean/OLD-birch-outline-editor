@@ -24,6 +24,22 @@
   background-color: fade(@syntax-selection-color, 99%);
 }
 
+birch-link-editor {
+  .buttonRow {
+    text-align: right;
+  }
+
+  button {
+    min-width: 100px;
+    text-align: right
+  }
+}
+
+.styledTextCaret {
+  pointer-events: none;
+  background: @syntax-cursor-color;
+}
+
 #textIteratorIFrame {
   position: absolute;
   left:-999em;
@@ -163,6 +179,10 @@ birch-outline-editor > ul {
   &:focus {
     outline-color: transparent;
     outline-style: none;
+  }
+  a {
+    color: @syntax-text-color;
+    text-decoration: underline;
   }
 }
 

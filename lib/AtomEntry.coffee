@@ -15,6 +15,9 @@ module.exports = BirchOutlineEditor =
   subscriptions: null
 
   config:
+    useStyledTextCaret:
+      type: 'boolean'
+      default: false
     disableAnimation:
       type: 'boolean'
       default: false

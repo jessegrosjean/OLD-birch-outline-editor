@@ -1,7 +1,7 @@
 {
   "name": "birch-outline-editor",
   "main": "./lib/AtomEntry",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Simple and clean outline editor",
   "license": "Commercial",
   "engines": {
@@ -11,7 +11,7 @@
     "birch-outine-editor-service": {
       "description": "Birch Outline Editor Service",
       "versions": {
-        "0.0.1": "birchOutlineEditorService"
+        "0.1.0": "birchOutlineEditorService"
       }
     }
   },
@@ -30,6 +30,7 @@
     "theorist": "^1.0.2",
     "typechecker": "^2.0.8",
     "underscore-plus": "^1.6.6",
+    "valid-url": "^1.0.9",
     "velocity-animate": "^1.2.1"
   },
   "devDependencies": {

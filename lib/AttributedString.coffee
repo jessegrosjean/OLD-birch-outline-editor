@@ -22,6 +22,29 @@ class AttributedString
     @_clean = false
     @_pendingAddAttributes = []
 
+  attributesAtIndex: (index, effectiveRange, longestEffectiveRange) ->
+    if index == -1
+      index = @_string.length - location
+
+    @_validateRange(index)
+    @_ensureClean()
+
+    runIndex = @_indexOfAttributeRunWithCharacterIndex(index)
+    if runIndex == -1
+      return null
+
+    attributeRun = this.attributeRuns()[runIndex]
+    if effectiveRange
+      effectiveRange.location = attributeRun.location
+      effectiveRange.length = attributeRun.length
+      effectiveRange.end = attributeRun.location + attributeRun.length
+
+    if longestEffectiveRange
+      attributes = attributeRun.attributes
+      @_longestEffectiveRange runIndex, attributeRun, longestEffectiveRange, (candiateRun) ->
+        deepEqual(candiateRun.attributes, attributes)
+    attributeRun.attributes
+
 `
 AttributedString.fromTextOrAttributedString = function(textOrAttributedString) {
   if (textOrAttributedString instanceof AttributedString) {
@@ -272,32 +295,6 @@ AttributedString.prototype.attributeRuns = function() {
   }
 
   return runs;
-};
-
-AttributedString.prototype.attributesAtIndex = function(index, effectiveRange, longestEffectiveRange) {
-  if (index === -1) {
-    index = this._string.length - location;
-  }
-  this._validateRange(index);
-  this._ensureClean();
-
-  var runIndex = this._indexOfAttributeRunWithCharacterIndex(index);
-  if (runIndex === -1) {
-    return null;
-  }
-  var attributeRun = this.attributeRuns()[runIndex];
-  if (effectiveRange) {
-    effectiveRange.location = attributeRun.location;
-    effectiveRange.length = attributeRun.length;
-    effectiveRange.end = attributeRun.location + attributeRun.length;
-  }
-  if (longestEffectiveRange) {
-    var attributes = attributeRun.attributes;
-    this._longestEffectiveRange(runIndex, attributeRun, longestEffectiveRange, function (candiateRun) {
-      return deepEqual(candiateRun.attributes, attributes);
-    });
-  }
-  return attributeRun.attributes;
 };
 
 AttributedString.prototype.attributeAtIndex = function(attribute, index, effectiveRange, longestEffectiveRange) {

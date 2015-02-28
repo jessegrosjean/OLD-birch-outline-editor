@@ -94,14 +94,16 @@
   'cmd-u' : 'birch-outline-editor:toggle-underline'
   'cmd-C' : 'birch-outline-editor:toggle-code'
   'cmd-k' : 'birch-outline-editor:toggle-strikethrough'
+  'cmd-K' : 'birch-outline-editor:edit-link'
+  'ctrl-c' : 'birch-outline-editor:clear-formatting'
 
   'cmd-d' : 'birch-outline-editor:toggle-done'
 
-'birch-outline-editor.itemMode':
-  'right' : 'insertCaretAtEndOfLine',
-  'left' : 'insertCaretAtBeginingOfLine',
-  'i' : 'insertCaretAtBeginingOfLine',
-  'a' : 'insertCaretAtEndOfLine',
+'birch-outline-editor.outlineMode':
+  'left' : 'editor:move-to-beginning-of-paragraph',
+  'right' : 'editor:move-to-end-of-paragraph',
+  'i' : 'editor:move-to-beginning-of-paragraph',
+  'a' : 'editor:move-to-end-of-paragraph',
 
   'o' : 'editor:newline',
   'O' : 'editor:newline-above',

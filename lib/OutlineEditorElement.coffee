@@ -47,12 +47,25 @@ class OutlineEditorElement extends HTMLElement
     @_extendingSelectionLastScrollTop = undefined
     @_extendSelectionDisposables = new CompositeDisposable()
 
-    animationLayerElement = document.createElement('DIV')
+    @backgroundMessage = document.createElement('UL')
+    @backgroundMessage.classList.add 'background-message'
+    @backgroundMessage.classList.add 'centered'
+    @backgroundMessage.style.display = 'none'
+    @backgroundMessage.appendChild document.createElement 'LI'
+    @appendChild @backgroundMessage
+
+    animationLayerElement = document.createElement 'DIV'
     animationLayerElement.className = 'animationLayer'
     animationLayerElement.style.position = 'absolute'
     animationLayerElement.style.zIndex = '1'
-    @appendChild(animationLayerElement)
+    @appendChild animationLayerElement
     @animationLayerElement = animationLayerElement
+
+    @styledTextCaretElement = document.createElement 'DIV'
+    @styledTextCaretElement.className = 'styledTextCaret'
+    @styledTextCaretElement.style.position = 'absolute'
+    @styledTextCaretElement.style.zIndex = '1'
+    @appendChild @styledTextCaretElement
 
     outlineEditorFocusElement = new OutlineEditorFocusElement
     @appendChild(outlineEditorFocusElement)
@@ -61,6 +74,9 @@ class OutlineEditorElement extends HTMLElement
     outlineEditorQueryFieldElement = new OutlineEditorQueryFieldElement
     #@appendChild(outlineEditorQueryFieldElement)
 
+    topListElement = document.createElement('UL')
+    @appendChild(topListElement)
+    @topListElement = topListElement
 
     # Register directly on this element because Atom app handles this event
     # meaning that the event delegation path won't get called
@@ -73,12 +89,15 @@ class OutlineEditorElement extends HTMLElement
       drop: @onDrop
       dragleave: @onDragLeave
 
-    topListElement = document.createElement('UL')
-    @appendChild(topListElement)
-    @topListElement = topListElement
+    @subscriptions = new CompositeDisposable
+
+    @useStyledTextCaret = atom.config.get 'birch-outline-editor.useStyledTextCaret'
+    @subscriptions.add atom.config.observe 'birch-outline-editor.useStyledTextCaret', (newValue) =>
+      @useStyledTextCaret = newValue
+      @updateSimulatedCursor()
 
     @disableAnimationOverride = atom.config.get 'birch-outline-editor.disableAnimation'
-    @disableAnimationObserver = atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
+    @subscriptions.add atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
       @disableAnimationOverride = newValue
 
     this
@@ -86,7 +105,7 @@ class OutlineEditorElement extends HTMLElement
   destroyed: ->
     if @parentNode
       @parentNode.removeChild(this)
-    @disableAnimationObserver.dispose()
+    @subscriptions.dispose()
     @dragSubscription.dispose()
     @_idsToElements = null
 
@@ -208,6 +227,21 @@ class OutlineEditorElement extends HTMLElement
       item = item.parent
       level++
     level
+
+  ###
+  Section: Background Message
+  ###
+
+  getBackgroundMessage: ->
+    if @backgroundMessage.parentNode
+      @backgroundMessage.firstChild.innerHTML
+    else
+      ''
+
+  setBackgroundMessage: (message) ->
+    message ?= ''
+    @backgroundMessage.firstChild.innerHTML = message
+    @backgroundMessage.style.display = if message then null else 'none'
 
   ###
   Section: Animation
@@ -836,6 +870,23 @@ class OutlineEditorElement extends HTMLElement
     @_extendSelectionDisposables = new CompositeDisposable
     @_extendingSelection = false
 
+  updateSimulatedCursor: ->
+    if @useStyledTextCaret
+      selection = @editor.selection
+      if selection.isTextMode and selection.isCollapsed
+        width = 2
+        rect = selection.focusClientRect
+        @styledTextCaretElement.style.top = rect.top + 'px'
+        @styledTextCaretElement.style.left = (rect.left - (width / 2)) + 'px'
+        @styledTextCaretElement.style.height = rect.height + 'px'
+        @styledTextCaretElement.style.width = width + 'px'
+
+        @styledTextCaretElement.style.display = null
+      else
+        @styledTextCaretElement.style.display = 'none'
+    else
+      @styledTextCaretElement.style.display = 'none'
+
   ###
   Section: Drag and Drop
   ###
@@ -1157,7 +1208,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'editor:outdent-selected-rows': -> @editor.outdent()
   'editor:insert-tab-ignoring-field-editor': -> @editor.insertTabIgnoringFieldEditor()
   'core:backspace': -> @editor.deleteBackward()
-  'core:backspace-decomposing-previous-character': -> @editor.deleteBackwardByDecomposingPreviousCharacter()
+  #'core:backspace-decomposing-previous-character': -> @editor.deleteBackwardByDecomposingPreviousCharacter()
   'editor:delete-to-beginning-of-word': -> @editor.deleteWordBackward()
   'editor:delete-to-beginning-of-line': -> @editor.deleteToBeginningOfLine()
   'deleteToEndOfParagraph': -> @editor.deleteToEndOfParagraph()
@@ -1165,8 +1216,8 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'editor:delete-to-end-of-word': -> @editor.deleteWordForward()
   'editor:move-line-up': -> @editor.moveItemsUp()
   'editor:move-line-down': -> @editor.moveItemsDown()
-  'editor:promote-child-rows': -> @editor.promoteChildItems()
-  'editor:demote-trailing-sibling-rows': -> @editor.demoteTrailingSiblingItems()
+  'birch-outline-editor:promote-child-items': -> @editor.promoteChildItems()
+  'birch-outline-editor:demote-trailing-sibling-items': -> @editor.demoteTrailingSiblingItems()
   'deleteItemsBackward': -> @editor.deleteItemsBackward()
   'deleteItemsForward': -> @editor.deleteItemsForward()
   'birch-outline-editor:toggle-bold': -> @editor.toggleBold()
@@ -1175,6 +1226,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'birch-outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
   'birch-outline-editor:toggle-code': -> @editor.toggleCode()
   'birch-outline-editor:edit-link': -> @editor.editLink()
+  'birch-outline-editor:clear-formatting': -> @editor.clearFormatting()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
   'birch-outline-editor:toggle-done': -> @editor.toggleDone()
@@ -1220,8 +1272,6 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:select-paragraph-forward': -> @editor.moveParagraphForwardAndModifySelection()
   'core:select-all': -> @editor.selectAll()
   'editor:select-line': -> @editor.selectLine()
-  'insertCaretAtBeginingOfLine': -> @editor.insertCaretAtBeginingOfLine()
-  'insertCaretAtEndOfLine': -> @editor.insertCaretAtEndOfLine()
   'birch-outline-editor:hoist': -> @editor.hoist()
   'birch-outline-editor:unhoist': -> @editor.unhoist()
   'editor:scroll-to-top': -> @editor.scrollToBeginningOfDocument()

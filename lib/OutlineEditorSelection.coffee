@@ -35,6 +35,84 @@ class OutlineEditorSelection
 
     @_calculateRangeItems()
 
+  clientRectForItemOffset: (item, offset) ->
+    outlineEditorElement = @editor.outlineEditorElement
+
+    return undefined unless item
+    viewP = outlineEditorElement.itemViewPForItem item
+    return undefined unless viewP
+    return undefined unless document.body.contains viewP
+
+    bodyText = item.bodyText
+    paddingBottom = 0
+    paddingTop = 0
+    computedStyle
+
+    if offset != undefined
+      positionedAtEndOfWrappingLine = false
+      baseRect
+      side
+
+      if bodyText.length > 0
+        domRange = document.createRange()
+        startDOMNodeOffset
+        endDOMNodeOffset
+
+        if offset < bodyText.length
+          startDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset)
+          endDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset + 1)
+          side = 'left'
+        else
+          startDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset - 1)
+          endDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset)
+          side = 'right'
+
+        domRange.setStart(startDOMNodeOffset.node, startDOMNodeOffset.offset)
+        domRange.setEnd(endDOMNodeOffset.node, endDOMNodeOffset.offset)
+
+        # This is hacky, not sure what's going one, but seems to work.
+        # The goal is to get a single zero width rect for cursor
+        # position. This is complicated by fact that when a line wraps
+        # two rects are returned, one for each possible location. That
+        # ambiguity is solved by tracking rangeAffinity.
+        #
+        # The messy part is that there are other times that two client
+        # rects get returned. Such as when the range start starts at the
+        # end of a <b>. Seems we can just ignore those cases and return
+        # the first rect. To detect those cases the check is
+        # clientRects[0].top !== clientRects[1].top, because if that's
+        # true then we can be at a line wrap.
+        clientRects = domRange.getClientRects()
+        baseRect = clientRects[0]
+        #if clientRects.length > 1 and clientRects[0].top != clientRects[1].top
+        if clientRects.length > 1
+          alternateRect = clientRects[1]
+          sameLine = baseRect.top is alternateRect.top
+          if sameLine
+            unless baseRect.width
+              baseRect = alternateRect
+          else if @rangeAffinity == Constants.SelectionAffinityUpstream
+            positionedAtEndOfWrappingLine = true
+          else
+            baseRect = alternateRect
+      else
+        computedStyle = window.getComputedStyle(viewP)
+        paddingTop = parseInt(computedStyle.paddingTop, 10)
+        paddingBottom = parseInt(computedStyle.paddingBottom, 10)
+        baseRect = viewP.getBoundingClientRect()
+        side = 'left'
+
+      return {} =
+        positionedAtEndOfWrappingLine: positionedAtEndOfWrappingLine
+        bottom: baseRect.bottom - paddingBottom
+        height: baseRect.height - (paddingBottom + paddingTop)
+        left: baseRect[side]
+        right: baseRect[side] # trim
+        top: baseRect.top + paddingTop
+        width: 0 # trim
+    else
+      viewP.getBoundingClientRect()
+
 `function _isValidSelectionOffset(editor, item, itemOffset) {
   if (item && editor.isVisible(item)) {
     if (itemOffset === undefined) {
@@ -122,94 +200,7 @@ Object.defineProperty(OutlineEditorSelection.prototype, 'anchorClientRect', {
   }
 });
 
-OutlineEditorSelection.prototype.clientRectForItemOffset = function(item, offset) {
-  var outlineEditorElement = this.editor.outlineEditorElement;
 
-  if (!item) {
-    return undefined;
-  }
-
-  var viewP = outlineEditorElement.itemViewPForItem(item);
-  if (!viewP) {
-    return undefined;
-  }
-
-  if (!document.body.contains(viewP)) {
-    return undefined;
-  }
-
-  var bodyText = item.bodyText,
-    paddingBottom = 0,
-    paddingTop = 0,
-    computedStyle;
-
-  if (offset !== undefined) {
-    var positionedAtEndOfWrappingLine = false,
-      baseRect,
-      side;
-
-    if (bodyText.length > 0) {
-      var domRange = document.createRange(),
-        startDOMNodeOffset,
-        endDOMNodeOffset;
-
-      if (offset < bodyText.length) {
-        startDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset);
-        endDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset + 1);
-        side = 'left';
-      } else {
-        startDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset - 1);
-        endDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset);
-        side = 'right';
-      }
-
-      domRange.setStart(startDOMNodeOffset.node, startDOMNodeOffset.offset);
-      domRange.setEnd(endDOMNodeOffset.node, endDOMNodeOffset.offset);
-
-      // This is hacky, not sure what's going one, but seems to work.
-      // The goal is to get a single zero width rect for cursor
-      // position. This is complicated by fact that when a line wraps
-      // two rects are returned, one for each possible location. That
-      // ambiguity is solved by tracking rangeAffinity.
-      //
-      // The messy part is that there are other times that two client
-      // rects get returned. Such as when the range start starts at the
-      // end of a <b>. Seems we can just ignore those cases and return
-      // the first rect. To detect those cases the check is
-      // clientRects[0].top !== clientRects[1].top, because if that's
-      // true then we can be at a line wrap.
-      var clientRects = domRange.getClientRects();
-      if (clientRects.length > 1 && clientRects[0].top !== clientRects[1].top) {
-        if (this.rangeAffinity === Constants.SelectionAffinityUpstream) {
-          positionedAtEndOfWrappingLine = true;
-          baseRect = clientRects[0];
-        } else {
-          baseRect = clientRects[1];
-        }
-      } else {
-        baseRect = clientRects[0];
-      }
-    } else {
-      computedStyle = window.getComputedStyle(viewP);
-      paddingTop = parseInt(computedStyle.paddingTop, 10);
-      paddingBottom = parseInt(computedStyle.paddingBottom, 10);
-      baseRect = viewP.getBoundingClientRect();
-      side = 'left';
-    }
-
-    return {
-      positionedAtEndOfWrappingLine: positionedAtEndOfWrappingLine,
-      bottom: baseRect.bottom - paddingBottom,
-      height: baseRect.height - (paddingBottom + paddingTop),
-      left: baseRect[side],
-      right: baseRect[side], // trim
-      top: baseRect.top + paddingTop,
-      width: 0 // trim
-    };
-  } else {
-    return viewP.getBoundingClientRect();
-  }
-};
 
 OutlineEditorSelection.prototype.equals = function(otherSelection) {
   return (
