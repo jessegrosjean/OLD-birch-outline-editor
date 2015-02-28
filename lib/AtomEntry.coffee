@@ -37,7 +37,7 @@ module.exports = BirchOutlineEditor =
       else
         extension = path.extname(filePath).toLowerCase()
         switch extension
-          when '.oeml'
+          when '.bml'
             o = new Outline({
               filePath: filePath,
               load: true
