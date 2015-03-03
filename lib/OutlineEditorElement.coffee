@@ -1110,7 +1110,7 @@ class OutlineEditorElement extends HTMLElement
   _nodeCaretPositionFromPoint: (clientX, clientY) ->
       pick = @editor.DOMCaretPositionFromPoint(clientX, clientY)
       range = pick?.range
-      clientRects = @range?.getClientRects()
+      clientRects = range?.getClientRects()
       length = clientRects?.length
 
       if length > 1
