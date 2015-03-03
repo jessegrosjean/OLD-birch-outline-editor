@@ -344,7 +344,7 @@ class OutlineEditor extends Model
     @_setExpandedState items, false
 
   _setExpandedState: (items, expanded) ->
-    items ?= @selection.itemsCover
+    items ?= @selection.itemsCommonAncestors
 
     if not typechecker.isArray(items)
       items = [items]
@@ -383,7 +383,7 @@ class OutlineEditor extends Model
     @_foldItems items, undefined, fully
 
   _foldItems: (items, expand, fully) ->
-    items ?= @selection.itemsCover
+    items ?= @selection.itemsCommonAncestors
     unless typechecker.isArray(items)
       items = [items]
 
@@ -643,8 +643,8 @@ class OutlineEditor extends Model
     @editorState(item).selected
 
   # Public: Returns `true` if is selecting at item level.
-  isItemMode: ->
-    @_selection.isItemMode
+  isOutlineMode: ->
+    @_selection.isOutlineMode
 
   # Public: Returns `true` if is selecting at text level.
   isTextMode: ->
@@ -856,7 +856,7 @@ class OutlineEditor extends Model
 
   # Public: Select all children of the current {::hoistedItem} item.
   selectAll: ->
-    if @isItemMode()
+    if @isOutlineMode()
       @_disableScrollToSelection = true
       @moveSelectionRange(@firstVisibleItem(), undefined, @lastVisibleItem(), undefined)
       @_disableScrollToSelection = false
@@ -1132,7 +1132,7 @@ class OutlineEditor extends Model
     @_moveItemsInDirection('right')
 
   _moveItemsInDirection: (direction) ->
-    selectedItems = @selection.itemsCover
+    selectedItems = @selection.itemsCommonAncestors
     if selectedItems.length > 0
       startItem = selectedItems[0]
       newNextSibling
@@ -1160,7 +1160,7 @@ class OutlineEditor extends Model
         @moveItems(selectedItems, newParent, newNextSibling)
 
   promoteChildItems: (e) ->
-    selectedItems = @selection.itemsCover
+    selectedItems = @selection.itemsCommonAncestors
     if selectedItems.length > 0
       undoManager = @outline.undoManager
       undoManager.beginUndoGrouping()
@@ -1170,7 +1170,7 @@ class OutlineEditor extends Model
       undoManager.setActionName('Promote Children')
 
   demoteTrailingSiblingItems: (e) ->
-    selectedItems = @selection.itemsCover
+    selectedItems = @selection.itemsCommonAncestors
     item = selectedItems[0]
 
     if item
@@ -1261,8 +1261,8 @@ class OutlineEditor extends Model
         outline.endUpdates()
         undoManager.endUndoGrouping()
         undoManager.setActionName('Delete')
-    else if selectionRange.isItemMode
-      selectedItems = selectionRange.itemsCover
+    else if selectionRange.isOutlineMode
+      selectedItems = selectionRange.itemsCommonAncestors
       if selectedItems.length > 0
         startItem = selectedItems[0]
         endItem = selectedItems[selectedItems.length - 1]
@@ -1295,8 +1295,8 @@ class OutlineEditor extends Model
     selectionRange = @selection
 
     if not selectionRange.isCollapsed
-      if selectionRange.isItemMode
-        items = selectionRange.itemsCover
+      if selectionRange.isOutlineMode
+        items = selectionRange.itemsCommonAncestors
         ItemSerializer.writeItems(items, this, dataTransfer)
       else if selectionRange.isTextMode
         focusItem = selectionRange.focusItem

@@ -5,7 +5,64 @@ Constants = require './Constants'
 assert = require 'assert'
 Item = require './Item'
 
+# Public: The selection returned by {OutlineEditor::selection}.
+#
+# The anchor of a selection is the beginning point of the selection. When
+# making a selection with a mouse, the anchor is where in the document the
+# mouse button is initially pressed. As the user changes the selection using
+# the mouse or the keyboard, the anchor does not move.
+#
+# The focus of a selection is the end point of the selection. When making a
+# selection with a mouse, the focus is where in the document the mouse button
+# is released. As the user changes the selection using the mouse or the
+# keyboard, the focus is the end of the selection that moves.
+#
+# The start of a selection is the boundary closest to the beginning of the
+# document. The end of a selection is the boundary closest to the end of the
+# document.
 class Selection
+
+  ###
+  Section: Anchor and Focus
+  ###
+
+  # Public: Read-only {Item} where the selection is anchored.
+  anchorItem: null
+
+  # Public: Read-only text offset in the anchor {Item} where the selection is anchored.
+  anchorOffset: undefined
+
+  # Public: Read-only {Item} where the selection is focused.
+  focusItem: null
+
+  # Public: Read-only text offset in the focus {Item} where the selection is focused.
+  focusOffset: undefined
+
+  ###
+  Section: Start and End
+  ###
+
+  # Public: Read-only first selected {Item} in outline order.
+  startItem: null
+
+  # Public: Read-only text offset in the start {Item} where selection starts.
+  startOffset: undefined
+
+  # Public: Read-only last selected {Item} in outline order.
+  endItem: null
+
+  # Public: Read-only text offset in the end {Item} where selection end.
+  endOffset: undefined
+
+  ###
+  Section: Items
+  ###
+
+  # Public: Read only {Array} of selected {Item}s.
+  items: null
+
+  # Public: Read only {Array} of common ancestors of selected {Item}s.
+  itemsCommonAncestors: null
 
   @isUpstreamDirection: (direction) ->
     direction is 'backward' or direction is 'left' or direction is 'up'
@@ -42,18 +99,26 @@ class Selection
 
     @_calculateSelectionItems()
 
+  ###
+  Section: Selection State
+  ###
+
+  isValid: null
   Object.defineProperty @::, 'isValid',
     get: ->
       _isValidSelectionOffset(@editor, @focusItem, @focusOffset) and
       _isValidSelectionOffset(@editor, @anchorItem, @anchorOffset)
 
+  # Public: Read-only indicating whether the selection's start and end points
+  # are at the same position.
+  isCollapsed: null
   Object.defineProperty @::, 'isCollapsed',
     get: -> @isTextMode and @focusOffset is @anchorOffset
 
   Object.defineProperty @::, 'isUpstreamAffinity',
     get: -> @selectionAffinity is Constants.SelectionAffinityUpstream
 
-  Object.defineProperty @::, 'isItemMode',
+  Object.defineProperty @::, 'isOutlineMode',
     get: ->
       @isValid and (
         !!@anchorItem and
@@ -232,7 +297,7 @@ class Selection
     result
 
   nextItemOffsetInDirection: (direction, granularity, extending) ->
-    if @isItemMode
+    if @isOutlineMode
       switch granularity
         when 'sentenceboundary', 'lineboundary', 'character', 'word', 'sentence', 'line'
           granularity = 'paragraphboundary'
@@ -446,7 +511,7 @@ class Selection
         each = editor.nextVisibleItem(each)
 
     @items = items
-    @itemsCover = Item.commonAncestors(items)
+    @itemsCommonAncestors = Item.commonAncestors(items)
     @startItem = items[0]
     @endItem = items[items.length - 1]
 

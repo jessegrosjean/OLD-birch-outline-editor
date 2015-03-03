@@ -2,6 +2,7 @@
 
 ## 0.2.0
 
+- Documented {Selection} class.
 - Fixed clearing formatting at end of line.
 - Fixed dragging scroller to not modify selection.
 - Fixed text caret positioning problems at text wrap boundaries.

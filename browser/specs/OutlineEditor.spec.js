@@ -87,7 +87,7 @@ describe('OutlineEditor', function() {
 		it('should select item', function() {
 			editor.moveSelectionRange(outlineSetup.one);
 			editor.selection.items.should.eql([outlineSetup.one]);
-			editor.selection.isItemMode.should.be.true;
+			editor.selection.isOutlineMode.should.be.true;
 			editor.selection.focusItem.should.equal(outlineSetup.one);
 			editor.selection.anchorItem.should.equal(outlineSetup.one);
 			should(editor.selection.focusOffset === undefined);
