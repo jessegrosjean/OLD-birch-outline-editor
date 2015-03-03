@@ -81,12 +81,12 @@ describe('OutlineEditor', function() {
 
 	describe('Selection', function() {
 		it('should be empty by default', function() {
-			editor.selection.rangeItems.should.eql([]);
+			editor.selection.items.should.eql([]);
 		});
 
 		it('should select item', function() {
 			editor.moveSelectionRange(outlineSetup.one);
-			editor.selection.rangeItems.should.eql([outlineSetup.one]);
+			editor.selection.items.should.eql([outlineSetup.one]);
 			editor.selection.isItemMode.should.be.true;
 			editor.selection.focusItem.should.equal(outlineSetup.one);
 			editor.selection.anchorItem.should.equal(outlineSetup.one);
@@ -96,7 +96,7 @@ describe('OutlineEditor', function() {
 
 		it('should select item text', function() {
 			editor.moveSelectionRange(outlineSetup.one, 1);
-			editor.selection.rangeItems.should.eql([outlineSetup.one]);
+			editor.selection.items.should.eql([outlineSetup.one]);
 			editor.selection.isTextMode.should.be.true;
 		});
 

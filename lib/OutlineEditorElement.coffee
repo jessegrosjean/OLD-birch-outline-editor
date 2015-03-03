@@ -763,7 +763,7 @@ class OutlineEditorElement extends HTMLElement
     itemCaretPosition = {
       offsetItem: item,
       offset: if nodeCaretPosition then @nodeOffsetToItemOffset(nodeCaretPosition.offsetItem, nodeCaretPosition.offset) else 0,
-      rangeAffinity: if nodeCaretPosition then nodeCaretPosition.rangeAffinity else Constants.SelectionAffinityUpstream,
+      selectionAffinity: if nodeCaretPosition then nodeCaretPosition.selectionAffinity else Constants.SelectionAffinityUpstream,
       itemAffinity: itemAffinity
     }
 
@@ -1119,11 +1119,11 @@ class OutlineEditorElement extends HTMLElement
         upstreamDist = Math.abs(upstreamRect.left - clientX)
         downstreamDist = Math.abs(downstreamRect.left - clientX)
         if downstreamDist < upstreamDist
-          pick.rangeAffinity = Constants.SelectionAffinityDownstream
+          pick.selectionAffinity = Constants.SelectionAffinityDownstream
         else
-          pick.rangeAffinity = Constants.SelectionAffinityUpstream
+          pick.selectionAffinity = Constants.SelectionAffinityUpstream
       else
-        pick?.rangeAffinity = Constants.SelectionAffinityUpstream
+        pick?.selectionAffinity = Constants.SelectionAffinityUpstream
 
       pick
 

@@ -13,20 +13,20 @@ class Selection
   @isDownstreamDirection: (direction) ->
     direction is 'forward' or direction is 'right' or direction is 'down'
 
-  constructor: (editor, focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
+  constructor: (editor, focusItem, focusOffset, anchorItem, anchorOffset, selectionAffinity) ->
     if focusItem instanceof Selection
-      range = focusItem
-      editor = range.editor
-      focusItem = range.focusItem
-      focusOffset = range.focusOffset
-      anchorItem = range.anchorItem
-      anchorOffset = range.anchorOffset
-      rangeAffinity = range.rangeAffinity
+      selection = focusItem
+      editor = selection.editor
+      focusItem = selection.focusItem
+      focusOffset = selection.focusOffset
+      anchorItem = selection.anchorItem
+      anchorOffset = selection.anchorOffset
+      selectionAffinity = selection.selectionAffinity
 
     @editor = editor
     @focusItem = focusItem or null
     @focusOffset = focusOffset
-    @rangeAffinity = rangeAffinity or null
+    @selectionAffinity = selectionAffinity or null
     @anchorItem = anchorItem or null
     @anchorOffset = anchorOffset
 
@@ -40,7 +40,7 @@ class Selection
       @anchorItem = null
       @anchorOffset = undefined
 
-    @_calculateRangeItems()
+    @_calculateSelectionItems()
 
   Object.defineProperty @::, 'isValid',
     get: ->
@@ -51,7 +51,7 @@ class Selection
     get: -> @isTextMode and @focusOffset is @anchorOffset
 
   Object.defineProperty @::, 'isUpstreamAffinity',
-    get: -> @rangeAffinity is Constants.SelectionAffinityUpstream
+    get: -> @selectionAffinity is Constants.SelectionAffinityUpstream
 
   Object.defineProperty @::, 'isItemMode',
     get: ->
@@ -134,7 +134,7 @@ class Selection
         # The goal is to get a single zero width rect for cursor
         # position. This is complicated by fact that when a line wraps
         # two rects are returned, one for each possible location. That
-        # ambiguity is solved by tracking rangeAffinity.
+        # ambiguity is solved by tracking selectionAffinity.
         #
         # The messy part is that there are other times that two client
         # rects get returned. Such as when the range start starts at the
@@ -151,7 +151,7 @@ class Selection
           if sameLine
             unless baseRect.width
               baseRect = alternateRect
-          else if @rangeAffinity == Constants.SelectionAffinityUpstream
+          else if @selectionAffinity == Constants.SelectionAffinityUpstream
             positionedAtEndOfWrappingLine = true
           else
             baseRect = alternateRect
@@ -178,8 +178,8 @@ class Selection
     @focusOffset is otherSelection.focusOffset and
     @anchorItem is otherSelection.anchorItem and
     @anchorOffset is otherSelection.anchorOffset and
-    @rangeAffinity is otherSelection.rangeAffinity and
-    shallowEquals(@rangeItems, otherSelection.rangeItems)
+    @selectionAffinity is otherSelection.selectionAffinity and
+    shallowEquals(@items, otherSelection.items)
 
   selectionByExtending: (newFocusItem, newFocusOffset, newSelectionAffinity) ->
     new Selection(
@@ -188,7 +188,7 @@ class Selection
       newFocusOffset,
       @anchorItem,
       @anchorOffset,
-      newSelectionAffinity or @rangeAffinity
+      newSelectionAffinity or @selectionAffinity
     )
 
   selectionByModifying: (alter, direction, granularity) ->
@@ -196,7 +196,7 @@ class Selection
     next = @nextItemOffsetInDirection(direction, granularity, extending)
 
     if extending
-      @selectionByExtending(next.offsetItem, next.offset, next.rangeAffinity);
+      @selectionByExtending(next.offsetItem, next.offset, next.selectionAffinity);
     else
       new Selection(
         @editor,
@@ -204,17 +204,17 @@ class Selection
         next.offset,
         next.offsetItem,
         next.offset,
-        next.rangeAffinity
+        next.selectionAffinity
       )
 
   selectionByRevalidating: ->
     editor = @editor
-    visibleItems = @rangeItems.filter (each) ->
+    visibleItems = @items.filter (each) ->
       editor.isVisible each
     visibleSortedItems = visibleItems.sort (a, b) ->
       a.comparePosition(b) & Node.DOCUMENT_POSITION_PRECEDING
 
-    if shallowEquals @rangeItems, visibleSortedItems
+    if shallowEquals @items, visibleSortedItems
       return this
 
     focusItem = visibleSortedItems[0]
@@ -225,10 +225,10 @@ class Selection
       undefined,
       anchorItem,
       undefined,
-      @rangeAffinity
+      @selectionAffinity
     )
 
-    result._calculateRangeItems(visibleSortedItems)
+    result._calculateSelectionItems(visibleSortedItems)
     result
 
   nextItemOffsetInDirection: (direction, granularity, extending) ->
@@ -245,7 +245,7 @@ class Selection
     upstream = Selection.isUpstreamDirection(direction)
 
     next =
-      rangeAffinity: Constants.SelectionAffinityDownstream # All movements have downstream affinity except for line and lineboundary
+      selectionAffinity: Constants.SelectionAffinityDownstream # All movements have downstream affinity except for line and lineboundary
 
     if focusItem
       unless extending
@@ -316,12 +316,12 @@ class Selection
           nextItem = if upstream then editor.previousVisibleItem(focusItem) else editor.nextVisibleItem(focusItem)
           if nextItem
             direction = if upstream then 'backward' else 'forward'
-            editorRange = new Selection(@editor, nextItem, if upstream then nextItem.bodyText.length else 0)
-            editorRange = editorRange.selectionByModifying('move', direction, granularity)
+            editorSelection = new Selection(@editor, nextItem, if upstream then nextItem.bodyText.length else 0)
+            editorSelection = editorSelection.selectionByModifying('move', direction, granularity)
             next =
-              offsetItem: editorRange.focusItem
-              offset: editorRange.focusOffset
-              rangeAffinity: editorRange.rangeAffinity
+              offsetItem: editorSelection.focusItem
+              offset: editorSelection.focusOffset
+              selectionAffinity: editorSelection.selectionAffinity
 
       when 'line'
         next = @nextItemOffsetByLineFromFocus(focusItem, focusOffset, direction)
@@ -424,10 +424,10 @@ class Selection
             offset: focusItem.bodyText.length
     picked
 
-  _calculateRangeItems: (overRideRangeItems) ->
-    rangeItems = overRideRangeItems || []
+  _calculateSelectionItems: (overRideSelectionItems) ->
+    items = overRideSelectionItems || []
 
-    if @isValid and not overRideRangeItems
+    if @isValid and not overRideSelectionItems
       editor = @editor
       focusItem = @focusItem
       anchorItem = @anchorItem
@@ -440,17 +440,15 @@ class Selection
 
       each = startItem
       while each
-        rangeItems.push(each)
+        items.push(each)
         if each is endItem
           break
         each = editor.nextVisibleItem(each)
 
-    @rangeItems = rangeItems
-    @items = rangeItems
-    @rangeItemsCover = Item.commonAncestors(rangeItems)
-    @itemsCover = @rangeItemsCover
-    @startItem = rangeItems[0]
-    @endItem = rangeItems[rangeItems.length - 1]
+    @items = items
+    @itemsCover = Item.commonAncestors(items)
+    @startItem = items[0]
+    @endItem = items[items.length - 1]
 
     if @isReversed
       @startOffset = @focusOffset

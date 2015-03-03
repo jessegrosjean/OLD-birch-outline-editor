@@ -344,7 +344,7 @@ class OutlineEditor extends Model
     @_setExpandedState items, false
 
   _setExpandedState: (items, expanded) ->
-    items ?= @selection.rangeItemsCover
+    items ?= @selection.itemsCover
 
     if not typechecker.isArray(items)
       items = [items]
@@ -383,7 +383,7 @@ class OutlineEditor extends Model
     @_foldItems items, undefined, fully
 
   _foldItems: (items, expand, fully) ->
-    items ?= @selection.rangeItemsCover
+    items ?= @selection.itemsCover
     unless typechecker.isArray(items)
       items = [items]
 
@@ -811,7 +811,7 @@ class OutlineEditor extends Model
       undefined
     )
 
-  # Public: Set a new selection range.
+  # Public: Set a new {Selection}.
   #
   # - `focusItem` Selection focus {Item}
   # - `focusOffset` (optional) Selection focus offset index. Or `undefined`
@@ -819,22 +819,22 @@ class OutlineEditor extends Model
   # - `anchorItem` (optional) Selection anchor {Item}
   # - `anchorOffset` (optional) Selection anchor offset index. Or `undefined`
   #    when selecting at item level.
-  moveSelectionRange: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
+  moveSelectionRange: (focusItem, focusOffset, anchorItem, anchorOffset, selectionAffinity) ->
     @_textModeExtendingFromSnapbackRange = null
-    @_updateSelectionIfNeeded(@createSelection(focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity))
+    @_updateSelectionIfNeeded(@createSelection(focusItem, focusOffset, anchorItem, anchorOffset, selectionAffinity))
 
-  # Public: Extend the selection range to a new focus item/offset.
+  # Public: Extend the {Selection} to a new focus item/offset.
   #
   # - `focusItem` Selection focus {Item}
   # - `focusOffset` (optional) Selection focus offset index. Or `undefined`
   #    when selecting at item level.
-  extendSelectionRange: (focusItem, focusOffset, rangeAffinity) ->
+  extendSelectionRange: (focusItem, focusOffset, selectionAffinity) ->
     checkForTextModeSnapback = false
     if @selection.isTextMode
       @_textModeExtendingFromSnapbackRange = @selection
     else
       checkForTextModeSnapback = true
-    @_updateSelectionIfNeeded(@_selection.selectionByExtending(focusItem, focusOffset, rangeAffinity), checkForTextModeSnapback)
+    @_updateSelectionIfNeeded(@_selection.selectionByExtending(focusItem, focusOffset, selectionAffinity), checkForTextModeSnapback)
 
   modifySelectionRange: (alter, direction, granularity, maintainVertialAnchor) ->
     saved = @selectionVerticalAnchor()
@@ -873,8 +873,8 @@ class OutlineEditor extends Model
         else
           @moveSelectionRange(item, 0, item, textLength)
 
-  createSelection: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
-    new Selection(this, focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity)
+  createSelection: (focusItem, focusOffset, anchorItem, anchorOffset, selectionAffinity) ->
+    new Selection(this, focusItem, focusOffset, anchorItem, anchorOffset, selectionAffinity)
 
   _revalidateSelectionRange: ->
     @_updateSelectionIfNeeded(@_selection.selectionByRevalidating())
@@ -891,8 +891,8 @@ class OutlineEditor extends Model
 
     if not currentSelection.equals(newSelection)
       wasSelectedMarker = 'marker'
-      newRangeItems = newSelection.rangeItems
-      currentRangeItems = currentSelection.rangeItems
+      newRangeItems = newSelection.items
+      currentRangeItems = currentSelection.items
       @_selection = newSelection
 
       for each in currentRangeItems
@@ -1046,7 +1046,7 @@ class OutlineEditor extends Model
   # Returns the new {Item}.
   insertItem: (text, above=false) ->
     text ?= ''
-    selectedItems = @selection.rangeItems
+    selectedItems = @selection.items
     insertBefore
     parent
 
@@ -1132,7 +1132,7 @@ class OutlineEditor extends Model
     @_moveItemsInDirection('right')
 
   _moveItemsInDirection: (direction) ->
-    selectedItems = @selection.rangeItemsCover
+    selectedItems = @selection.itemsCover
     if selectedItems.length > 0
       startItem = selectedItems[0]
       newNextSibling
@@ -1160,7 +1160,7 @@ class OutlineEditor extends Model
         @moveItems(selectedItems, newParent, newNextSibling)
 
   promoteChildItems: (e) ->
-    selectedItems = @selection.rangeItemsCover
+    selectedItems = @selection.itemsCover
     if selectedItems.length > 0
       undoManager = @outline.undoManager
       undoManager.beginUndoGrouping()
@@ -1170,7 +1170,7 @@ class OutlineEditor extends Model
       undoManager.setActionName('Promote Children')
 
   demoteTrailingSiblingItems: (e) ->
-    selectedItems = @selection.rangeItemsCover
+    selectedItems = @selection.itemsCover
     item = selectedItems[0]
 
     if item
@@ -1246,7 +1246,7 @@ class OutlineEditor extends Model
         if 0 == startOffset && startItem != endItem && startItem == endItem.previousSibling && startItem.bodyText.length == 0
           @moveSelectionRange(endItem, 0)
           endItem.replaceBodyTextInRange('', 0, endOffset)
-          for each in selectionRange.rangeItems[...-1]
+          for each in selectionRange.items[...-1]
             each.removeFromParent()
         else
           @moveSelectionRange(startItem, startOffset)
@@ -1255,14 +1255,14 @@ class OutlineEditor extends Model
           else
             startItem.replaceBodyTextInRange(endItem.attributedBodyTextSubstring(endOffset, -1), startOffset, -1)
             startItem.appendChildren(endItem.children)
-            for each in selectionRange.rangeItems[1...]
+            for each in selectionRange.items[1...]
               each.removeFromParent()
 
         outline.endUpdates()
         undoManager.endUndoGrouping()
         undoManager.setActionName('Delete')
     else if selectionRange.isItemMode
-      selectedItems = selectionRange.rangeItemsCover
+      selectedItems = selectionRange.itemsCover
       if selectedItems.length > 0
         startItem = selectedItems[0]
         endItem = selectedItems[selectedItems.length - 1]
@@ -1296,7 +1296,7 @@ class OutlineEditor extends Model
 
     if not selectionRange.isCollapsed
       if selectionRange.isItemMode
-        items = selectionRange.rangeItemsCover
+        items = selectionRange.itemsCover
         ItemSerializer.writeItems(items, this, dataTransfer)
       else if selectionRange.isTextMode
         focusItem = selectionRange.focusItem
@@ -1466,7 +1466,7 @@ class OutlineEditor extends Model
     if selectionRange.isTextMode
       transform(selectionRange.startItem, selectionRange.startOffset, selectionRange.endOffset)
     else
-      for each in selectionRange.rangeItems
+      for each in selectionRange.items
         transform(each, 0, each.bodyText.length)
 
     undoManager.endUndoGrouping()
@@ -1476,7 +1476,7 @@ class OutlineEditor extends Model
     outline = @outline
     undoManager = outline.undoManager
     doneDate = new Date().toISOString()
-    selectedItems = @selection.rangeItems
+    selectedItems = @selection.items
     firstItem = selectedItems[0]
 
     if firstItem
