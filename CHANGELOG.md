@@ -2,7 +2,8 @@
 
 ## 0.2.0
 
-- Fixed bug where dragging scroll bar would modify selection.
+- Fixed clearing formatting at end of line.
+- Fixed dragging scroller to not modify selection.
 
 ## 0.1.0
 

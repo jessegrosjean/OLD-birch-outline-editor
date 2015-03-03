@@ -867,7 +867,7 @@ class OutlineEditor extends Model
       endOffset = selectionRange.endOffset
 
       if item
-        textLength = item.bodyText.length;
+        textLength = item.bodyText.length
         if startOffset == 0 and endOffset == textLength
           @moveSelectionRange(item, undefined, item, undefined)
         else
@@ -1429,9 +1429,19 @@ class OutlineEditor extends Model
     if selection.isCollapsed
       longestRange = {}
       focusItem = selection.focusItem
-      elements = focusItem.elementsAtBodyTextIndex(selection.focusOffset, null, longestRange)
+      focusOffset = selection.focusOffset
+      focusTextLength = focusItem.bodyText.length
+
+      if focusTextLength is 0
+        return
+
+      if focusOffset is focusTextLength
+        focusOffset--
+
+      elements = focusItem.elementsAtBodyTextIndex(focusOffset, null, longestRange)
       unless Object.keys(elements).length
         return
+
       @moveSelectionRange(focusItem, longestRange.location, focusItem, longestRange.end)
 
     @_transformSelectedText (eachItem, start, end) ->
