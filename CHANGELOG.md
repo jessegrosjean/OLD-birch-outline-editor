@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.2.0
+
+- Fixed bug where dragging scroll bar would modify selection.
+
 ## 0.1.0
 
 - Updated docs
