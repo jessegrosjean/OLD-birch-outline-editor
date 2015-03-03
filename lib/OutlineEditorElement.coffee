@@ -5,7 +5,7 @@ OutlineEditorFocusElement = require './OutlineEditorFocusElement'
 ChildrenULAnimation = require './animations/ChildrenULAnimation'
 LIInsertAnimation = require './animations/LIInsertAnimation'
 LIRemoveAnimation = require './animations/LIRemoveAnimation'
-OutlineEditorSelection = require './OutlineEditorSelection'
+Selection = require './Selection'
 LIMoveAnimation = require './animations/LIMoveAnimation'
 ItemBodyEncoder = require './ItemBodyEncoder'
 Mutation = require './Mutation'
@@ -40,7 +40,7 @@ class OutlineEditorElement extends HTMLElement
     @editor = editor
     @_animationDisabled = 0
     @_animationContexts = [Constants.DefaultItemAnimactionContext]
-    @_maintainOutlineEditorSelection = null
+    @_maintainSelection = null
     @_animations = {}
     @_idsToElements = {}
     @_extendingSelection = false
@@ -788,7 +788,7 @@ class OutlineEditorElement extends HTMLElement
       if focusItem
         focusOffset = @nodeOffsetToItemOffset(selection.focusNode, selection.focusOffset)
         anchorOffset = @nodeOffsetToItemOffset(selection.anchorNode, selection.anchorOffset)
-        return new OutlineEditorSelection(
+        return new Selection(
           @editor,
           focusItem,
           focusOffset,
@@ -796,7 +796,7 @@ class OutlineEditorElement extends HTMLElement
           anchorOffset
         )
 
-    new OutlineEditorSelection(@editor)
+    new Selection(@editor)
 
   beginExtendSelectionInteraction: (e) ->
     editor = @editor

@@ -1,11 +1,11 @@
 'use strict';
 
 var OutlineEditor = require('birch/OutlineEditor'),
-	OutlineEditorSelection = require('birch/OutlineEditorSelection'),
+	Selection = require('birch/Selection'),
 	Outline = require('birch/Outline'),
 	should = require('should');
 
-describe('OutlineEditorSelection', function() {
+describe('Selection', function() {
 	var outlineSetup, outline, editor;
 
 	beforeEach(function() {
@@ -27,7 +27,7 @@ describe('OutlineEditorSelection', function() {
 	describe('Modify', function() {
 		describe('Character', function() {
 			it('should move/backward/character', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.six, 1);
+				var r = editor.createSelection(outlineSetup.six, 1);
 				r = r.selectionByModifying('move', 'backward', 'character');
 				r.focusItem.should.equal(outlineSetup.six);
 				r.focusOffset.should.equal(0);
@@ -38,7 +38,7 @@ describe('OutlineEditorSelection', function() {
 			});
 
 			it('should move/forward/character', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.one, 2);
+				var r = editor.createSelection(outlineSetup.one, 2);
 				r = r.selectionByModifying('move', 'forward', 'character');
 				r.focusItem.should.equal(outlineSetup.one);
 				r.focusOffset.should.equal(3);
@@ -52,7 +52,7 @@ describe('OutlineEditorSelection', function() {
 		describe('Word', function() {
 			it('should move/backward/word', function() {
 				outlineSetup.six.bodyText = 'one two';
-				var r = editor.createOutlineEditorSelection(outlineSetup.six, 5);
+				var r = editor.createSelection(outlineSetup.six, 5);
 
 				r = r.selectionByModifying('move', 'backward', 'word');
 				r.focusItem.should.equal(outlineSetup.six);
@@ -69,7 +69,7 @@ describe('OutlineEditorSelection', function() {
 
 			it('should move/forward/word', function() {
 				outlineSetup.one.bodyText = 'one two';
-				var r = editor.createOutlineEditorSelection(outlineSetup.one, 1);
+				var r = editor.createSelection(outlineSetup.one, 1);
 
 				r = r.selectionByModifying('move', 'forward', 'word');
 				r.focusItem.should.equal(outlineSetup.one);
@@ -86,7 +86,7 @@ describe('OutlineEditorSelection', function() {
 
 			it('should move/forward/word japanese', function() {
 				outlineSetup.one.bodyText = 'ジェッセワsヘレ';
-				var r = editor.createOutlineEditorSelection(outlineSetup.one, 0);
+				var r = editor.createSelection(outlineSetup.one, 0);
 
 				r = r.selectionByModifying('move', 'forward', 'word');
 				r.focusItem.should.equal(outlineSetup.one);
@@ -109,7 +109,7 @@ describe('OutlineEditorSelection', function() {
 		describe('Sentence', function() {
 			it('should move/backward/sentance', function() {
 				outlineSetup.six.bodyText = 'Hello world! Let\'s take a look at this.';
-				var r = editor.createOutlineEditorSelection(outlineSetup.six, 26);
+				var r = editor.createSelection(outlineSetup.six, 26);
 
 				r = r.selectionByModifying('move', 'backward', 'sentence');
 				r.focusItem.should.equal(outlineSetup.six);
@@ -126,7 +126,7 @@ describe('OutlineEditorSelection', function() {
 
 			it('should move/forward/sentence', function() {
 				outlineSetup.one.bodyText = 'Hello world! Let\'s take a look at this.';
-				var r = editor.createOutlineEditorSelection(outlineSetup.one, 8);
+				var r = editor.createSelection(outlineSetup.one, 8);
 
 				r = r.selectionByModifying('move', 'forward', 'sentence');
 				r.focusItem.should.equal(outlineSetup.one);
@@ -144,14 +144,14 @@ describe('OutlineEditorSelection', function() {
 
 		describe('Line Boundary', function() {
 			it('should move/backward/lineboundary', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.two, 1);
+				var r = editor.createSelection(outlineSetup.two, 1);
 				r = r.selectionByModifying('move', 'backward', 'lineboundary');
 				r.focusItem.should.equal(outlineSetup.two);
 				r.focusOffset.should.equal(0);
 			});
 
 			it('should move/forward/lineboundary', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.two, 1);
+				var r = editor.createSelection(outlineSetup.two, 1);
 				r = r.selectionByModifying('move', 'forward', 'lineboundary');
 				r.focusItem.should.equal(outlineSetup.two);
 				r.focusOffset.should.equal(3);
@@ -178,7 +178,7 @@ describe('OutlineEditorSelection', function() {
 
 		describe('Paragraph Boundary', function() {
 			it('should move/backward/paragraphboundary', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.six, 3);
+				var r = editor.createSelection(outlineSetup.six, 3);
 				r = r.selectionByModifying('move', 'backward', 'paragraphboundary');
 				r.focusItem.should.equal(outlineSetup.six);
 				r.focusOffset.should.equal(0);
@@ -189,7 +189,7 @@ describe('OutlineEditorSelection', function() {
 			});
 
 			it('should move/forward/paragraphboundary', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.one, 0);
+				var r = editor.createSelection(outlineSetup.one, 0);
 				r = r.selectionByModifying('move', 'forward', 'paragraphboundary');
 				r.focusItem.should.equal(outlineSetup.one);
 				r.focusOffset.should.equal(3);
@@ -202,7 +202,7 @@ describe('OutlineEditorSelection', function() {
 
 		describe('Paragraph', function() {
 			it('should move/backward/paragraph', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.six, 3);
+				var r = editor.createSelection(outlineSetup.six, 3);
 				r = r.selectionByModifying('move', 'backward', 'paragraph');
 				r.focusItem.should.equal(outlineSetup.five);
 				r.focusOffset.should.equal(0);
@@ -213,7 +213,7 @@ describe('OutlineEditorSelection', function() {
 			});
 
 			it('should move/forward/paragraph', function() {
-				var r = editor.createOutlineEditorSelection(outlineSetup.one, 2);
+				var r = editor.createSelection(outlineSetup.one, 2);
 				r = r.selectionByModifying('move', 'forward', 'paragraph');
 				r.focusItem.should.equal(outlineSetup.two);
 				r.focusOffset.should.equal(3);
@@ -227,9 +227,9 @@ describe('OutlineEditorSelection', function() {
 
 	describe('Geometry', function() {
 		it('should get client rects from selection', function() {
-			var itemRect = editor.createOutlineEditorSelection(outlineSetup.one).focusClientRect,
-				textRect1 = editor.createOutlineEditorSelection(outlineSetup.one, 0).focusClientRect,
-				textRect2 = editor.createOutlineEditorSelection(outlineSetup.one, 3).focusClientRect;
+			var itemRect = editor.createSelection(outlineSetup.one).focusClientRect,
+				textRect1 = editor.createSelection(outlineSetup.one, 0).focusClientRect,
+				textRect2 = editor.createSelection(outlineSetup.one, 3).focusClientRect;
 
 			should(textRect1.left >= itemRect.left);
 			should(textRect1.top >= itemRect.top);
@@ -240,8 +240,8 @@ describe('OutlineEditorSelection', function() {
 		it('should get client rects from empty selection', function() {
 			outlineSetup.one.bodyText = '';
 
-			var charRect = editor.createOutlineEditorSelection(outlineSetup.one, 0).focusClientRect,
-				itemRect = editor.createOutlineEditorSelection(outlineSetup.one).focusClientRect;
+			var charRect = editor.createSelection(outlineSetup.one, 0).focusClientRect,
+				itemRect = editor.createSelection(outlineSetup.one).focusClientRect;
 
 			itemRect.left.should.equal(charRect.left);
 			charRect.width.should.equal(0);

@@ -1,6 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-OutlineEditorSelection = require './OutlineEditorSelection'
 LinkEditorElement = require './elements/LinkEditorElement'
 OutlineEditorElement = require './OutlineEditorElement'
 AttributedString = require './AttributedString'
@@ -13,6 +12,7 @@ Velocity = require 'velocity-animate'
 shallowCopy = require 'shallow-copy'
 typechecker = require 'typechecker'
 Constants = require './Constants'
+Selection = require './Selection'
 Mutation = require './Mutation'
 Outline = require './Outline'
 shortid = require './shortid'
@@ -47,7 +47,7 @@ class OutlineEditor extends Model
     @emitter = new Emitter()
     @outline = null
     @_overrideIsFocused = false
-    @_selection = new OutlineEditorSelection(this)
+    @_selection = new Selection(this)
     @_textModeExtendingFromSnapbackRange = null
     @_textModeTypingFormattingTags = {}
     @_selectionVerticalAnchor = undefined
@@ -631,7 +631,7 @@ class OutlineEditor extends Model
   Section: Selection
   ###
 
-  # Public: Read-only current {OutlineEditorSelection}.
+  # Public: Read-only current {Selection}.
   selection: null
   Object.defineProperty @::, 'selection',
     get: -> @_selection
@@ -821,7 +821,7 @@ class OutlineEditor extends Model
   #    when selecting at item level.
   moveSelectionRange: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
     @_textModeExtendingFromSnapbackRange = null
-    @_updateSelectionIfNeeded(@createOutlineEditorSelection(focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity))
+    @_updateSelectionIfNeeded(@createSelection(focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity))
 
   # Public: Extend the selection range to a new focus item/offset.
   #
@@ -834,7 +834,7 @@ class OutlineEditor extends Model
       @_textModeExtendingFromSnapbackRange = @selection
     else
       checkForTextModeSnapback = true
-    @_updateSelectionIfNeeded(@_selection.rangeByExtending(focusItem, focusOffset, rangeAffinity), checkForTextModeSnapback)
+    @_updateSelectionIfNeeded(@_selection.selectionByExtending(focusItem, focusOffset, rangeAffinity), checkForTextModeSnapback)
 
   modifySelectionRange: (alter, direction, granularity, maintainVertialAnchor) ->
     saved = @selectionVerticalAnchor()
@@ -873,11 +873,11 @@ class OutlineEditor extends Model
         else
           @moveSelectionRange(item, 0, item, textLength)
 
-  createOutlineEditorSelection: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
-    new OutlineEditorSelection(this, focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity)
+  createSelection: (focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity) ->
+    new Selection(this, focusItem, focusOffset, anchorItem, anchorOffset, rangeAffinity)
 
   _revalidateSelectionRange: ->
-    @_updateSelectionIfNeeded(@_selection.rangeByRevalidating())
+    @_updateSelectionIfNeeded(@_selection.selectionByRevalidating())
 
   _updateSelectionIfNeeded: (newSelection, checkForTextModeSnapback) ->
     currentSelection = @selection
@@ -1271,7 +1271,7 @@ class OutlineEditor extends Model
         previousSibling = @previousVisibleItem(startItem)
         nextSelection = null
 
-        if OutlineEditorSelection.isUpstreamDirection(direction)
+        if Selection.isUpstreamDirection(direction)
           nextSelection = previousSibling || nextSibling || parent
         else
           nextSelection = nextSibling || previousSibling || parent
