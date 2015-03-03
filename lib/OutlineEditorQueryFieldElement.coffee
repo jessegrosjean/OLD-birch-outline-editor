@@ -11,7 +11,7 @@ class OutlineEditorQueryFieldElement extends HTMLElement
     @textFieldElement.classList.add 'padding'
     @textFieldElement.setAttribute 'mini', true
     @textFieldElement.setAttribute 'placeholder-text', 'Search...'
-    @textFieldEditor = @textFieldElement.getModel()
+    @textFieldEditor = @textFieldElement.getModel?()
     @appendChild @textFieldElement
 
   attachedCallback: ->
