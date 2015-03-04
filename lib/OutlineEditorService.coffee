@@ -7,9 +7,9 @@ Item = require './Item'
 
 # Essential: This is the Atom [services
 # API](https://atom.io/docs/latest/creating-a-package#interacting-with-other-
-# packages-via-services) object vended for `birch-outline-editor-service`. Please
-# see the [Package Tutorial](Package%20Tutorial) to learn how to build a
-# package that uses this service.
+# packages-via-services) object vended for `birch-outline-editor-service`.
+# Please see the [Customizing Birch](README#customizing-birch) to get started
+# in creating a package that uses this service.
 class OutlineEditorService
 
   ###

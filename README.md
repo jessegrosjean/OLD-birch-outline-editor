@@ -29,7 +29,7 @@ It's a two step process:
         "consumedServices": {
           "birch-outine-editor-service": {
             "versions": {
-              "^0.1.0": "consumeBirchOutlineEditorService"
+              "1": "consumeBirchOutlineEditorService"
             }
           }
         },
@@ -43,7 +43,10 @@ It's a two step process:
           new Disposable =>
             @birchOutlineEditorService = null
 
-Your package will then have access to Birch through the passed in {OutlineEditorService}. Please see the [archive-done](https://github.com/FoldingText/archive-done) example package as a starting point.
+Your package will then have access to Birch through the passed in {OutlineEditorService}. Please see these example package to get started:
+
+- [archive-done](https://github.com/FoldingText/archive-done)
+- [birch-markdown](https://github.com/FoldingText/birch-markdown)
 
 ## Birch Markup Language
 
