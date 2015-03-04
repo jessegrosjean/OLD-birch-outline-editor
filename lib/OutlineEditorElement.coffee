@@ -781,7 +781,7 @@ class OutlineEditorElement extends HTMLElement
     @outlineEditorFocusElement.focus()
 
   editorRangeFromDOMSelection: ->
-    selection = @editor.DOMGetSelection();
+    selection = @editor.DOMGetSelection()
 
     if selection.focusNode
       focusItem = @itemForViewNode(selection.focusNode)
@@ -1108,24 +1108,24 @@ class OutlineEditorElement extends HTMLElement
       each = Util.nextNode(each)
 
   _nodeCaretPositionFromPoint: (clientX, clientY) ->
-      pick = @editor.DOMCaretPositionFromPoint(clientX, clientY)
-      range = pick?.range
-      clientRects = range?.getClientRects()
-      length = clientRects?.length
+    pick = @editor.DOMCaretPositionFromPoint(clientX, clientY)
+    range = pick?.range
+    clientRects = range?.getClientRects()
+    length = clientRects?.length
 
-      if length > 1
-        upstreamRect = clientRects[0]
-        downstreamRect = clientRects[1]
-        upstreamDist = Math.abs(upstreamRect.left - clientX)
-        downstreamDist = Math.abs(downstreamRect.left - clientX)
-        if downstreamDist < upstreamDist
-          pick.selectionAffinity = Constants.SelectionAffinityDownstream
-        else
-          pick.selectionAffinity = Constants.SelectionAffinityUpstream
+    if length > 1
+      upstreamRect = clientRects[0]
+      downstreamRect = clientRects[1]
+      upstreamDist = Math.abs(upstreamRect.left - clientX)
+      downstreamDist = Math.abs(downstreamRect.left - clientX)
+      if downstreamDist < upstreamDist
+        pick.selectionAffinity = Constants.SelectionAffinityDownstream
       else
-        pick?.selectionAffinity = Constants.SelectionAffinityUpstream
+        pick.selectionAffinity = Constants.SelectionAffinityUpstream
+    else
+      pick?.selectionAffinity = Constants.SelectionAffinityUpstream
 
-      pick
+    pick
 
   _itemViewBodyP: (itemViewLI) ->
     @_itemViewRowDIV(itemViewLI)?.firstChild.nextElementSibling
