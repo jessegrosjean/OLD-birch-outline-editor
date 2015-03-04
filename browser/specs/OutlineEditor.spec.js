@@ -118,7 +118,7 @@ describe('OutlineEditor', function() {
 		describe('Focus', function() {
 			it('should not focus editor when setting selection unless it already has focus', function() {
 				editor.moveSelectionRange(outlineSetup.one);
-				document.activeElement.should.not.equal(editor.outlineEditorElement.outlineEditorFocusElement);
+				document.activeElement.should.not.equal(editor.outlineEditorElement.focusElement);
 				editor.moveSelectionRange(outlineSetup.one, 1);
 				document.activeElement.textContent.should.not.equal(outlineSetup.one.bodyText);
 			});
@@ -127,7 +127,7 @@ describe('OutlineEditor', function() {
 				editor.focus();
 				editor.moveSelectionRange(outlineSetup.one);
 				should(document.getSelection().focusNode === null);
-				document.activeElement.should.equal(editor.outlineEditorElement.outlineEditorFocusElement);
+				document.activeElement.should.equal(editor.outlineEditorElement.focusElement);
 			});
 
 			it('should focus item text when selecting item text', function() {
@@ -153,13 +153,13 @@ describe('OutlineEditor', function() {
 				editor.moveSelectionRange(outlineSetup.two, 1);
 				editor.extendSelectionRange(outlineSetup.five, 3);
 				should(document.getSelection().focusNode === null);
-				document.activeElement.should.equal(editor.outlineEditorElement.outlineEditorFocusElement);
+				document.activeElement.should.equal(editor.outlineEditorElement.focusElement);
 			});
 
 			it('should focus item mode focus element on invalid selection', function() {
 				editor.focus();
 				editor.moveSelectionRange(outlineSetup.one, 4);
-				document.activeElement.should.equal(editor.outlineEditorElement.outlineEditorFocusElement);
+				document.activeElement.should.equal(editor.outlineEditorElement.focusElement);
 			});
 		});
 	});

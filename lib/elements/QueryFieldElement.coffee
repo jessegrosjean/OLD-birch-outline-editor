@@ -1,6 +1,6 @@
 {Disposable, CompositeDisposable} = require 'atom'
 
-class OutlineEditorQueryFieldElement extends HTMLElement
+class QueryFieldElement extends HTMLElement
   query: null
 
   initialize: ->
@@ -25,5 +25,5 @@ class OutlineEditorQueryFieldElement extends HTMLElement
 
 module.exports = document.registerElement(
   'outline-editor-query-field',
-  prototype: OutlineEditorQueryFieldElement.prototype
+  prototype: QueryFieldElement.prototype
 )

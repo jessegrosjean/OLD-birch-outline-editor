@@ -2,7 +2,7 @@
 
 # Focused when in item mode so that cut, copy, and paste will work. But
 # causes problems in languages with input managers...
-class OutlineEditorFocusElement extends HTMLInputElement
+class FocusElement extends HTMLInputElement
   constructor: ->
     super()
     @value = '.'
@@ -25,4 +25,4 @@ class OutlineEditorFocusElement extends HTMLInputElement
 
 module.exports = document.registerElement 'outline-editor-focus',
   extends: 'input'
-  prototype: OutlineEditorFocusElement.prototype
+  prototype: FocusElement.prototype

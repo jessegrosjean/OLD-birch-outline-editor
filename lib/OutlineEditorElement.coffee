@@ -1,24 +1,23 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-OutlineEditorQueryFieldElement  = require './OutlineEditorQueryFieldElement'
-OutlineEditorFocusElement = require './OutlineEditorFocusElement'
 ChildrenULAnimation = require './animations/ChildrenULAnimation'
 LIInsertAnimation = require './animations/LIInsertAnimation'
 LIRemoveAnimation = require './animations/LIRemoveAnimation'
-Selection = require './Selection'
 LIMoveAnimation = require './animations/LIMoveAnimation'
+FocusElement = require './elements/FocusElement'
 ItemBodyEncoder = require './ItemBodyEncoder'
-Mutation = require './Mutation'
 ItemSerializer = require './ItemSerializer'
 EventRegistery = require './EventRegistery'
 {CompositeDisposable} = require 'atom'
 Velocity = require 'velocity-animate'
+Selection = require './Selection'
 Constants = require './Constants'
+Mutation = require './Mutation'
 Util = require './Util'
 
-require './OutlineEditorElementSelectionMouseHandler'
-require './OutlineEditorElementHandleClickHandler'
-require './OutlineEditorElementBodyInputHandler'
+require './handlers/SelectionMouseHandler'
+require './handlers/HandleClickHandler'
+require './handlers/BodyInputHandler'
 
 class OutlineEditorElement extends HTMLElement
 
@@ -67,12 +66,12 @@ class OutlineEditorElement extends HTMLElement
     @styledTextCaretElement.style.zIndex = '1'
     @appendChild @styledTextCaretElement
 
-    outlineEditorFocusElement = new OutlineEditorFocusElement
-    @appendChild(outlineEditorFocusElement)
-    @outlineEditorFocusElement = outlineEditorFocusElement
+    @focusElement = new FocusElement
+    @appendChild(@focusElement)
 
-    outlineEditorQueryFieldElement = new OutlineEditorQueryFieldElement
-    #@appendChild(outlineEditorQueryFieldElement)
+    textField = document.createElement 'INPUT'
+    textField.setAttribute 'type', 'text'
+    @appendChild textField
 
     topListElement = document.createElement('UL')
     @appendChild(topListElement)
@@ -777,8 +776,8 @@ class OutlineEditorElement extends HTMLElement
   ###
 
   focus: ->
-    @outlineEditorFocusElement.select()
-    @outlineEditorFocusElement.focus()
+    @focusElement.select()
+    @focusElement.focus()
 
   editorRangeFromDOMSelection: ->
     selection = @editor.DOMGetSelection()
