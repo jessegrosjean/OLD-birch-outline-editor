@@ -2,15 +2,16 @@
 //
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
+
+// Once Atom supports LESS 2.4 should (optionally) so this will also run in browser.
 @import "ui-variables";
 @import "syntax-variables";
-//@import "atom://static/variables/ui-variables";
 
-@font-family: 'Open Sans', Helvetica;
 @font-size: 16px;
+@font-family: 'Open Sans', Helvetica;
 @line-height: @font-size * 1.5;
-@item-padding: @font-size / 4.0;
-@gutterWidthPerLevel: @font-size * 1.5;
+@item-spacing: @font-size / 4.0;
+@item-indent-spacing: @font-size * 1.5;
 
 birch-outline-editor {
   color: @syntax-text-color;
@@ -57,7 +58,7 @@ birch-outline-editor > ul {
   > .bcontent {
     display: none;
   }
-  margin: @gutterWidthPerLevel 0;
+  margin: @item-indent-spacing 0;
 }
 
 //
@@ -73,20 +74,17 @@ birch-outline-editor > ul {
 .bchildren {
   margin: 0;
   padding: 0;
-//	padding-left: @gutterWidthPerLevel / 2.0;
-//	margin-left: @gutterWidthPerLevel / 2.0;
-//	border-left: 1px dashed mix(@syntax-text-color, @syntax-background-color, percentage(0.1));
 }
 
 .bcontent {
   display: flex;
-  margin-right: @gutterWidthPerLevel;
+  margin-right: @item-indent-spacing;
 }
 
 .bgutter {
   flex: 0 0 auto;
   display: flex;
-  padding-top: @item-padding;
+  padding-top: @item-spacing;
   align-items: flex-start;
   justify-content: flex-end;
 }
@@ -94,7 +92,7 @@ birch-outline-editor > ul {
 .generate-gutter-levels(@n, @i: 0) when (@i =< @n) {
   .bitem[data-level="@{i}"] {
     > .bcontent > .bgutter {
-      flex-basis: (@gutterWidthPerLevel * @i);
+      flex-basis: (@item-indent-spacing * @i);
     }
   }
   .generate-gutter-levels(@n, (@i + 1));
@@ -109,7 +107,7 @@ birch-outline-editor > ul {
   user-select: text;
   line-height: @line-height;
   white-space: pre-wrap;
-  padding: @item-padding 0;
+  padding: @item-spacing 0;
   margin: 0;
   &:focus {
     outline-color: transparent;
@@ -165,7 +163,7 @@ birch-outline-editor > ul {
   border: 0;
   margin: 0;
   padding: 0;
-  min-width: @gutterWidthPerLevel;
+  min-width: @item-indent-spacing;
   background: none;
   text-align: center;
   user-select: none;
@@ -208,14 +206,14 @@ birch-outline-editor > ul {
   left: 0;
   right: 0;
   height: @drop-ball-diameter;
-  margin: -(@item-padding + @drop-ball-radius) 0 0 -@drop-ball-diameter;
+  margin: -(@item-spacing + @drop-ball-radius) 0 0 -@drop-ball-diameter;
   content: "";
   background-image: url('data:image/svg+xml;utf8,<svg width="10000rem" height="0.5rem" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g id="dropIndicator"><circle fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" cx="4" cy="4" r="3.0" /><line fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" x1="7" y1="4" x2="10000" y2="4" /></g></svg>');
   background-repeat: no-repeat;
 }
 
 .bdropInsertAfterItem > .bcontent > .bbody::after {
-  margin: (@item-padding - @drop-ball-radius) 0 0 -@drop-ball-diameter;
+  margin: (@item-spacing - @drop-ball-radius) 0 0 -@drop-ball-diameter;
 }
 
 //
