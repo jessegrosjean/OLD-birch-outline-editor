@@ -3,6 +3,7 @@
   "main": "./lib/AtomEntry",
   "version": "1.0.0",
   "description": "Simple and clean outline editor",
+  "repository": "https://github.com/jessegrosjean/birch-outline-editor",
   "license": "Commercial",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"

@@ -113,6 +113,25 @@ describe('Item', function() {
 				outlineSetup.one.bodyHTML.should.equal('<b>t<u>h</u></b><u>r<i>e</i></u><i>e</i>');
 			});
 
+			it('should add append text with elements', function() {
+				outlineSetup.one.bodyText = '';
+				outlineSetup.one.appendBodyText('o', {'I': {}});
+				outlineSetup.one.appendBodyText('ne', {'I': {}, 'B': {}});
+				outlineSetup.one.bodyHTML.should.equal('<i>o<b>ne</b></i>');
+			});
+
+			it('should add consecutive attribute with different values', function() {
+				outlineSetup.one.addElementInBodyTextRange('SPAN', {'data-a' : 'a'}, 0, 1)
+				outlineSetup.one.addElementInBodyTextRange('SPAN', {'data-b' : 'b'}, 1, 2)
+				outlineSetup.one.bodyHTML.should.equal('<span data-a="a">o</span><span data-b="b">ne</span>');
+			});
+
+			it('should add consecutive attribute with same values', function() {
+				outlineSetup.one.addElementInBodyTextRange('SPAN', {'data-a' : 'a'}, 0, 1)
+				outlineSetup.one.addElementInBodyTextRange('SPAN', {'data-a' : 'a'}, 1, 2)
+				outlineSetup.one.bodyHTML.should.equal('<span data-a="a">one</span>');
+			});
+
 			it('should remove element', function() {
 				outlineSetup.one.bodyHTML = '<b>one</b>';
 				outlineSetup.one.removeElementInBodyTextRange('B', 0, 3);

@@ -31,9 +31,8 @@ class AttributeRun
   _mergeWithNext: (attributeRun) ->
     end = @location + @length
     endsAtStart = end == attributeRun.location
-    attributesEqual = deepEqual(@attributes, attributeRun.attributes)
-    if endsAtStart and attributesEqual
-      @length += attributeRun.length;
+    if endsAtStart and deepEqual(@attributes, attributeRun.attributes)
+      @length += attributeRun.length
       true
     else
       false

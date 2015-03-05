@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.0.1
+
+- Fixed some bugs in encoding AttributedStrings to HTML
+
 ## 1.0.0
 
 - Documented {Selection} class.

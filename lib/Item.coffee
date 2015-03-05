@@ -290,9 +290,9 @@ class Item
     changedText.removeAttributesInRange(tagNames, 0, length)
     @replaceBodyTextInRange(changedText, location, length)
 
-  insertLineBreakInBodyTextAtLocation: (location) ->
+  insertLineBreakInBodyText: (location) ->
 
-  insertImageInBodyTextAtLocation: (location, image) ->
+  insertImageInBodyText: (location, image) ->
 
   # Public: Replace body text in the given range.
   #
@@ -354,6 +354,19 @@ class Item
 
     if isInOutline
       outline.endUpdates()
+
+  # Public: Append body text.
+  #
+  # - `text` {String} or {AttributedString}
+  # - `elements` (optional) {Object} whose keys are formatting element
+  #   tagNames and values are attributes for those elements. If specified the
+  #   appended text will include these elements.
+  appendBodyText: (text, elements) ->
+    if elements
+      unless text instanceof AttributedString
+        text = new AttributedString text
+      text.addAttributesInRange elements, 0, text.length
+    @replaceBodyTextInRange text, @bodyText.length, 0
 
   _replaceBodyTextInRangeIgnoringAliases: (insertedText, location, length) ->
     if @isRoot
