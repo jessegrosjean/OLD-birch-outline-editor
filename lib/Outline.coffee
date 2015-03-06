@@ -126,6 +126,7 @@ class Outline
 
     @setPath(params.filePath) if params?.filePath
     @load() if params?.load
+    #@loadSync()
 
   createOutlineStoreIfNeeded: (outlineStore) ->
     if not outlineStore
