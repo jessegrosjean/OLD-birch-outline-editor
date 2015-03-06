@@ -317,6 +317,12 @@ class Outline
     assert.ok(item.outline == @, 'Item must be owned by this outline')
     @createItem(null, item._liOrRootUL.cloneNode(true))
 
+  # Public: Creates a copy of an {Item} from an external outline that can be
+  # inserted into the current outline.
+  #
+  # - `item` {Item} to import.
+  #
+  # Returns {Item} copy.
   importItem: (item) ->
     assert.ok(!item.isRoot, 'Can not import root item')
     assert.ok(item.outline != @, 'Item must not be owned by this outline')

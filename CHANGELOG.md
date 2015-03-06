@@ -2,6 +2,7 @@
 
 ## 1.1.0
 
+- Added {Outline::importItem} API.
 - Fixed toggle formatting (Bold, Italic, etc) works with empty selection.
 - Fixed bug where consecutive formatting tags could be lost.
 

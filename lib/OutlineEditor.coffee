@@ -1395,11 +1395,19 @@ class OutlineEditor extends Model
       subscriptions.dispose()
       editLinkPanel.destroy()
       linkText = birchLinkEditor.getAttribute 'text'
-      @_transformSelectedText (eachItem, start, end) ->
-        if linkText
-          eachItem.addElementInBodyTextRange('A', href: linkText, start, end - start)
-        else
-          eachItem.removeElementInBodyTextRange('A', start, end - start)
+
+      if selection.isCollapsed
+        insertText = new AttributedString linkText
+        insertText.addAttributeInRange 'A', href: linkText, 0, linkText.length
+        focusItem.replaceBodyTextInRange insertText, selection.focusOffset, 0
+        selection = @createSelection focusItem, selection.focusOffset, focusItem, selection.focusOffset + linkText.length
+      else
+        @_transformSelectedText (eachItem, start, end) ->
+          if linkText
+            eachItem.addElementInBodyTextRange('A', href: linkText, start, end - start)
+          else
+            eachItem.removeElementInBodyTextRange('A', start, end - start)
+
       @focus()
       @moveSelectionRange selection
 
