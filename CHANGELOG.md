@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.1.0
+
+- Fixed toggle formatting (Bold, Italic, etc) works with empty selection.
+- Fixed bug where consecutive formatting tags could be lost.
+
 ## 1.0.1
 
 - Fixed some bugs in encoding AttributedStrings to HTML

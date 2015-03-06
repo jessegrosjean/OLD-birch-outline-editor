@@ -1108,12 +1108,12 @@ class OutlineEditor extends Model
     @_textModeTypingFormattingTags = typingFormattingTags or {}
 
   toggleTypingFormattingTag: (tagName, tagValue) ->
-    typingFormattingTags = @typingFormattingTags
+    typingFormattingTags = @typingFormattingTags()
     if typingFormattingTags[tagName] != undefined
       delete typingFormattingTags[tagName]
     else
       typingFormattingTags[tagName] = tagValue or null
-    @typingFormattingTags = typingFormattingTags
+    @setTypingFormattingTags typingFormattingTags
 
   ###
   Section: Move Items

@@ -115,6 +115,27 @@ describe('OutlineEditor', function() {
 			should(editor.selection.focusOffset === undefined);
 		});
 
+		describe('Formatting', function() {
+			it('should toggle formatting', function() {
+				editor.moveSelectionRange(outlineSetup.one, 0, outlineSetup.one, 2);
+				editor.toggleBold();
+				outlineSetup.one.bodyHTML.should.equal('<b>on</b>e');
+				editor.toggleBold();
+				outlineSetup.one.bodyHTML.should.equal('one');
+			});
+
+			it('should toggle typing formatting tags if collapsed selection', function() {
+				outlineSetup.one.bodyText = '';
+				editor.moveSelectionRange(outlineSetup.one, 0);
+				editor.toggleBold();
+				editor.insertText('hello');
+				outlineSetup.one.bodyHTML.should.equal('<b>hello</b>');
+				editor.toggleBold();
+				editor.insertText('world');
+				outlineSetup.one.bodyHTML.should.equal('<b>hello</b>world');
+			});
+		});
+
 		describe('Focus', function() {
 			it('should not focus editor when setting selection unless it already has focus', function() {
 				editor.moveSelectionRange(outlineSetup.one);
