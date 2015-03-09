@@ -98,11 +98,13 @@ class OutlineEditorService
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   @onDidChangeActiveOutlineEditor: (callback) ->
+    prev = null
     atom.workspace.onDidChangeActivePaneItem (item) ->
-      if item instanceof OutlineEditor
+      unless item instanceof OutlineEditor
+        item = null
+      unless prev is item
         callback item
-      else
-        callback null
+        prev = item
 
   # Public: Invoke the given callback with the current {OutlineEditor} and
   # with all future active outline editors in the workspace.
@@ -112,11 +114,13 @@ class OutlineEditorService
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   @observeActiveOutlineEditor: (callback) ->
+    prev = {}
     atom.workspace.observeActivePaneItem (item) ->
-      if item instanceof OutlineEditor
+      unless item instanceof OutlineEditor
+        item = null
+      unless prev is item
         callback item
-      else
-        callback null
+        prev = item
 
   # Public: Invoke the given callback when the active {OutlineEditor}
   # {Selection} changes.
@@ -131,7 +135,6 @@ class OutlineEditorService
       selectionSubscription?.dispose()
       selectionSubscription = outlineEditor?.onDidChangeSelection callback
       callback outlineEditor?.selection or null
-
     new Disposable ->
       selectionSubscription?.dispose()
       activeEditorSubscription.dispose()
@@ -144,7 +147,7 @@ class OutlineEditorService
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   @observeActiveOutlineEditorSelection: (callback) ->
-    callback @getActiveOutlineEditor()?.selection
+    callback @getActiveOutlineEditor()?.selection or null
     @onDidChangeActiveOutlineEditorSelection callback
 
 module.exports = OutlineEditorService
