@@ -69,9 +69,9 @@ class OutlineEditorElement extends HTMLElement
     @focusElement = new FocusElement
     @appendChild(@focusElement)
 
-    textField = document.createElement 'INPUT'
-    textField.setAttribute 'type', 'text'
-    @appendChild textField
+    #textField = document.createElement 'INPUT'
+    #textField.setAttribute 'type', 'text'
+    #@appendChild textField
 
     topListElement = document.createElement('UL')
     @appendChild(topListElement)
