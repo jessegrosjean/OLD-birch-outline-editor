@@ -15,9 +15,9 @@
 
 @font-size: 16px;
 @font-family: 'Open Sans', Helvetica;
-@line-height: @font-size * 1.5;
-@item-spacing: @font-size / 4.0;
-@item-indent-spacing: @font-size * 1.5;
+@line-height: round(@font-size * 1.5);
+@item-spacing: round(@font-size / 4.0);
+@item-indent-spacing: round(@font-size * 1.5);
 
 birch-outline-editor {
   color: @syntax-text-color;
@@ -32,7 +32,7 @@ birch-outline-editor {
 
 #birchTextCalculationIFrame {
   position: absolute;
-  left:-999em;
+  left:-9999px;
 }
 
 input[is="outline-editor-focus"] {
@@ -201,8 +201,8 @@ birch-outline-editor > ul {
   position: relative;
 }
 
-@drop-ball-radius: @font-size / 4;
-@drop-ball-diameter: @drop-ball-radius * 2.0;
+@drop-ball-radius: round(@font-size / 4);
+@drop-ball-diameter: round(@drop-ball-radius * 2.0);
 
 .bdropInsertBeforeItem > .bcontent > .bbody::before,
 .bdropInsertAfterItem > .bcontent > .bbody::after {
