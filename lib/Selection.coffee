@@ -209,10 +209,9 @@ class Selection
         # true then we can be at a line wrap.
         clientRects = domRange.getClientRects()
         baseRect = clientRects[0]
-        #if clientRects.length > 1 and clientRects[0].top != clientRects[1].top
         if clientRects.length > 1
           alternateRect = clientRects[1]
-          sameLine = baseRect.top is alternateRect.top
+          sameLine = alternateRect.top < baseRect.bottom
           if sameLine
             unless baseRect.width
               baseRect = alternateRect
