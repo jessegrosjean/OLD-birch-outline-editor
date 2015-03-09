@@ -214,7 +214,7 @@ class OutlineEditor extends Model
   onDidChange: (callback) ->
     @outline.onDidChange(callback)
 
-  # Extended: Calls your `callback` when the result of {::isModified} changes.
+  # Public: Calls your `callback` when the result of {::isModified} changes.
   #
   # * `callback` {Function}
   #
@@ -222,7 +222,7 @@ class OutlineEditor extends Model
   onDidChangeModified: (callback) ->
     @outline.onDidChangeModified(callback)
 
-  # Extended: Calls your `callback` when the editor's outline's underlying
+  # Public: Calls your `callback` when the editor's outline's underlying
   # file changes on disk at a moment when the result of {::isModified} is
   # true.
   #
@@ -250,6 +250,26 @@ class OutlineEditor extends Model
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
+
+  # Public: Calls your `callback` when {Selection} changes in the editor.
+  #
+  # * `callback` {Function}
+  #   * `selection` {Selection} in editor.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeSelection: (callback) ->
+    @emitter.on 'did-change-selection', callback
+
+  # Public: Calls your `callback` when {Selection} changes in the editor.
+  # Immediately calls your callback for existing selection.
+  #
+  # * `callback` {Function}
+  #   * `selection` {Selection} in editor.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  observeSelection: (callback) ->
+    callback @selection
+    @onDidChangeSelection(callback)
 
   ###
   Section: Hoisting Items
@@ -889,7 +909,9 @@ class OutlineEditor extends Model
         newSelection = @_textModeExtendingFromSnapbackRange
         @_textModeExtendingFromSnapbackRange = null
 
-    if not currentSelection.equals(newSelection)
+    selectionDidChange = currentSelection.equals(newSelection)
+
+    if not selectionDidChange
       wasSelectedMarker = 'marker'
       newRangeItems = newSelection.items
       currentRangeItems = currentSelection.items
@@ -988,6 +1010,8 @@ class OutlineEditor extends Model
         classList.add('outlineMode')
 
     outlineEditorElement.updateSimulatedCursor()
+
+    @emitter.emit 'did-change-selection', currentSelection
 
   ###
   Section: Insert Items
@@ -1542,11 +1566,11 @@ class OutlineEditor extends Model
   Section: Undo
   ###
 
-  # Essential: Undo the last change.
+  # Public: Undo the last change.
   undo: ->
     @outline.undoManager.undo()
 
-  # Essential: Redo the last change.
+  # Public: Redo the last change.
   redo: ->
     @outline.undoManager.redo()
 
