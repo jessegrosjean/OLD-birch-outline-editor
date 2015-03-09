@@ -1286,7 +1286,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:fold-current-row': -> @editor.foldItems()
   'editor:unfold-current-row': -> @editor.unfoldItems()
   'birch-outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
-
+  'editor:copy-path': -> @editor.copyPathToClipboard()
 )
 
 module.exports = document.registerElement 'birch-outline-editor', prototype: OutlineEditorElement.prototype

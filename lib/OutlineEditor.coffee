@@ -1696,6 +1696,10 @@ class OutlineEditor extends Model
   isEmpty: ->
     @outline.isEmpty()
 
+  copyPathToClipboard: ->
+    if filePath = @getPath()
+      atom.clipboard.write(filePath)
+
   save: ->
     @outline.save(this)
 
