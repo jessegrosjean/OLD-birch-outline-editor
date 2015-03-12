@@ -86,4 +86,4 @@ class LIMoveAnimation
       complete: (elements) =>
         LI.style.opacity = null
         Util.removeFromDOM movingLIClone
-        @outlineEditorElement._completedAnimation @_id
+        @outlineEditorElement.completedAnimation @_id

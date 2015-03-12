@@ -1212,7 +1212,7 @@ class OutlineEditor extends Model
   moveItems: (items, newParent, newNextSibling, startOffset) ->
     undoManager = newParent.outline.undoManager
     undoManager.beginUndoGrouping()
-    @outlineEditorElement._animateMoveItems(items, newParent, newNextSibling, startOffset)
+    @outlineEditorElement.animateMoveItems(items, newParent, newNextSibling, startOffset)
     undoManager.endUndoGrouping()
     undoManager.setActionName('Move Items')
 

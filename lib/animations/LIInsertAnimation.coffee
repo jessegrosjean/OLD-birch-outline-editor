@@ -19,7 +19,7 @@ class LIInsertAnimation
     @_insertLI?.style.height = @_targetHeight + 'px'
 
   complete: ->
-    @outlineEditorElement._completedAnimation(@_id)
+    @outlineEditorElement.completedAnimation(@_id)
     if @_insertLI
       Velocity @_insertLI, 'stop', true
       @_insertLI.style.height = null

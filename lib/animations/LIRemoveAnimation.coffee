@@ -20,7 +20,7 @@ class LIRemoveAnimation
     @_removingLI?.style.height = @_targetHeight + 'px'
 
   complete: ->
-    @outlineEditorElement._completedAnimation @_id
+    @outlineEditorElement.completedAnimation @_id
     if @_removingLI
       Velocity @_removingLI, 'stop', true
       Util.removeFromDOM @_removingLI

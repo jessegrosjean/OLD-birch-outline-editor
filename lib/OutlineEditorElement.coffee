@@ -453,7 +453,7 @@ class OutlineEditorElement extends HTMLElement
       for eachChild in removedChildren
         eachChildLI = @itemViewLIForItem(eachChild)
         if eachChildLI
-          @_disconnectBranchIDs(eachChildLI)
+          @disconnectBranchIDs(eachChildLI)
           if animate
             @_animateRemoveLI(eachChild, eachChildLI)
           else
@@ -489,7 +489,7 @@ class OutlineEditorElement extends HTMLElement
 
       if itemViewUL
         itemViewUL.parentNode.removeChild(itemViewUL)
-        @_disconnectBranchIDs(itemViewUL)
+        @disconnectBranchIDs(itemViewUL)
 
       itemViewUL = @createULForItemChildren(
         item,
@@ -511,7 +511,7 @@ class OutlineEditorElement extends HTMLElement
           @_animateCollapseUL(item, itemViewUL)
         else
           itemViewUL.parentNode.removeChild(itemViewUL)
-        @_disconnectBranchIDs(itemViewUL)
+        @disconnectBranchIDs(itemViewUL)
 
       newViewUL = @createULForItemChildren(item, @_levelToHoistedItem(item) + 1)
       if newViewUL
@@ -540,7 +540,7 @@ class OutlineEditorElement extends HTMLElement
   Section: Animations
   ###
 
-  _completedAnimation: (id) ->
+  completedAnimation: (id) ->
     delete @_animations[id]
 
   _animationForItem: (item, clazz) ->
@@ -578,7 +578,7 @@ class OutlineEditorElement extends HTMLElement
       width: viewLIRect.width
     }
 
-  _animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
+  animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
     if items.length == 0
       return
 
@@ -1096,7 +1096,7 @@ class OutlineEditorElement extends HTMLElement
   itemOffsetToNodeOffset: (item, offset) ->
     ItemBodyEncoder.bodyTextOffsetToNodeOffset(@_itemViewBodyP(@itemViewLIForItem(item)), offset)
 
-  _disconnectBranchIDs: (element) ->
+  disconnectBranchIDs: (element) ->
     end = Util.nodeNextBranch(element)
     idsToElements = @_idsToElements
     each = element
