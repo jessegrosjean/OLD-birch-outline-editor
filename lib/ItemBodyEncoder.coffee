@@ -145,20 +145,37 @@ function elementToAttributedString(element, innerHTML) {
 }
 
 var allowedTags = {
-  'B': true,
-  'I': true,
-  'U': true,
-  'S': true,
   'A': true,
-  'SPAN': true,
-  'CODE': true,
+  'ABBR': true,
+  'B': true,
+  'BDI': true,
+  'BDO': true,
   'BR': true,
-  'IMG': true
-};
+  'CITE': true,
+  'CODE': true,
+  'DATA': true,
+  'DFN': true,
+  'EM': true,
+  'I': true,
+  'KBD': true,
+  'MARK': true,
+  'Q': true,
+  'RP': true,
+  'RT': true,
+  'RUBY': true,
+  'S': true,
+  'SAMP': true,
+  'SMALL': true,
+  'SPAN': true,
+  'STRONG': true,
+  'SUB': true,
+  'SUP': true,
+  'TIME': true,
+  'U': true,
+  'VAR': true,
+  'WBR': true,
 
-var allowedAttributes = {
-  'href': true,
-  'src': true
+  'IMG': true
 };
 
 function _addDOMNodeToAttributedString(node, attributedString) {
@@ -177,31 +194,28 @@ function _addDOMNodeToAttributedString(node, attributedString) {
       }
 
       if (allowedTags[node.tagName]) {
-        attributedString.addAttributeInRange(node.tagName, _elementAllowedAttributes(node), tagStart, attributedString.length - tagStart);
+        attributedString.addAttributeInRange(node.tagName, _elementAttributes(node), tagStart, attributedString.length - tagStart);
       }
     } else if (allowedTags[node.tagName]) {
       if (node.tagName === 'BR') {
         var lineBreak = new AttributedString(Constants.LineSeparatorCharacter);
-        lineBreak.addAttributeInRange('BR', _elementAllowedAttributes(node), 0, 1);
+        lineBreak.addAttributeInRange('BR', _elementAttributes(node), 0, 1);
         attributedString.appendString(lineBreak);
       } else if (node.tagName === 'IMG') {
         var image = new AttributedString(Constants.ObjectReplacementCharacter);
-        image.addAttributeInRange('IMG', _elementAllowedAttributes(node), 0, 1);
+        image.addAttributeInRange('IMG', _elementAttributes(node), 0, 1);
         attributedString.appendString(image);
       }
     }
   }
 }
 
-function _elementAllowedAttributes(element) {
+function _elementAttributes(element) {
   if (element.hasAttributes()) {
     var attrs = element.attributes,
       result = {};
     for (var i = attrs.length - 1; i >= 0; i--) {
-      var name = attrs[i].name;
-      if (allowedAttributes[name]) {
-        result[name] = attrs[i].value;
-      }
+        result[attrs[i].name] = attrs[i].value;
     }
     return result;
   }
