@@ -15,6 +15,12 @@ Util = require './Util'
 # - {Item::replaceBodyTextInRange}
 class AttributedString
 
+  @fromTextOrAttributedString: (textOrAttributedString) ->
+    if textOrAttributedString instanceof AttributedString
+      textOrAttributedString.copy()
+    else
+      new AttributedString textOrAttributedString
+
   constructor: (string) ->
     string ?= ''
     @length = string.length
@@ -45,29 +51,18 @@ class AttributedString
         deepEqual(candiateRun.attributes, attributes)
     attributeRun.attributes
 
+  copy: ->
+    @_ensureClean()
+    theCopy = new AttributedString @_string
+    attributeRuns = @attributeRuns()
+    if attributeRuns
+      attributeRunsCopy = []
+      for each in attributeRuns
+        attributeRunsCopy.push each.copy()
+      theCopy._attributeRuns = attributeRunsCopy
+    theCopy
+
 `
-AttributedString.fromTextOrAttributedString = function(textOrAttributedString) {
-  if (textOrAttributedString instanceof AttributedString) {
-    return textOrAttributedString.copy();
-  }
-  return new AttributedString(textOrAttributedString);
-};
-
-AttributedString.prototype.copy = function() {
-  this._ensureClean();
-
-  var theCopy = new AttributedString(this._string),
-    attributeRuns = this.attributeRuns();
-  if (attributeRuns) {
-    var attributeRunsCopy = [],
-      length = attributeRuns.length;
-    for (var i = 0; i < length; i++) {
-      attributeRunsCopy.push(attributeRuns[i].copy());
-    }
-    theCopy._attributeRuns = attributeRunsCopy;
-  }
-  return theCopy;
-};
 
 //
 // String

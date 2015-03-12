@@ -209,6 +209,13 @@ describe('AttributedString', function() {
 			attributedString.toString().should.equal('(two/)');
 		});
 
+		it('should retain attributes of fully replaced range if replacing string length is not zero.', function () {
+			attributedString = new AttributedString('\ttwo');
+			attributedString.addAttributeInRange('name', 'jesse', 0, 1);
+			attributedString.replaceCharactersInRange('h', 0, 1);
+			attributedString.toString().should.equal('(h/name)(two/)');
+		});
+
 		it('should allow inserting of another attributed string', function () {
 			var newString = new AttributedString('two');
 			newString.addAttributeInRange('b', null, 0, 3);

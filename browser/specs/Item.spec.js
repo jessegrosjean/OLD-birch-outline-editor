@@ -74,12 +74,6 @@ describe('Item', function() {
 			outlineSetup.one.bodyText.length.should.equal(13);
 		});
 
-		xit('should fill existing tag with replaced text if present', function() {
-			outlineSetup.one.bodyHTML = 'one <b>two</b> three';
-			outlineSetup.one.replaceBodyTextInRange('hi', 4, 3);
-			outlineSetup.one.bodyHTML.should.equal('one <b>hi</b> three');
-		});
-
 		describe('Inline Elements', function() {
 			it('should get elements', function() {
 				outlineSetup.one.bodyHTML = '<b>one</b> <img src="boo.png">two three';
