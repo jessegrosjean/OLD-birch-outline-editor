@@ -145,6 +145,7 @@ function elementToAttributedString(element, innerHTML) {
 }
 
 var allowedTags = {
+  // Inline text semantics
   'A': true,
   'ABBR': true,
   'B': true,
@@ -175,7 +176,14 @@ var allowedTags = {
   'VAR': true,
   'WBR': true,
 
-  'IMG': true
+  // Image & multimedia
+  'AUDIO': true,
+  'IMG': true,
+  'VIDEO': true,
+
+  // Edits
+  'DEL': true,
+  'INS': true
 };
 
 function _addDOMNodeToAttributedString(node, attributedString) {
