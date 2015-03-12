@@ -10,9 +10,9 @@
 
 module.exports =
 class ItemEditorState
-	constructor: ->
-		@marked = false
-		@selected = false
-		@expanded = false
-		@matched = false
-		@matchedAncestor = false
+  constructor: ->
+    @marked = false
+    @selected = false
+    @expanded = false
+    @matched = false
+    @matchedAncestor = false
