@@ -8,10 +8,10 @@ class LIMoveAnimation
 
   @id = 'ItemLIMove'
 
-  constructor: (id, item, outlineEditorElement) ->
+  constructor: (id, item, itemRenderer) ->
     @_id = id
     @_item = item
-    @outlineEditorElement = outlineEditorElement
+    @itemRenderer = itemRenderer
     @_movingLIClone = null
 
   fastForward: ->
@@ -30,8 +30,8 @@ class LIMoveAnimation
       movingLIClone.style.pointerEvents = 'none'
 
       # Add simulated selection if in text edit mode.
-      outlineEditorElement = @outlineEditorElement
-      selectionRange = outlineEditorElement.editor.selection
+      itemRenderer = @itemRenderer
+      selectionRange = itemRenderer.editor.selection
 
       if selectionRange.isTextMode and selectionRange.focusItem is @_item
         itemRect = LI.getBoundingClientRect()
@@ -43,7 +43,7 @@ class LIMoveAnimation
         if selectionRange.isCollapsed
           selectionRects.push selectionRange.focusClientRect
         else
-          domSelection = outlineEditorElement.editor.DOMGetSelection()
+          domSelection = itemRenderer.editor.DOMGetSelection()
           if domSelection.rangeCount > 0
             selectionRects = domSelection.getRangeAt(0).getClientRects()
 
@@ -62,9 +62,9 @@ class LIMoveAnimation
           else
             selectDIV.className = 'bsimulatedSelection'
 
-          movingLIClone.appendChild(selectDIV)
+          movingLIClone.appendChild selectDIV
 
-      @outlineEditorElement.animationLayerElement.appendChild movingLIClone
+      @itemRenderer.editorElement.animationLayerElement.appendChild movingLIClone
       @_movingLIClone = movingLIClone
 
   performMove: (LI, position, context) ->
@@ -86,4 +86,4 @@ class LIMoveAnimation
       complete: (elements) =>
         LI.style.opacity = null
         Util.removeFromDOM movingLIClone
-        @outlineEditorElement.completedAnimation @_id
+        @itemRenderer.completedAnimation @_id

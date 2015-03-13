@@ -167,6 +167,10 @@ class Item
   Section: Body Text
   ###
 
+  # Public: Read-only true if this item has body text
+  Object.defineProperty @::, 'hasBodyText',
+    get: -> _bodyP(@_liOrRootUL).innerHTML.length > 0
+
   # Public: Body text as plain text {String}.
   bodyText: null
   Object.defineProperty @::, 'bodyText',

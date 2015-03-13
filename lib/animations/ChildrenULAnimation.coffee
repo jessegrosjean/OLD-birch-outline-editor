@@ -10,8 +10,8 @@ class ChildrenULAnimation
 
   @id = 'ChildrenUL'
 
-  constructor: (id, item, outlineEditorElement) ->
-    @outlineEditorElement = outlineEditorElement
+  constructor: (id, item, itemRenderer) ->
+    @itemRenderer = itemRenderer
     @_id = id
     @_expandingUL = null
     @_collapsingUL = null
@@ -49,7 +49,7 @@ class ChildrenULAnimation
         UL.style.height = null
         UL.style.marginBottom = null
         UL.style.overflowY = null
-        @outlineEditorElement.completedAnimation @_id
+        @itemRenderer.completedAnimation @_id
 
   collapse: (UL, context) ->
     startHeight = UL.clientHeight
@@ -81,4 +81,4 @@ class ChildrenULAnimation
           UL.style.marginBottom = null
       complete: (elements) =>
         Util.removeFromDOM(UL)
-        @outlineEditorElement.completedAnimation(@_id)
+        @itemRenderer.completedAnimation(@_id)

@@ -8,8 +8,8 @@ class LIInsertAnimation
 
   @id = 'ItemLIInsert'
 
-  constructor: (id, item, outlineEditorElement) ->
-    @outlineEditorElement = outlineEditorElement
+  constructor: (id, item, itemRenderer) ->
+    @itemRenderer = itemRenderer
     @_id = id
     @_item = item
     @_insertLI = null
@@ -19,7 +19,7 @@ class LIInsertAnimation
     @_insertLI?.style.height = @_targetHeight + 'px'
 
   complete: ->
-    @outlineEditorElement.completedAnimation(@_id)
+    @itemRenderer.completedAnimation @_id
     if @_insertLI
       Velocity @_insertLI, 'stop', true
       @_insertLI.style.height = null

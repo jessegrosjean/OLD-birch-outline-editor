@@ -77,16 +77,16 @@ describe('OutlineEditorElement', function() {
 		describe('Editor State', function() {
 			it('should rendered selection state', function() {
 				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
-				li.classList.contains('bselectedItem').should.be.false;
+				li.classList.contains('bitemselected').should.be.false;
 				editor.moveSelectionRange(outlineSetup.one);
-				li.classList.contains('bselectedItem').should.be.true;
+				li.classList.contains('bitemselected').should.be.true;
 			});
 
 			it('should rendered expanded state', function() {
 				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
-				li.classList.contains('bexpandedItem').should.be.true;
+				li.classList.contains('bexpanded').should.be.true;
 				editor.setCollapsed(outlineSetup.one);
-				li.classList.contains('bexpandedItem').should.be.false;
+				li.classList.contains('bexpanded').should.be.false;
 			});
 		});
 	});

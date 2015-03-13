@@ -6,12 +6,13 @@
 // Once Atom supports LESS 2.4 should (optionally) so this will also run in browser.
 @syntax-text-color: black;
 @syntax-background-color: white;
-@syntax-selection-color: #69c;
+@syntax-selection-color: #a7caff;
+@syntax-secondary-selection-color: #EDF4FF;
 @syntax-cursor-color: #333;
-@syntax-invisible-character-color: gray;
+@syntax-invisible-character-color: lightgray;
 
-@import "ui-variables";
-@import "syntax-variables";
+//@import "ui-variables";
+//@import "syntax-variables";
 
 @font-size: 16px;
 @font-family: 'Open Sans', Helvetica;
@@ -60,16 +61,192 @@ birch-outline-editor > ul {
   position: relative;
 }
 
-.bitem.bhoistedItem {
-  > .bcontent {
+.bhoistedItem {
+  > .bbranchcontrols {
+    display: none;
+  }
+  > .bbranchcontrols {
+    display: none;
+  }
+  > .bbranch > .bitemcontent {
     display: none;
   }
   margin: @item-indent-spacing 0;
 }
 
 //
-// Item
+// Outline Structure
 //
+
+.bitem {
+  display:flex;
+  flex-direction: row;
+}
+
+.bbranchcontrols {
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  //margin:0.5rem 0 0 0;
+  margin:0;
+}
+
+.bhandle {
+  cursor: default;
+  pointer-events: all;
+  width: @item-indent-spacing;
+  background: none;
+  line-height: @line-height;
+  font-size: @font-size;
+  text-decoration:none;
+  flex-grow: 0;
+  color: @syntax-text-color;
+}
+
+.bhandle:before {
+  font-size: @font-size;
+  line-height: @line-height;
+  font-weight: normal;
+  content: '▸';
+}
+
+.bborder {
+  flex-grow: 1;
+}
+
+.bexpanded > .bbranchcontrols > .bborder {
+    border-left: 1px solid @syntax-invisible-character-color;
+}
+
+.bbranch {
+  flex-grow: 1;
+}
+
+.bbodytext {
+  margin: 0.5rem 0 0 0;
+  margin: 0;
+  display: inline-block;
+  min-width: 1px; // So cursor will display when empty since inline-block
+  user-select: text;
+  line-height: @line-height;
+  white-space: pre-wrap;
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+}
+
+.bbadges {
+  user-select: none;
+  display: inline-block;
+}
+
+.bbadges > a {
+  //margin-left: 0.5rem;
+  padding: 0px 2px;
+  border-radius: 2px;
+  color: white;
+  text-decoration:none;
+}
+
+.bbadges > .btag {
+  user-select: none;
+  background: #5bc0de;
+}
+
+.bbadges > .btag:before {
+  content: "";
+}
+
+.bbadges > .bassign {
+  background: #E0FFE0;
+}
+
+.bbadges > .bassign:before {
+  content: "@";
+}
+
+.bchildren {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+//
+// Selection
+//
+
+::selection {
+  // http://stackoverflow.com/questions/14970891/css-selection-color-behaving-strangely-on-chrome
+  background-color: fade(@syntax-selection-color, 99%);
+}
+
+.styledTextCaret {
+  pointer-events: none;
+  background: @syntax-cursor-color;
+}
+
+.bitemselected {
+  > .bbranchcontrols > .bhandle {
+    background: @syntax-selection-color;
+  }
+  > .bbranch {
+    > .bitemcontent {
+      background-color: @syntax-selection-color;
+      *::selection {
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+.btextselected > .bbranch > .bitemcontent {
+  background-color: transparent;
+}
+
+.bsimulatedSelectionCursor {
+  background-color: @syntax-text-color;
+}
+
+.bsimulatedSelection {
+  background-color: @syntax-selection-color;
+}
+
+//
+// Drag and Drop
+//
+
+.bdropbefore > .bbranch > .bitemcontent,
+.bdropafter > .bbranch > .bitemcontent {
+  position: relative;
+}
+
+@drop-ball-radius: round(@font-size / 4);
+@drop-ball-diameter: round(@drop-ball-radius * 2.0);
+
+.bdropbefore > .bbranch > .bitemcontent::before,
+.bdropafter > .bbranch > .bitemcontent::after {
+  pointer-events: none;
+  display:block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: @drop-ball-diameter;
+  margin: -(@drop-ball-radius) 0 0 -@drop-ball-diameter;
+  content: "";
+  background-image: url('data:image/svg+xml;utf8,<svg width="10000rem" height="0.5rem" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g id="dropIndicator"><circle fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" cx="4" cy="4" r="3.0" /><line fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" x1="7" y1="4" x2="10000" y2="4" /></g></svg>');
+  background-repeat: no-repeat;
+}
+
+.bdropafter > .bbranch > .bitemcontent::after {
+  margin: -@drop-ball-radius 0 0 -@drop-ball-diameter;
+}
+
+/*
 
 .bitem {
   list-style-type: none;
@@ -126,41 +303,6 @@ birch-outline-editor > ul {
 }
 
 //
-// Selection
-//
-
-::selection {
-  // fade is to work around
-  // http://stackoverflow.com/questions/14970891/css-selection-color-behaving-strangely-on-chrome
-  background-color: fade(@syntax-selection-color, 99%);
-}
-
-.styledTextCaret {
-  pointer-events: none;
-  background: @syntax-cursor-color;
-}
-
-.bselectedItem > .bcontent > .bbody {
-  background-color: @syntax-selection-color;
-}
-
-.bselectedItem:not(.bselectedItemWithTextSelection) > .bcontent *::selection {
-  background-color: transparent;
-}
-
-.bselectedItemWithTextSelection > .bcontent > .bbody {
-  background-color: transparent;
-}
-
-.bsimulatedSelectionCursor {
-  background-color: @syntax-text-color;
-}
-
-.bsimulatedSelection {
-  background-color: @syntax-selection-color;
-}
-
-//
 // Handles
 //
 
@@ -181,7 +323,7 @@ birch-outline-editor > ul {
   outline-style: none;
 }
 
-.bhasChildren:not(.bexpandedItem) > .bcontent > .bgutter > .bitemHandle {
+.bhasChildren:not(.bexpanded) > .bcontent > .bgutter > .bitemHandle {
   color: @syntax-text-color;
 }
 
@@ -196,16 +338,16 @@ birch-outline-editor > ul {
 // Drag and Drop
 //
 
-.bdropInsertBeforeItem > .bcontent > .bbody,
-.bdropInsertAfterItem > .bcontent > .bbody {
+.bdropbefore > .bcontent > .bbody,
+.bdropafter > .bcontent > .bbody {
   position: relative;
 }
 
 @drop-ball-radius: round(@font-size / 4);
 @drop-ball-diameter: round(@drop-ball-radius * 2.0);
 
-.bdropInsertBeforeItem > .bcontent > .bbody::before,
-.bdropInsertAfterItem > .bcontent > .bbody::after {
+.bdropbefore > .bcontent > .bbody::before,
+.bdropafter > .bcontent > .bbody::after {
   pointer-events: none;
   display:block;
   position: absolute;
@@ -218,7 +360,7 @@ birch-outline-editor > ul {
   background-repeat: no-repeat;
 }
 
-.bdropInsertAfterItem > .bcontent > .bbody::after {
+.bdropafter > .bcontent > .bbody::after {
   margin: (@item-spacing - @drop-ball-radius) 0 0 -@drop-ball-diameter;
 }
 
@@ -244,4 +386,4 @@ birch-link-editor {
 .bitem[data-done] > .bcontent > .bbody {
   text-decoration: line-through;
 }
-
+*/

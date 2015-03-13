@@ -9,8 +9,8 @@ class LIRemoveAnimation
 
   @id = 'ItemLIRemove'
 
-  constructor: (id, item, outlineEditorElement) ->
-    @outlineEditorElement = outlineEditorElement
+  constructor: (id, item, itemRenderer) ->
+    @itemRenderer = itemRenderer
     @_id = id
     @_item = item
     @_removingLI = null
@@ -20,7 +20,7 @@ class LIRemoveAnimation
     @_removingLI?.style.height = @_targetHeight + 'px'
 
   complete: ->
-    @outlineEditorElement.completedAnimation @_id
+    @itemRenderer.completedAnimation @_id
     if @_removingLI
       Velocity @_removingLI, 'stop', true
       Util.removeFromDOM @_removingLI

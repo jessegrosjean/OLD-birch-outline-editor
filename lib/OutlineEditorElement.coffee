@@ -8,11 +8,11 @@ FocusElement = require './elements/FocusElement'
 ItemBodyEncoder = require './ItemBodyEncoder'
 ItemSerializer = require './ItemSerializer'
 EventRegistery = require './EventRegistery'
+ItemRenderer = require './ItemRenderer'
 {CompositeDisposable} = require 'atom'
 Velocity = require 'velocity-animate'
 Selection = require './Selection'
 Constants = require './Constants'
-Mutation = require './Mutation'
 Util = require './Util'
 
 require './handlers/SelectionMouseHandler'
@@ -37,6 +37,7 @@ class OutlineEditorElement extends HTMLElement
   initialize: (editor) ->
     @tabIndex = -1
     @editor = editor
+    @itemRenderer = new ItemRenderer editor, this
     @_animationDisabled = 0
     @_animationContexts = [Constants.DefaultItemAnimactionContext]
     @_maintainSelection = null
@@ -106,126 +107,23 @@ class OutlineEditorElement extends HTMLElement
       @parentNode.removeChild(this)
     @subscriptions.dispose()
     @dragSubscription.dispose()
-    @_idsToElements = null
+    @itemRenderer.destroyed()
 
   ###
-  Section: Rendering
+  Section: Updates
   ###
 
-  createLIForItem: (item, level) ->
-    li = document.createElement('LI')
+  updateHoistedItem: (oldHoistedItem, newHoistedItem) ->
+    @itemRenderer.updateHoistedItem oldHoistedItem, newHoistedItem
 
-    for eachName in item.attributeNames
-      value = item.attribute(eachName)
-      if value
-        li.setAttribute(eachName, value)
+  updateItemClass: (item) ->
+    @itemRenderer.updateItemClass item
 
-    if level == undefined
-      level = @_levelToHoistedItem(item)
+  updateItemExpanded: (item) ->
+    @itemRenderer.updateItemExpanded item
 
-    li.id = item.id
-    li.className = @createItemClassString(item)
-    li.setAttribute('data-level', level)
-    li.appendChild(@createDIVForItemRow(item))
-
-    @_idsToElements[item.id] = li
-
-    childrenUL = @createULForItemChildren(item, level + 1)
-    if childrenUL
-      li.appendChild(childrenUL)
-
-    li
-
-  createItemClassString: (item) ->
-    editor = @editor
-    itemClass = ['bitem']
-
-    if item.hasChildren
-      itemClass.push('bhasChildren')
-
-    if editor.isExpanded(item)
-      itemClass.push('bexpandedItem')
-
-    if editor.isSelected(item)
-      itemClass.push('bselectedItem')
-      if editor.selection.isTextMode
-        itemClass.push('bselectedItemWithTextSelection')
-
-    if editor.hoistedItem() == item
-      itemClass.push('bhoistedItem')
-
-    if editor.dropParentItem() == item
-      itemClass.push('bdropParentItem')
-
-    if editor.dropInsertBeforeItem() == item
-      itemClass.push('bdropInsertBeforeItem')
-
-    if editor.dropInsertAfterItem() == item
-      itemClass.push('bdropInsertAfterItem')
-
-    itemClass.join(' ')
-
-  createDIVForItemRow: (item) ->
-    div = document.createElement('DIV')
-    div.className = 'bcontent'
-    div.appendChild(@createDIVForItemGutter(item))
-    div.appendChild(@createPForItemBody(item))
-    div
-
-  createDIVForItemGutter: (item) ->
-    div = document.createElement('DIV')
-    div.className = 'bgutter'
-    div.appendChild(@createBUTTONForItemHandle(item))
-    div
-
-  createBUTTONForItemHandle: (item) ->
-    button = document.createElement('button')
-    button.className = 'bitemHandle'
-    button.draggable = true
-    button.tabIndex = -1
-    button
-
-  createPForItemBody: (item) ->
-    p = document.createElement('p')
-    p.className = 'bbody'
-    p.contentEditable = true
-    p.innerHTML = @createItemHighlightedBodyHTML(item)
-    p
-
-  createItemHighlightedBodyHTML: (item) ->
-    #text = item.bodyText
-    #index = text.indexOf('a')
-    #if (index !== -1) {
-    #  attributedString = item.attributedBodyText.copy();
-    #  attributedString.addAttributeInRange('B', null, index, 1);
-    #  p = document.createElement('p');
-    #  p.appendChild(ItemBodyEncoder.attributedStringToDocumentFragment(attributedString, document));
-    #  return p.innerHTML;
-    #} else {
-    #  return item.bodyHTML;
-    #}
-    item.bodyHTML
-
-  createULForItemChildren: (item, level) ->
-    editor = @editor
-    if editor.isExpanded(item) || editor.hoistedItem() == item
-      each = item.firstChild
-      if each
-        ul = document.createElement('UL')
-        ul.className = 'bchildren'
-        while each
-          if editor.isVisible(each)
-            ul.appendChild(@createLIForItem(each, level))
-          each = each.nextSibling
-        return ul
-
-  _levelToHoistedItem: (item) ->
-    hoistedItem = @editor.hoistedItem()
-    level = 0
-    while item != hoistedItem
-      item = item.parent
-      level++
-    level
+  outlineDidChange: (e) ->
+    @itemRenderer.outlineDidChange e
 
   ###
   Section: Background Message
@@ -263,6 +161,9 @@ class OutlineEditorElement extends HTMLElement
 
   popAnimationContext: ->
     @_animationContexts.pop()
+
+  animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
+    @itemRenderer.animateMoveItems items, newParent, newNextSibling, startOffset
 
   ###
   Section: Viewport
@@ -391,277 +292,13 @@ class OutlineEditorElement extends HTMLElement
       @scrollToOffsetRangeIfNeeded(itemTop, itemBottom, center)
 
   ###
-  Section: Updates
-  ###
-
-  updateHoistedItem: (oldHoistedItem, newHoistedItem) ->
-    editor = @editor
-
-    #if @isAnimationEnabled && oldHoistedItem && newHoistedItem
-      # 1. Find "RelativeToItem" that's visible in both views
-      # 2. Get rect of item in first view.
-      # 3. Disable animation
-      # 4. Render next view
-      # 5. Enable animation
-      # 6. Get rect of item in second view.
-      # 7. Animate topListElement relative based on differece between those two rects.
-      #relativeToItem
-      #oldVisible = editor.isVisible(oldHoistedItem),
-      #  newVisible = editor.isVisible(newHoistedItem);
-
-      #if (newVisible) {
-        # fade out all roots that do not contain new hoisted item.
-        # disable animate
-        # means we are zooming in.
-      #}
-
-    @topListElement.innerHTML = ''
-    @_idsToElements = {}
-    if newHoistedItem
-      @topListElement.appendChild(@createLIForItem(newHoistedItem));
-
-  updateItemClass: (item) ->
-    @itemViewLIForItem(item)?.className = @createItemClassString(item)
-
-  updateItemAttribute: (item, attributeName) ->
-    itemViewLI = @itemViewLIForItem(item)
-    if itemViewLI
-      if item.hasAttribute(attributeName)
-        itemViewLI.setAttribute(attributeName, item.attribute(attributeName))
-      else
-        itemViewLI.removeAttribute(attributeName)
-
-  updateItemBody: (item) ->
-    itemViewLI = @itemViewLIForItem(item)
-    if itemViewLI
-      itemViewP = @_itemViewBodyP(itemViewLI)
-      viewPHTML = itemViewP.innerHTML
-      bodyHighlightedHTML = @createItemHighlightedBodyHTML(item)
-
-      if viewPHTML != bodyHighlightedHTML
-        itemViewP.innerHTML = bodyHighlightedHTML
-
-  updateItemChildren: (item, removedChildren, addedChildren, nextSibling) ->
-    itemViewLI = @itemViewLIForItem(item)
-    if itemViewLI
-      itemViewUL = @_itemViewChildrenUL(itemViewLI)
-      animate = @isAnimationEnabled()
-      editor = @editor
-
-      @updateItemClass(item)
-
-      for eachChild in removedChildren
-        eachChildLI = @itemViewLIForItem(eachChild)
-        if eachChildLI
-          @disconnectBranchIDs(eachChildLI)
-          if animate
-            @_animateRemoveLI(eachChild, eachChildLI)
-          else
-            itemViewUL.removeChild(eachChildLI)
-
-      if addedChildren.length
-        nextSiblingLI = @itemViewLIForItem(nextSibling)
-        documentFragment = document.createDocumentFragment()
-        addedChildrenLIs = []
-
-        for eachChild in addedChildren
-          if editor.isVisible(eachChild)
-            eachChildItemLI = @createLIForItem(eachChild)
-            addedChildrenLIs.push(eachChildItemLI)
-            documentFragment.appendChild(eachChildItemLI)
-
-        if !itemViewUL
-          itemViewUL = @_itemViewChildrenUL(itemViewLI, true)
-
-        itemViewUL.insertBefore(documentFragment, nextSiblingLI)
-
-        if animate
-          for eachChildLI in addedChildrenLIs
-            @_animateInsertLI(
-              editor.outline.itemForID(eachChildLI.id),
-              eachChildLI
-            )
-
-  updateRefreshItemChildren: (item) ->
-    itemViewLI = @itemViewLIForItem(item)
-    if itemViewLI
-      itemViewUL = @_itemViewChildrenUL(itemViewLI)
-
-      if itemViewUL
-        itemViewUL.parentNode.removeChild(itemViewUL)
-        @disconnectBranchIDs(itemViewUL)
-
-      itemViewUL = @createULForItemChildren(
-        item,
-        @_levelToHoistedItem(item) + 1
-      )
-      if itemViewUL
-        itemViewLI.appendChild(itemViewUL)
-
-  updateItemExpanded: (item) ->
-    @updateItemClass(item)
-
-    itemViewLI = @itemViewLIForItem(item)
-    if itemViewLI
-      animate = @isAnimationEnabled()
-      itemViewUL = @_itemViewChildrenUL(itemViewLI)
-
-      if itemViewUL
-        if animate
-          @_animateCollapseUL(item, itemViewUL)
-        else
-          itemViewUL.parentNode.removeChild(itemViewUL)
-        @disconnectBranchIDs(itemViewUL)
-
-      newViewUL = @createULForItemChildren(item, @_levelToHoistedItem(item) + 1)
-      if newViewUL
-        itemViewLI.appendChild(newViewUL)
-        if animate
-          @_animateExpandUL(item, newViewUL)
-
-  outlineDidChange: (e) ->
-    for each in e.mutations
-      switch each.type
-        when Mutation.AttributeChanged
-          @updateItemAttribute(each.target, each.attributeName)
-        when Mutation.BodyTextChanged
-          @updateItemBody(each.target)
-        when Mutation.ChildrenChanged
-          @updateItemChildren(
-            each.target,
-            each.removedItems,
-            each.addedItems,
-            each.nextSibling
-          )
-        else
-          throw new Error 'Unexpected Change Type'
-
-  ###
-  Section: Animations
-  ###
-
-  completedAnimation: (id) ->
-    delete @_animations[id]
-
-  _animationForItem: (item, clazz) ->
-    animationID = item.id + clazz.id
-    animation = @_animations[animationID]
-
-    if not animation
-      animation = new clazz(animationID, item, this)
-      @_animations[animationID] = animation
-
-    animation
-
-  _animateExpandUL: (item, viewUL) ->
-    @_animationForItem(item, ChildrenULAnimation).expand(viewUL, @animationContext())
-
-  _animateCollapseUL: (item, viewUL) ->
-    @_animationForItem(item, ChildrenULAnimation).collapse(viewUL, @animationContext())
-
-  _animateInsertLI: (item, viewLI) ->
-    @_animationForItem(item, LIInsertAnimation).insert(viewLI, @animationContext())
-
-  _animateRemoveLI: (item, viewLI) ->
-    @_animationForItem(item, LIRemoveAnimation).remove(viewLI, @animationContext())
-
-  _viewLIPosition: (viewLI) ->
-    viewPRect = @_itemViewBodyP(viewLI).getBoundingClientRect()
-    animationRect = @animationLayerElement.getBoundingClientRect()
-    viewLIRect = viewLI.getBoundingClientRect()
-
-    {
-      top: viewLIRect.top - animationRect.top,
-      bottom: viewPRect.bottom - animationRect.bottom,
-      left: viewLIRect.left - animationRect.left,
-      pLeft: viewPRect.left,
-      width: viewLIRect.width
-    }
-
-  animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
-    if items.length == 0
-      return
-
-    editor = @editor
-    outline = editor.outline
-    animate = @isAnimationEnabled()
-    savedSelectionRange = editor.selection
-    hoistedItem = editor.hoistedItem()
-    context = @animationContext()
-    animations = @_animations
-
-    for own key, animation of animations
-      animation.complete() if animation.complete
-
-    if animate
-      for each in items
-        viewLI = @itemViewLIForItem(each);
-        if viewLI
-          startPosition = @_viewLIPosition(viewLI)
-          if startOffset
-            startPosition.left += startOffset.xOffset
-            startPosition.top += startOffset.yOffset
-            startPosition.bottom += startOffset.yOffset
-          @_animationForItem(each, LIMoveAnimation).beginMove(viewLI, startPosition)
-
-    firstItem = items[0]
-    firstItemParent = firstItem.parent
-    firstItemParentParent = firstItemParent?.parent
-    lastItem = items[items.length - 1]
-    shouldDisableRemoveInsertAndExpandAnimations = false
-    newParentNeedsExpand = newParent != hoistedItem && !editor.isExpanded(newParent) && editor.isVisible(newParent)
-
-    # Special case indent and unindent indentations when vertical position of
-    # fist item won't change. In those cases disable all animations except
-    # for the slide
-    if newParent == editor.previousVisibleSibling(firstItem) && !newNextSibling && (!newParentNeedsExpand || !newParent.firstChild)
-      shouldDisableRemoveInsertAndExpandAnimations = true
-    else if newParent == firstItemParentParent && firstItemParent == lastItem.parent && editor.lastVisibleChild(lastItem.parent) == lastItem
-      shouldDisableRemoveInsertAndExpandAnimations = true
-
-    if shouldDisableRemoveInsertAndExpandAnimations
-      @disableAnimation()
-
-    outline.beginUpdates()
-    outline.removeItemsFromParents(items)
-    newParent.insertChildrenBefore(items, newNextSibling)
-    outline.endUpdates()
-
-    if newParentNeedsExpand
-      editor.setExpanded(newParent)
-
-    if shouldDisableRemoveInsertAndExpandAnimations
-      @enableAnimation()
-
-    editor.moveSelectionRange(savedSelectionRange)
-
-    # Fast temporarily forward all animations to final position. Animation
-    # system will automatically continue normal animations on next tick.
-    for own key, animation of animations
-      animation.fastForward(context)
-
-    scrollToTop = Number.MAX_VALUE
-    scrollToBottom = Number.MIN_VALUE
-
-    if animate
-      for each in items
-        animation = animations[each.id + LIMoveAnimation.id]
-        viewLI = @itemViewLIForItem(each)
-
-        if animation
-          position = @_viewLIPosition(viewLI, true)
-          scrollToTop = Math.min(position.top, scrollToTop)
-          scrollToBottom = Math.max(position.bottom, scrollToBottom)
-          animation.performMove(viewLI, position, context)
-
-    if scrollToTop != Number.MAX_VALUE
-      @scrollToOffsetRangeIfNeeded(scrollToTop, scrollToBottom, true)
-
-  ###
   Section: Picking
   ###
 
   pick: (clientX, clientY) ->
+    @itemRenderer.pick clientX, clientY
+
+    ###
     topListElement = @topListElement
 
     if topListElement
@@ -693,8 +330,9 @@ class OutlineEditorElement extends HTMLElement
       if row
         return @_pickItemBody(clientX, clientY, @_itemViewBodyP(row.parentNode))
 
-    {}
+    {}###
 
+  ###
   _pickRow: (x, y) ->
     each = @editor.DOMElementFromPoint(x, y)
     while each
@@ -758,7 +396,7 @@ class OutlineEditorElement extends HTMLElement
     else if clientX >= bodyRect.right
       clientX = Math.floor(bodyRect.right) - 1
 
-    nodeCaretPosition = @_nodeCaretPositionFromPoint(clientX, clientY)
+    nodeCaretPosition = @_caretPositionFromPoint(clientX, clientY)
     itemCaretPosition = {
       offsetItem: item,
       offset: if nodeCaretPosition then @nodeOffsetToItemOffset(nodeCaretPosition.offsetItem, nodeCaretPosition.offset) else 0,
@@ -770,6 +408,7 @@ class OutlineEditorElement extends HTMLElement
       nodeCaretPosition: nodeCaretPosition,
       itemCaretPosition: itemCaretPosition
     }
+  ###
 
   ###
   Section: Selection
@@ -1070,19 +709,10 @@ class OutlineEditorElement extends HTMLElement
   ###
 
   itemForViewNode: (viewNode) ->
-    while viewNode
-      item = @editor.outline.itemForID(viewNode?.id)
-      return item if item
-      viewNode = viewNode.parentNode
+    @itemRenderer.itemForRenderedNode viewNode
 
   itemViewLIForItem: (item) ->
-    if item
-      # Maintain our own idsToElements mapping instead of using
-      # getElementById so that we can maintain two views of the same
-      # document in the same DOM. The other approach would be to require
-      # use of Shadow DOM in that case, but that brings lots of bagage and
-      # some performance issues with it.
-      return @_idsToElements[item.id]
+    @itemRenderer.renderedLIForItem item
 
   itemViewPForItem: (item) ->
     @_itemViewBodyP(@itemViewLIForItem(item))
@@ -1096,17 +726,7 @@ class OutlineEditorElement extends HTMLElement
   itemOffsetToNodeOffset: (item, offset) ->
     ItemBodyEncoder.bodyTextOffsetToNodeOffset(@_itemViewBodyP(@itemViewLIForItem(item)), offset)
 
-  disconnectBranchIDs: (element) ->
-    end = Util.nodeNextBranch(element)
-    idsToElements = @_idsToElements
-    each = element
-    while each != end
-      if each.id
-        delete idsToElements[each.id]
-        each.removeAttribute('id')
-      each = Util.nextNode(each)
-
-  _nodeCaretPositionFromPoint: (clientX, clientY) ->
+  _caretPositionFromPoint: (clientX, clientY) ->
     pick = @editor.DOMCaretPositionFromPoint(clientX, clientY)
     range = pick?.range
     clientRects = range?.getClientRects()
@@ -1127,24 +747,10 @@ class OutlineEditorElement extends HTMLElement
     pick
 
   _itemViewBodyP: (itemViewLI) ->
-    @_itemViewRowDIV(itemViewLI)?.firstChild.nextElementSibling
-
-  _itemViewRowDIV: (itemViewLI) ->
-    itemViewLI?.firstChild
+    @itemRenderer.renderedBodyTextPForRenderedLI itemViewLI
 
   _itemViewChildrenUL: (itemViewLI, createIfNeeded) ->
-    if itemViewLI
-      lastElement = itemViewLI.lastElementChild
-      if lastElement.classList.contains('bchildren')
-        return lastElement
-
-      if createIfNeeded
-        ul = document.createElement('UL')
-        ul.className = 'bchildren'
-        itemViewLI.appendChild(ul)
-        return ul
-
-    return null
+    @itemRenderer.renderedChildrenULForRenderedLI itemViewLI, createIfNeeded
 
 ###
 Util Functions
