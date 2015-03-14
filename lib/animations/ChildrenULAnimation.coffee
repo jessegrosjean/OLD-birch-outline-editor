@@ -66,6 +66,8 @@ class ChildrenULAnimation
       tween: [targetHeight, startHeight],
       height: targetHeight
 
+    LI = UL.parentElement.parentElement
+
     Velocity UL, properties,
       easing: context.easing
       duration: context.duration
@@ -76,9 +78,9 @@ class ChildrenULAnimation
       progress: (elements, percentComplete, timeRemaining, timeStart, tweenULHeight) ->
         if tweenULHeight < 0
           UL.style.height = '0px'
-          UL.style.marginBottom = tweenULHeight + 'px'
+          LI.style.marginBottom = tweenULHeight + 'px'
         else
-          UL.style.marginBottom = null
+          LI.style.marginBottom = null
       complete: (elements) =>
         Util.removeFromDOM(UL)
         @itemRenderer.completedAnimation(@_id)

@@ -190,19 +190,19 @@ class ItemRenderer
     # but that brings lots of bagage and some performance issues with it.
     @idsToLIs[item?.id]
 
-  renderedBranchDIVForRenderedLI: (LI) ->
+  @renderedBranchDIVForRenderedLI: (LI) ->
     LI?.firstChild.nextSibling
 
-  renderedItemContentDIVForRenderedLI: (LI) ->
+  @renderedItemContentDIVForRenderedLI: (LI) ->
     @renderedBranchDIVForRenderedLI(LI)?.firstChild
 
-  renderedBodyTextPForRenderedLI: (LI) ->
-    @renderedItemContentDIVForRenderedLI(LI)?.firstChild
+  @renderedBodyTextPForRenderedLI: (LI) ->
+    ItemRenderer.renderedItemContentDIVForRenderedLI(LI)?.firstChild
 
-  renderedBodyBadgesDIVForRenderedLI: (LI) ->
-    @renderedItemContentDIVForRenderedLI(LI)?.lastChild
+  @renderedBodyBadgesDIVForRenderedLI: (LI) ->
+    ItemRenderer.renderedItemContentDIVForRenderedLI(LI)?.lastChild
 
-  renderedChildrenULForRenderedLI: (LI, createIfNeeded) ->
+  @renderedChildrenULForRenderedLI: (LI, createIfNeeded) ->
     bbranch = @renderedBranchDIVForRenderedLI LI
     if bbranch
       last = bbranch.lastChild
@@ -254,7 +254,7 @@ class ItemRenderer
 
   updateItemBodyContent: (item) ->
     renderedLI = @renderedLIForItem item
-    renderedP = @renderedBodyTextPForRenderedLI renderedLI
+    renderedP = ItemRenderer.renderedBodyTextPForRenderedLI renderedLI
     if renderedP
       html = @renderBodyTextInnerHTML item
       if renderedP.innerHTML != html
@@ -263,7 +263,7 @@ class ItemRenderer
   updateItemChildren: (item, removedChildren, addedChildren, nextSibling) ->
     renderedLI = @renderedLIForItem item
     if renderedLI
-      renderedChildrenUL = @renderedChildrenULForRenderedLI renderedLI
+      renderedChildrenUL = ItemRenderer.renderedChildrenULForRenderedLI renderedLI
       animate = @editorElement.isAnimationEnabled()
       editor = @editor
 
@@ -290,7 +290,7 @@ class ItemRenderer
             documentFragment.appendChild eachChildRenderedLI
 
         if !renderedChildrenUL
-          renderedChildrenUL = @renderedChildrenULForRenderedLI(renderedLI, true)
+          renderedChildrenUL = ItemRenderer.renderedChildrenULForRenderedLI(renderedLI, true)
 
         renderedChildrenUL.insertBefore documentFragment, nextSiblingRenderedLI
 
@@ -303,7 +303,7 @@ class ItemRenderer
   updateRefreshItemChildren: (item) ->
     renderedLI = @renderedLIForItem item
     if renderedLI
-      renderedChildrenUL = @renderedChildrenULForRenderedLI renderedLI
+      renderedChildrenUL = ItemRenderer.renderedChildrenULForRenderedLI renderedLI
 
       if renderedChildrenUL
         renderedChildrenUL.parentNode.removeChild renderedChildrenUL
@@ -319,7 +319,7 @@ class ItemRenderer
     renderedLI = @renderedLIForItem item
     if renderedLI
       animate = @editorElement.isAnimationEnabled()
-      renderedChildrenUL = @renderedChildrenULForRenderedLI renderedLI
+      renderedChildrenUL = ItemRenderer.renderedChildrenULForRenderedLI renderedLI
 
       if renderedChildrenUL
         if animate
@@ -330,7 +330,7 @@ class ItemRenderer
 
       renderedChildrenUL = @renderChildrenUL item
       if renderedChildrenUL
-        renderedBranchDIV = @renderedBranchDIVForRenderedLI renderedLI
+        renderedBranchDIV = ItemRenderer.renderedBranchDIVForRenderedLI renderedLI
         renderedBranchDIV.appendChild renderedChildrenUL
         if animate
           @animateExpandRenderedChildrenUL item, renderedChildrenUL
@@ -380,14 +380,13 @@ class ItemRenderer
     @animationForItem(item, LIRemoveAnimation).remove renderedLI, @editorElement.animationContext()
 
   renderedItemLIPosition: (renderedLI) ->
-    renderedPRect = @renderedBodyTextPForRenderedLI(renderedLI).getBoundingClientRect()
+    renderedPRect = ItemRenderer.renderedBodyTextPForRenderedLI(renderedLI).getBoundingClientRect()
     animationRect = @editorElement.animationLayerElement.getBoundingClientRect()
     renderedLIRect = renderedLI.getBoundingClientRect()
     {} =
       top: renderedLIRect.top - animationRect.top
       bottom: renderedPRect.bottom - animationRect.bottom
       left: renderedLIRect.left - animationRect.left
-      pLeft: renderedPRect.left
       width: renderedLIRect.width
 
   animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
@@ -482,13 +481,13 @@ class ItemRenderer
 
   pick: (clientX, clientY, LI) ->
     LI ?= @editorElement.topListElement.firstChild
-    UL = @renderedChildrenULForRenderedLI LI
+    UL = ItemRenderer.renderedChildrenULForRenderedLI LI
 
     if UL
-      itemContentDIV = @renderedItemContentDIVForRenderedLI LI
+      itemContentDIV = ItemRenderer.renderedItemContentDIVForRenderedLI LI
       itemContentRect = itemContentDIV.getBoundingClientRect()
       if clientY > itemContentRect.top and clientY < itemContentRect.bottom
-        @pickBodyTextP clientX, clientY, @renderedBodyTextPForRenderedLI LI
+        @pickBodyTextP clientX, clientY, ItemRenderer.renderedBodyTextPForRenderedLI LI
       else
         children = UL.children
         high = children.length - 1
@@ -507,7 +506,7 @@ class ItemRenderer
 
         @pick clientX, clientY, childLI
     else
-      @pickBodyTextP clientX, clientY, @renderedBodyTextPForRenderedLI LI
+      @pickBodyTextP clientX, clientY, ItemRenderer.renderedBodyTextPForRenderedLI LI
 
   pickBodyTextP: (clientX, clientY, renderedBodyTextP) ->
     item = @itemForRenderedNode renderedBodyTextP
@@ -590,12 +589,12 @@ class ItemRenderer
   nodeOffsetToItemOffset: (node, offset) ->
     item = @itemForRenderedNode node
     renderedLI = @renderedLIForItem item
-    renderedBodyTextP = @renderedBodyTextPForRenderedLI renderedLI
+    renderedBodyTextP = ItemRenderer.renderedBodyTextPForRenderedLI renderedLI
     ItemBodyEncoder.nodeOffsetToBodyTextOffset node, offset, renderedBodyTextP
 
   itemOffsetToNodeOffset: (item, offset) ->
     renderedLI = @renderedLIForItem item
-    renderedBodyTextP = @renderedBodyTextPForRenderedLI renderedLI
+    renderedBodyTextP = ItemRenderer.renderedBodyTextPForRenderedLI renderedLI
     ItemBodyEncoder.bodyTextOffsetToNodeOffset renderedBodyTextP, offset
 
   ###

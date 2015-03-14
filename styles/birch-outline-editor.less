@@ -9,7 +9,7 @@
 @syntax-selection-color: #a7caff;
 @syntax-secondary-selection-color: #EDF4FF;
 @syntax-cursor-color: #333;
-@syntax-invisible-character-color: lightgray;
+@syntax-invisible-character-color: gray;
 
 //@import "ui-variables";
 //@import "syntax-variables";
@@ -119,7 +119,7 @@ birch-outline-editor > ul {
 }
 
 .bexpanded > .bbranchcontrols > .bborder {
-    border-left: 1px solid @syntax-invisible-character-color;
+  border-left: 1px solid mix(@syntax-invisible-character-color, @syntax-background-color, 50%);
 }
 
 .bbranch {

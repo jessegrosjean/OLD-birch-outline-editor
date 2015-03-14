@@ -26,7 +26,6 @@ class LIMoveAnimation
       movingLIClone.style.top = position.top + 'px'
       movingLIClone.style.left = position.left + 'px'
       movingLIClone.style.width = position.width + 'px'
-      movingLIClone.dataset.pLeft = position.pLeft
       movingLIClone.style.pointerEvents = 'none'
 
       # Add simulated selection if in text edit mode.
@@ -69,14 +68,13 @@ class LIMoveAnimation
 
   performMove: (LI, position, context) ->
     movingLIClone = @_movingLIClone
-    pLeftDiff = parseInt(movingLIClone.dataset.pLeft, 10) - position.pLeft
 
     Velocity movingLIClone, 'stop', true
 
     properties =
       top: position.top
-      left: position.left - pLeftDiff
-      width: position.width + pLeftDiff
+      left: position.left
+      width: position.width
 
     Velocity movingLIClone, properties,
       easing: context.easing

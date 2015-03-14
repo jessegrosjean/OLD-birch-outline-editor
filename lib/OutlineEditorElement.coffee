@@ -41,8 +41,6 @@ class OutlineEditorElement extends HTMLElement
     @_animationDisabled = 0
     @_animationContexts = [Constants.DefaultItemAnimactionContext]
     @_maintainSelection = null
-    @_animations = {}
-    @_idsToElements = {}
     @_extendingSelection = false
     @_extendingSelectionLastScrollTop = undefined
     @_extendSelectionDisposables = new CompositeDisposable()
@@ -297,118 +295,6 @@ class OutlineEditorElement extends HTMLElement
 
   pick: (clientX, clientY) ->
     @itemRenderer.pick clientX, clientY
-
-    ###
-    topListElement = @topListElement
-
-    if topListElement
-      rect = topListElement.getBoundingClientRect()
-      x = rect.left + (rect.width / 2.0)
-      y = clientY
-      row = @_pickRow(x, y)
-
-      if not row
-        lineHeight = parseInt(window.getComputedStyle(topListElement).lineHeight, 10)
-        prevRow = @_pickNextRow(x, y, rect, -lineHeight)
-        nextRow = @_pickNextRow(x, y, rect, lineHeight)
-
-        if prevRow and nextRow
-          prevRect = prevRow.getBoundingClientRect()
-          nextRect = nextRow.getBoundingClientRect()
-          prevDist = y - prevRect.bottom
-          nextDist = nextRect.top - y
-
-          if prevDist < nextDist
-            row = prevRow
-          else
-            row = nextRow
-        else if prevRow && !nextRow
-          row = prevRow
-        else if !prevRow && nextRow
-          row = nextRow
-
-      if row
-        return @_pickItemBody(clientX, clientY, @_itemViewBodyP(row.parentNode))
-
-    {}###
-
-  ###
-  _pickRow: (x, y) ->
-    each = @editor.DOMElementFromPoint(x, y)
-    while each
-      if each.tagName == 'DIV' && each.classList.contains('bcontent')
-        return each
-      each = each.parentNode
-
-  _pickNextRow: (x, y, bounds, pickDelta) ->
-    looking = ->
-      if pickDelta < 0
-        y > bounds.top
-      else
-        y < bounds.bottom
-
-    while looking()
-      row = @_pickRow(x, y)
-      if row
-        return row
-      y += pickDelta
-
-  _pickItemBody: (clientX, clientY, itemBody) ->
-    item = @itemForViewNode(itemBody)
-    bodyRect = itemBody.getBoundingClientRect()
-    bodyRectMid = bodyRect.top + (bodyRect.height / 2.0)
-    itemAffinity
-
-    if clientY < bodyRect.top
-      itemAffinity = Constants.ItemAffinityAbove
-      clientX = Number.MIN_VALUE
-    else if clientY < bodyRectMid
-      itemAffinity = Constants.ItemAffinityTopHalf
-    else if clientY > bodyRect.bottom
-      itemAffinity = Constants.ItemAffinityBelow
-      clientX = Number.MAX_VALUE
-    else
-      itemAffinity = Constants.ItemAffinityBottomHalf
-
-    # Constrain pick point inside the text rect so that we'll get a good
-    # 3 pick result.
-
-    style = window.getComputedStyle(itemBody)
-    paddingTop = parseInt(style.paddingTop, 10)
-    paddingBottom = parseInt(style.paddingBottom, 10)
-    lineHeight = parseInt(style.lineHeight, 10)
-    halfLineHeight = lineHeight / 2.0
-    bodyTop = Math.ceil(bodyRect.top)
-    bodyBottom = Math.ceil(bodyRect.bottom)
-    pickableBodyTop = bodyTop + halfLineHeight + paddingTop
-    pickableBodyBottom = bodyBottom - (halfLineHeight + paddingBottom)
-
-    if clientY <= pickableBodyTop
-      clientY = pickableBodyTop
-    else if clientY >= pickableBodyBottom
-      clientY = pickableBodyBottom
-
-    # Magic nubmer is "1" for x values, any more and we miss l's at the
-    # end of the line.
-
-    if clientX <= bodyRect.left
-      clientX = Math.ceil(bodyRect.left) + 1
-    else if clientX >= bodyRect.right
-      clientX = Math.floor(bodyRect.right) - 1
-
-    nodeCaretPosition = @_caretPositionFromPoint(clientX, clientY)
-    itemCaretPosition = {
-      offsetItem: item,
-      offset: if nodeCaretPosition then @nodeOffsetToItemOffset(nodeCaretPosition.offsetItem, nodeCaretPosition.offset) else 0,
-      selectionAffinity: if nodeCaretPosition then nodeCaretPosition.selectionAffinity else Constants.SelectionAffinityUpstream,
-      itemAffinity: itemAffinity
-    }
-
-    return {
-      nodeCaretPosition: nodeCaretPosition,
-      itemCaretPosition: itemCaretPosition
-    }
-  ###
 
   ###
   Section: Selection
@@ -717,40 +603,14 @@ class OutlineEditorElement extends HTMLElement
   itemViewPForItem: (item) ->
     @_itemViewBodyP(@itemViewLIForItem(item))
 
-  itemViewChildrenULForItem: (item) ->
-    @_itemViewChildrenUL(@itemViewLIForItem(item))
-
   nodeOffsetToItemOffset: (node, offset) ->
     ItemBodyEncoder.nodeOffsetToBodyTextOffset(node, offset, @_itemViewBodyP(@itemViewLIForItem(@itemForViewNode(node))))
 
   itemOffsetToNodeOffset: (item, offset) ->
     ItemBodyEncoder.bodyTextOffsetToNodeOffset(@_itemViewBodyP(@itemViewLIForItem(item)), offset)
 
-  _caretPositionFromPoint: (clientX, clientY) ->
-    pick = @editor.DOMCaretPositionFromPoint(clientX, clientY)
-    range = pick?.range
-    clientRects = range?.getClientRects()
-    length = clientRects?.length
-
-    if length > 1
-      upstreamRect = clientRects[0]
-      downstreamRect = clientRects[1]
-      upstreamDist = Math.abs(upstreamRect.left - clientX)
-      downstreamDist = Math.abs(downstreamRect.left - clientX)
-      if downstreamDist < upstreamDist
-        pick.selectionAffinity = Constants.SelectionAffinityDownstream
-      else
-        pick.selectionAffinity = Constants.SelectionAffinityUpstream
-    else
-      pick?.selectionAffinity = Constants.SelectionAffinityUpstream
-
-    pick
-
   _itemViewBodyP: (itemViewLI) ->
-    @itemRenderer.renderedBodyTextPForRenderedLI itemViewLI
-
-  _itemViewChildrenUL: (itemViewLI, createIfNeeded) ->
-    @itemRenderer.renderedChildrenULForRenderedLI itemViewLI, createIfNeeded
+    ItemRenderer.renderedBodyTextPForRenderedLI itemViewLI
 
 ###
 Util Functions
