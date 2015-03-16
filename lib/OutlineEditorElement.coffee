@@ -5,6 +5,7 @@ LIInsertAnimation = require './animations/LIInsertAnimation'
 LIRemoveAnimation = require './animations/LIRemoveAnimation'
 LIMoveAnimation = require './animations/LIMoveAnimation'
 FocusElement = require './elements/FocusElement'
+AttributedString = require './AttributedString'
 ItemBodyEncoder = require './ItemBodyEncoder'
 ItemSerializer = require './ItemSerializer'
 EventRegistery = require './EventRegistery'
@@ -13,11 +14,8 @@ ItemRenderer = require './ItemRenderer'
 Velocity = require 'velocity-animate'
 Selection = require './Selection'
 Constants = require './Constants'
+diff = require 'fast-diff'
 Util = require './Util'
-
-require './handlers/SelectionMouseHandler'
-require './handlers/HandleClickHandler'
-require './handlers/BodyInputHandler'
 
 class OutlineEditorElement extends HTMLElement
 
@@ -616,6 +614,12 @@ class OutlineEditorElement extends HTMLElement
 Util Functions
 ###
 
+findOutlineEditorElement = (e) ->
+  element = e.target
+  while element and element.tagName != 'BIRCH-OUTLINE-EDITOR'
+    element = element.parentNode
+  element
+
 stopEventPropagation = (commandListeners) ->
   newCommandListeners = {}
   for commandName, commandListener of commandListeners
@@ -638,14 +642,141 @@ stopEventPropagationAndGroupUndo = (commandListeners) ->
 Event and Command registration
 ###
 
+#
+# Handle Selection Interaction
+#
+
+EventRegistery.listen 'birch-outline-editor > ul',
+  'mousedown': (e) ->
+    editorElement = findOutlineEditorElement e
+    editorElement.editor.focus()
+    setTimeout ->
+      editorElement.beginExtendSelectionInteraction e
+
+EventRegistery.listen '.bbodytext',
+  'focusin': (e) ->
+    editorElement = findOutlineEditorElement e
+    editor = editorElement.editor
+    if !editorElement._extendingSelection
+      focusItem = editorElement.itemForViewNode e.target
+      if editor.selection.focusItem != focusItem
+        editor.moveSelectionRange focusItem
+
+  'mousedown': (e) ->
+    editorElement = findOutlineEditorElement e
+    editorElement.editor.focus()
+    editorElement.beginExtendSelectionInteraction e
+    e.stopPropagation()
+
+#
+# Handle Text Input
+#
+
+EventRegistery.listen '.bbodytext',
+  compositionstart: (e) ->
+  compositionupdate: (e) ->
+  compositionend: (e) ->
+  input: (e) ->
+    editorElement = findOutlineEditorElement e
+    editor = editorElement.editor
+    typingFormattingTags = editor.typingFormattingTags()
+    item = editorElement.itemForViewNode e.target
+    itemViewLI = editorElement.itemViewLIForItem item
+    itemViewP = editorElement._itemViewBodyP itemViewLI
+    newBodyText = ItemBodyEncoder.bodyEncodedTextContent itemViewP
+    oldBodyText = item.bodyText
+    outline = item.outline
+    location = 0
+
+    outline.beginUpdates()
+
+    # Insert marker into old body text to ensure diffs get generated in
+    # correct locations. For example if user has cursor at position "tw^o"
+    # and types an "o" then the default diff will insert a new "o" after the
+    # original. But that's not what is needed since the cursor is after the
+    # "w" not the "o". In plain text it doesn't make much difference, but
+    # when rich text attributes (bold, italic, etc) are in play it can mess
+    # things up... so add the marker which will server as an anchor point
+    # from which the diff is generated.
+    marker = '\uE000'
+    markerRegex = new RegExp marker, 'g'
+    startOffset = editor.selection.startOffset
+    markedOldBodyText = oldBodyText.slice(0, startOffset) + marker + oldBodyText.slice(startOffset)
+
+    for each in diff markedOldBodyText, newBodyText
+      type = each[0]
+      text = each[1].replace(markerRegex, '')
+
+      if text.length
+        switch type
+          when diff.INSERT
+            text = new AttributedString text
+            text.addAttributesInRange typingFormattingTags, 0, -1
+            item.replaceBodyTextInRange text, location, 0
+          when diff.EQUAL
+            location += text.length
+          when diff.DELETE
+            if text != '^'
+              item.replaceBodyTextInRange '', location, text.length
+
+
+    # Range affinity should always be upstream after text input
+    editorRange = editorElement.editorRangeFromDOMSelection()
+    editorRange.selectionAffinity = Constants.SelectionAffinityUpstream
+    editor.moveSelectionRange editorRange
+
+    outline.endUpdates()
+
+#
+# Handle clicking on handle
+#
+
+EventRegistery.listen '.bhandle',
+  mousedown: (e) ->
+    editorElement = findOutlineEditorElement e
+    editor = editorElement.editor
+    editorElement._maintainSelection = editor.selection
+    e.stopPropagation()
+
+  focusin: (e) ->
+    setTimeout ->
+      e.target.blur()
+
+  focusout: (e) ->
+    editorElement = findOutlineEditorElement e
+    maintainSelection = editorElement._maintainSelection
+    editor = editorElement.editor
+
+    if maintainSelection
+      setTimeout ->
+        if maintainSelection.isTextMode
+          editor.focus()
+          editor._disableScrollToSelection = true
+          editor.moveSelectionRange maintainSelection
+          editor._disableScrollToSelection = false
+        else
+          editor.focus()
+
+  click: (e) ->
+    editorElement = findOutlineEditorElement e
+    item = editorElement.itemForViewNode e.target
+    editor = editorElement.editor
+    if item
+      if e.shiftKey
+        editor.hoist item
+      else if item.firstChild
+        editor.toggleFoldItems item
+    e.stopPropagation()
+
+#
+# Handle Cut/Copy/Paste
+#
+
 EventRegistery.listen 'input[is="outline-editor-focus"]', stopEventPropagation(
   'cut': (e) -> @parentElement.editor.cutSelection(e.clipboardData)
   'copy': (e) -> @parentElement.editor.copySelection(e.clipboardData)
   'paste': (e) -> @parentElement.editor.pasteToSelection(e.clipboardData)
 )
-
-EventRegistery.listen 'birch-outline-editor',
-  'contextmenu': (e) -> @onContextMenu(e)
 
 clipboardAsDatatransfer =
   getData: (type) -> atom.clipboard.read()
@@ -659,6 +790,17 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'core:paste': (e) ->
     @editor.pasteToSelection clipboardAsDatatransfer
 )
+
+#
+# Handle Context Menu
+#
+
+EventRegistery.listen 'birch-outline-editor',
+  'contextmenu': (e) -> @onContextMenu(e)
+
+#
+# Handle Commands
+#
 
 atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'core:undo': -> @editor.undo()
