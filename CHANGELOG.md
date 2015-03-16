@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.2.0
+
+- Fixed bug in some cases of shifting items to the left.
+
 ## 1.1.0
 
 - Added {Outline::importItem} API.

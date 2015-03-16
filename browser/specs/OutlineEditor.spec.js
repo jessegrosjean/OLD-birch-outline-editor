@@ -185,6 +185,57 @@ describe('OutlineEditor', function() {
 		});
 	});
 
+	describe('Moving', function() {
+		it ('should move items up', function () {
+			editor.setExpanded(outlineSetup.one);
+			editor.moveSelectionRange(outlineSetup.five);
+			editor.moveItemsUp();
+			outlineSetup.one.firstChild.should.equal(outlineSetup.five);
+			outlineSetup.one.lastChild.should.equal(outlineSetup.two);
+			editor.moveItemsUp(); // should do nothing
+			outlineSetup.one.firstChild.should.equal(outlineSetup.five);
+		});
+
+		it ('should move items down', function () {
+			editor.setExpanded(outlineSetup.one);
+			editor.moveSelectionRange(outlineSetup.two);
+			editor.moveItemsDown();
+			outlineSetup.one.firstChild.should.equal(outlineSetup.five);
+			outlineSetup.one.lastChild.should.equal(outlineSetup.two);
+			editor.moveItemsDown(); // should do nothing
+			outlineSetup.one.lastChild.should.equal(outlineSetup.two);
+		});
+
+		it ('should move items left', function () {
+			editor.setExpanded(outlineSetup.one);
+			editor.moveSelectionRange(outlineSetup.two);
+			editor.moveItemsLeft();
+			outlineSetup.one.firstChild.should.equal(outlineSetup.five);
+			outlineSetup.one.nextSibling.should.equal(outlineSetup.two);
+			editor.moveItemsLeft(); // should do nothing
+			outlineSetup.one.nextSibling.should.equal(outlineSetup.two);
+		});
+
+		it ('should move items left with prev sibling children selected', function () {
+			editor.setExpanded(outlineSetup.one);
+			editor.setExpanded(outlineSetup.two);
+			editor.moveSelectionRange(outlineSetup.four, undefined, outlineSetup.five);
+			editor.moveItemsLeft();
+			outlineSetup.two.nextSibling.should.equal(outlineSetup.four);
+			outlineSetup.four.nextSibling.should.equal(outlineSetup.five);
+		});
+
+		it ('should move items right', function () {
+			editor.setExpanded(outlineSetup.one);
+			editor.setExpanded(outlineSetup.two);
+			editor.moveSelectionRange(outlineSetup.four);
+			editor.moveItemsRight();
+			outlineSetup.three.firstChild.should.equal(outlineSetup.four);
+			editor.moveItemsRight(); // should do nothing
+			outlineSetup.three.firstChild.should.equal(outlineSetup.four);
+		});
+	});
+
 	describe('Deleting', function() {
 		it('should delete selection', function() {
 			editor.moveSelectionRange(outlineSetup.one, 1, outlineSetup.one, 3);

@@ -1177,6 +1177,8 @@ class OutlineEditor extends Model
         if startItemParent != @hoistedItem()
           newParent = startItemParent.parent
           newNextSibling = @nextVisibleSibling(startItemParent)
+          while newNextSibling and newNextSibling in selectedItems
+            newNextSibling = @nextVisibleSibling(newNextSibling)
       else if direction == 'right'
         newParent = @previousVisibleSibling(startItem)
 
