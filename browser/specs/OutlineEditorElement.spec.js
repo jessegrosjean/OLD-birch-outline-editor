@@ -138,6 +138,7 @@ describe('OutlineEditorElement', function() {
 
 			outlineSetup.one.bodyHTML = 'one <b>two</b> three';
 
+			p = outlineEditorElement._itemViewBodyP(viewLI);
 			outlineEditorElement.itemOffsetToNodeOffset(outlineSetup.one, 4).should.eql({
 				node: p.firstChild,
 				offset: 4
@@ -156,6 +157,7 @@ describe('OutlineEditorElement', function() {
 			outlineEditorElement.nodeOffsetToItemOffset(p.firstChild, 0).should.equal(0);
 
 			outlineSetup.one.bodyHTML = 'one <b>two</b> three';
+				p = outlineEditorElement._itemViewBodyP(viewLI);
 
 			outlineEditorElement.nodeOffsetToItemOffset(p, 0).should.equal(0);
 			outlineEditorElement.nodeOffsetToItemOffset(p, 1).should.equal(4);

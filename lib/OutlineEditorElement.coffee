@@ -332,9 +332,9 @@ class OutlineEditorElement extends HTMLElement
         editor.moveSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
     e.stopPropagation()
-
-    # Calling prevent default fixes picking inbetween items. But it
-    # breaks autoscroll. e.preventDefault();
+    # Calling prevent default fixes picking inbetween items. But it breaks
+    # autoscroll, double-click select word and triple-click select paragraph.
+    # e.preventDefault()
 
     if e.button == 0
       editor._disableScrollToSelection = true
@@ -355,8 +355,8 @@ class OutlineEditorElement extends HTMLElement
     caretPosition = pick.itemCaretPosition
 
     if caretPosition
-      if e.target.tagName == 'P' and caretPosition.offsetItem != @editor.selection.anchorItem
-        e.preventDefault()
+      #if e.target.classList.contains('bbodytext') and caretPosition.offsetItem != @editor.selection.anchorItem
+      #  e.preventDefault() # don't understand this
       @editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
   onScroll: (e) ->
@@ -608,7 +608,7 @@ class OutlineEditorElement extends HTMLElement
     ItemBodyEncoder.bodyTextOffsetToNodeOffset(@_itemViewBodyP(@itemViewLIForItem(item)), offset)
 
   _itemViewBodyP: (itemViewLI) ->
-    ItemRenderer.renderedBodyTextPForRenderedLI itemViewLI
+    ItemRenderer.renderedBodyTextSPANForRenderedLI itemViewLI
 
 ###
 Util Functions
@@ -648,6 +648,7 @@ Event and Command registration
 
 EventRegistery.listen 'birch-outline-editor > ul',
   'mousedown': (e) ->
+    console.log e.target
     editorElement = findOutlineEditorElement e
     editorElement.editor.focus()
     setTimeout ->
@@ -657,7 +658,7 @@ EventRegistery.listen '.bbodytext',
   'focusin': (e) ->
     editorElement = findOutlineEditorElement e
     editor = editorElement.editor
-    if !editorElement._extendingSelection
+    unless editorElement._extendingSelection
       focusItem = editorElement.itemForViewNode e.target
       if editor.selection.focusItem != focusItem
         editor.moveSelectionRange focusItem
@@ -672,7 +673,7 @@ EventRegistery.listen '.bbodytext',
 # Handle Text Input
 #
 
-EventRegistery.listen '.bbodytext',
+EventRegistery.listen '.bitemcontent',
   compositionstart: (e) ->
   compositionupdate: (e) ->
   compositionend: (e) ->

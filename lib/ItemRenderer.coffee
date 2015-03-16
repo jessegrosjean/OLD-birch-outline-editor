@@ -105,21 +105,22 @@ class ItemRenderer
   renderBranchDIV: (item) ->
     bbranch = document.createElement 'DIV'
     bbranch.className = 'bbranch'
-    bbranch.appendChild @renderItemContentDIV item
+    bbranch.appendChild @renderItemContentP item
     if bchildrenUL = @renderChildrenUL item
       bbranch.appendChild bchildrenUL
     bbranch
 
-  renderItemContentDIV: (item) ->
-    bitemcontent = document.createElement 'DIV'
+  renderItemContentP: (item) ->
+    bitemcontent = document.createElement 'P'
     bitemcontent.className = 'bitemcontent'
-    bitemcontent.appendChild @renderBodyTextP item
-    if bbadges = @renderBadgesDIV item
+    bitemcontent.appendChild @renderBodyTextSPAN item
+
+    if bbadges = @renderBadgesSPAN item
       bitemcontent.appendChild bbadges
     bitemcontent
 
-  renderBodyTextP: (item) ->
-    bbodytext = document.createElement 'P'
+  renderBodyTextSPAN: (item) ->
+    bbodytext = document.createElement 'SPAN'
     bbodytext.className = 'bbodytext'
     bbodytext.contentEditable = true
     bbodytext.innerHTML = @renderBodyTextInnerHTML item
@@ -143,14 +144,14 @@ class ItemRenderer
     else
       item.bodyHTML
 
-  renderBadgesDIV: (item) ->
+  renderBadgesSPAN: (item) ->
     if @renderers
       bbadges = null
       for each in @renderers
         if each.renderBadges
           each.renderBadges item, (badge) ->
             unless bbadges
-              bbadges = document.createElement 'DIV'
+              bbadges = document.createElement 'SPAN'
               bbadges.className = 'bbadges'
             bbadges.appendChild badge
       bbadges
@@ -193,14 +194,14 @@ class ItemRenderer
   @renderedBranchDIVForRenderedLI: (LI) ->
     LI?.firstChild.nextSibling
 
-  @renderedItemContentDIVForRenderedLI: (LI) ->
+  @renderedItemContentPForRenderedLI: (LI) ->
     @renderedBranchDIVForRenderedLI(LI)?.firstChild
 
-  @renderedBodyTextPForRenderedLI: (LI) ->
-    ItemRenderer.renderedItemContentDIVForRenderedLI(LI)?.firstChild
+  @renderedBodyTextSPANForRenderedLI: (LI) ->
+    ItemRenderer.renderedItemContentPForRenderedLI(LI)?.firstChild
 
   @renderedBodyBadgesDIVForRenderedLI: (LI) ->
-    ItemRenderer.renderedItemContentDIVForRenderedLI(LI)?.lastChild
+    ItemRenderer.renderedItemContentPForRenderedLI(LI)?.lastChild
 
   @renderedChildrenULForRenderedLI: (LI, createIfNeeded) ->
     bbranch = @renderedBranchDIVForRenderedLI LI
@@ -251,14 +252,16 @@ class ItemRenderer
         renderedLI.setAttribute attributeName, item.attribute(attributeName)
       else
         renderedLI.removeAttribute attributeName
+      @updateItemBodyContent item
 
   updateItemBodyContent: (item) ->
     renderedLI = @renderedLIForItem item
-    renderedP = ItemRenderer.renderedBodyTextPForRenderedLI renderedLI
-    if renderedP
-      html = @renderBodyTextInnerHTML item
-      if renderedP.innerHTML != html
-        renderedP.innerHTML = html
+    renderedBodyContentP = ItemRenderer.renderedItemContentPForRenderedLI renderedLI
+
+    if renderedBodyContentP
+      newHTML = @renderItemContentP(item).innerHTML
+      if renderedBodyContentP.innerHTML != newHTML
+        renderedBodyContentP.innerHTML = newHTML
 
   updateItemChildren: (item, removedChildren, addedChildren, nextSibling) ->
     renderedLI = @renderedLIForItem item
@@ -380,7 +383,7 @@ class ItemRenderer
     @animationForItem(item, RemoveAnimation).remove renderedLI, @editorElement.animationContext()
 
   renderedItemLIPosition: (renderedLI) ->
-    renderedPRect = ItemRenderer.renderedBodyTextPForRenderedLI(renderedLI).getBoundingClientRect()
+    renderedPRect = ItemRenderer.renderedBodyTextSPANForRenderedLI(renderedLI).getBoundingClientRect()
     animationRect = @editorElement.animationLayerElement.getBoundingClientRect()
     renderedLIRect = renderedLI.getBoundingClientRect()
     {} =
@@ -484,10 +487,10 @@ class ItemRenderer
     UL = ItemRenderer.renderedChildrenULForRenderedLI LI
 
     if UL
-      itemContentDIV = ItemRenderer.renderedItemContentDIVForRenderedLI LI
-      itemContentRect = itemContentDIV.getBoundingClientRect()
+      itemContentP = ItemRenderer.renderedItemContentPForRenderedLI LI
+      itemContentRect = itemContentP.getBoundingClientRect()
       if clientY < itemContentRect.bottom
-        @pickBodyTextP clientX, clientY, ItemRenderer.renderedBodyTextPForRenderedLI LI
+        @pickBodyTextSPAN clientX, clientY, ItemRenderer.renderedBodyTextSPANForRenderedLI LI
       else
         children = UL.children
         high = children.length - 1
@@ -506,11 +509,11 @@ class ItemRenderer
 
         @pick clientX, clientY, childLI
     else
-      @pickBodyTextP clientX, clientY, ItemRenderer.renderedBodyTextPForRenderedLI LI
+      @pickBodyTextSPAN clientX, clientY, ItemRenderer.renderedBodyTextSPANForRenderedLI LI
 
-  pickBodyTextP: (clientX, clientY, renderedBodyTextP) ->
-    item = @itemForRenderedNode renderedBodyTextP
-    bodyTextRect = renderedBodyTextP.getBoundingClientRect()
+  pickBodyTextSPAN: (clientX, clientY, renderedBodyTextSPAN) ->
+    item = @itemForRenderedNode renderedBodyTextSPAN
+    bodyTextRect = renderedBodyTextSPAN.getBoundingClientRect()
     bodyTextRectMid = bodyTextRect.top + (bodyTextRect.height / 2.0)
     itemAffinity
 
@@ -528,7 +531,7 @@ class ItemRenderer
     # Constrain pick point inside the text rect so that we'll get a good
     # 3 pick result.
 
-    style = window.getComputedStyle(renderedBodyTextP)
+    style = window.getComputedStyle renderedBodyTextSPAN
     paddingTop = parseInt(style.paddingTop, 10)
     paddingBottom = parseInt(style.paddingBottom, 10)
     lineHeight = parseInt(style.lineHeight, 10)
@@ -552,9 +555,13 @@ class ItemRenderer
       clientX = Math.floor(bodyTextRect.right) - 1
 
     nodeCaretPosition = @caretPositionFromPoint(clientX, clientY)
+    offset = if nodeCaretPosition then @nodeOffsetToItemOffset(nodeCaretPosition.offsetItem, nodeCaretPosition.offset) else 0
+    if offset is undefined
+      offset = item.bodyText.length
+
     itemCaretPosition =
       offsetItem: item
-      offset: if nodeCaretPosition then @nodeOffsetToItemOffset(nodeCaretPosition.offsetItem, nodeCaretPosition.offset) else 0
+      offset: offset
       selectionAffinity: if nodeCaretPosition then nodeCaretPosition.selectionAffinity else Constants.SelectionAffinityUpstream
       itemAffinity: itemAffinity
 
@@ -589,13 +596,13 @@ class ItemRenderer
   nodeOffsetToItemOffset: (node, offset) ->
     item = @itemForRenderedNode node
     renderedLI = @renderedLIForItem item
-    renderedBodyTextP = ItemRenderer.renderedBodyTextPForRenderedLI renderedLI
-    ItemBodyEncoder.nodeOffsetToBodyTextOffset node, offset, renderedBodyTextP
+    renderedBodyTextSPAN = ItemRenderer.renderedBodyTextSPANForRenderedLI renderedLI
+    ItemBodyEncoder.nodeOffsetToBodyTextOffset node, offset, renderedBodyTextSPAN
 
   itemOffsetToNodeOffset: (item, offset) ->
     renderedLI = @renderedLIForItem item
-    renderedBodyTextP = ItemRenderer.renderedBodyTextPForRenderedLI renderedLI
-    ItemBodyEncoder.bodyTextOffsetToNodeOffset renderedBodyTextP, offset
+    renderedBodyTextSPAN = ItemRenderer.renderedBodyTextSPANForRenderedLI renderedLI
+    ItemBodyEncoder.bodyTextOffsetToNodeOffset renderedBodyTextSPAN, offset
 
   ###
   Section: Util
