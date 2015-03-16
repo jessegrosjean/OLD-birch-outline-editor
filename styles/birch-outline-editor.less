@@ -8,8 +8,8 @@
 @syntax-background-color: white;
 @syntax-selection-color: #a7caff;
 @syntax-secondary-selection-color: #EDF4FF;
-@syntax-cursor-color: #333;
-@syntax-invisible-character-color: gray;
+@syntax-cursor-color: #007aff;
+@syntax-invisible-character-color: #ccc;
 
 //@import "ui-variables";
 //@import "syntax-variables";
@@ -17,8 +17,8 @@
 @font-size: 16px;
 @font-family: 'Open Sans', Helvetica;
 @line-height: round(@font-size * 1.5);
-@item-spacing: round(@font-size / 4.0);
 @item-indent-spacing: round(@font-size * 1.5);
+@item-vertical-spacing: round(@font-size / 4.0);
 
 birch-outline-editor {
   color: @syntax-text-color;
@@ -29,6 +29,10 @@ birch-outline-editor {
   overflow-y: auto;
   overflow-x: hidden;
   user-select: none;
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
 }
 
 #birchTextCalculationIFrame {
@@ -71,7 +75,7 @@ birch-outline-editor > ul {
   > .bbranch > .bitemcontent {
     display: none;
   }
-  margin: @item-indent-spacing 0;
+  //margin: @item-vertical-spacing 0;
 }
 
 //
@@ -91,8 +95,6 @@ birch-outline-editor > ul {
   align-items: center;
   flex-shrink: 0;
   flex-grow: 0;
-  //margin:0.5rem 0 0 0;
-  margin:0;
 }
 
 .bhandle {
@@ -104,6 +106,7 @@ birch-outline-editor > ul {
   font-size: @font-size;
   text-decoration:none;
   flex-grow: 0;
+  padding: @item-vertical-spacing 0;
   color: @syntax-text-color;
 }
 
@@ -119,21 +122,26 @@ birch-outline-editor > ul {
 }
 
 .bexpanded > .bbranchcontrols > .bborder {
-  border-left: 1px solid mix(@syntax-invisible-character-color, @syntax-background-color, 50%);
+  border-left: 1px solid @syntax-invisible-character-color;
 }
 
 .bbranch {
   flex-grow: 1;
 }
 
-.bbodytext {
-  margin: 0.5rem 0 0 0;
-  margin: 0;
-  display: inline-block;
-  min-width: 1px; // So cursor will display when empty since inline-block
-  user-select: text;
+.bitemcontent {
   line-height: @line-height;
+  margin: 0;
+  padding: @item-vertical-spacing 0;
+  //display: inline-block;
+  //min-width: 1px; // So cursor will display when empty since inline-block
+}
+
+.bbodytext {
+  user-select: all;
+  user-modify: read-write;
   white-space: pre-wrap;
+  margin-right: round(@line-height / 4);
   &:focus {
     outline-color: transparent;
     outline-style: none;
@@ -141,15 +149,13 @@ birch-outline-editor > ul {
 }
 
 .bbadges {
-  user-select: none;
-  display: inline;
-  font-size: @font-size * 0.7;
-  line-height: @line-height * 0.7;
-  vertical-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: round(@font-size * 0.7);
+  line-height: round(@line-height * 0.7);
 }
 
 .bbadges > a {
-  //margin-left: 0.5rem;
   padding: 0px 2px;
   border-radius: 2px;
   color: white;
@@ -157,19 +163,18 @@ birch-outline-editor > ul {
 }
 
 .bbadges > .btag {
-  user-select: none;
   background: #5bc0de;
 }
 
 .bbadges > .btag:before {
-  content: "";
+  content: "#";
 }
 
-.bbadges > .bassign {
+.bbadges > .bmention {
   background: #E0FFE0;
 }
 
-.bbadges > .bassign:before {
+.bbadges > .bmention:before {
   content: "@";
 }
 
@@ -239,14 +244,14 @@ birch-outline-editor > ul {
   left: 0;
   right: 0;
   height: @drop-ball-diameter;
-  margin: -(@drop-ball-radius) 0 0 -@drop-ball-diameter;
+  margin: -(@drop-ball-radius + @item-vertical-spacing) 0 0 -@drop-ball-diameter;
   content: "";
   background-image: url('data:image/svg+xml;utf8,<svg width="10000rem" height="0.5rem" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g id="dropIndicator"><circle fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" cx="4" cy="4" r="3.0" /><line fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" x1="7" y1="4" x2="10000" y2="4" /></g></svg>');
   background-repeat: no-repeat;
 }
 
 .bdropafter > .bbranch > .bitemcontent::after {
-  margin: -@drop-ball-radius 0 0 -@drop-ball-diameter;
+  margin: -@drop-ball-radius + @item-vertical-spacing 0 0 -@drop-ball-diameter;
 }
 
 /*
