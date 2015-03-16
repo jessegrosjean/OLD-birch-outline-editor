@@ -329,21 +329,6 @@ class Outline
     assert.ok(item.outline != @, 'Item must not be owned by this outline')
     @createItem(null, @outlineStore.importNode(item._liOrRootUL, true))
 
-  aliasItem: (item) ->
-    assert.ok(!item.isRoot, 'Can not alias root item')
-    alias = @cloneItem(item)
-    aliases = item._aliases
-    end = item.nextBranch
-    eachAlias = alias
-    each = item
-
-    while each != end
-      @associateItemWithAlias(each, eachAlias)
-      each = each.nextItem
-      eachAlias = eachAlias.nextItem
-
-    alias
-
   removeItemsFromParents: (items) ->
     siblings = []
     prev = null
@@ -604,20 +589,6 @@ class Outline
         return id
       else
         candidateID = null
-
-  associateItemWithAlias: (item, newAlias) ->
-    assert.ok(
-      newAlias._aliases == null,
-      'should only happen when item is first created'
-    )
-    itemAliases = item._aliases ?= []
-    newAliases = newAlias._aliases = itemAliases.slice()
-
-    for each in itemAliases
-      newAliases.push each
-
-    newAliases.push(item)
-    itemAliases.push(newAlias)
 
   getText: (editor) ->
     if @cachedText?

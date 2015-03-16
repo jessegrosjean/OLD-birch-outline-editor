@@ -179,46 +179,4 @@ describe('Item', function() {
 			});
 		});
 	});
-
-	describe('Aliases', function() {
-		it('should alias item', function() {
-			var twoAlias = outlineSetup.two.aliasItem();
-			outlineSetup.two.isAliased.should.be.true;
-			outlineSetup.two.firstChild.isAliased.should.be.true;
-			twoAlias.isAliased.should.be.true;
-			twoAlias.firstChild.isAliased.should.be.true;
-		});
-
-		it('should keep aliased item attributes in sync', function() {
-			var twoAlias = outlineSetup.two.aliasItem();
-
-			outlineSetup.two.setAttribute('hello', 'world');
-			outlineSetup.two.attribute('hello').should.equal('world');
-			twoAlias.attribute('hello').should.equal('world');
-
-			twoAlias.setAttribute('hello', 'world!');
-			outlineSetup.two.attribute('hello').should.equal('world!');
-			twoAlias.attribute('hello').should.equal('world!');
-		});
-
-		it('should keep aliased item children in sync on remove', function() {
-			var twoAlias = outlineSetup.two.aliasItem();
-
-			twoAlias.lastChild.bodyText.should.equal('four');
-			outlineSetup.two.lastChild.bodyText.should.equal('four');
-			twoAlias.lastChild.removeFromParent();
-			twoAlias.lastChild.bodyText.should.equal('three');
-			outlineSetup.two.lastChild.bodyText.should.equal('three');
-		});
-
-		it('should keep aliased item children in sync on insert', function() {
-			var twoAlias = outlineSetup.two.aliasItem(),
-				newItem = outline.createItem('new!');
-
-			twoAlias.appendChild(newItem);
-			newItem.isAliased.should.be.true;
-			twoAlias.lastChild.bodyText.should.equal('new!');
-			outlineSetup.two.lastChild.bodyText.should.equal('new!');
-		});
-	});
 });

@@ -63,7 +63,6 @@ class Item
 
     @outline = outline
     @_liOrRootUL = liOrRootUL
-    @_aliases = null
     @_editorState = {}
     @_bodyAttributedString = null
     liOrRootUL._item = this
@@ -134,6 +133,8 @@ class Item
   # - `name` The {String} attribute name.
   # - `value` The new attribute value.
   setAttribute: (name, value) ->
+    assert.ok(name != 'id', 'id is reserved attribute name')
+
     outline = @outline
     isInOutline = @isInOutline
 
@@ -143,25 +144,13 @@ class Item
         @setAttribute(name, oldValue)
       outline.beginUpdates()
 
-    @_setAttributeIgnoringAliases(name, value)
-
-    if @isAliased
-      for eachAlias in @aliases
-        eachInOutline = eachAlias.isInOutline
-        eachOutline = eachAlias.outline
-        if eachInOutline then eachOutline.beginUpdates()
-        eachAlias._setAttributeIgnoringAliases(name, value)
-        if eachInOutline then eachOutline.endUpdates()
-
-    if isInOutline
-      outline.endUpdates()
-
-  _setAttributeIgnoringAliases: (name, value) ->
-    assert.ok(name != 'id', 'id is reserved attribute name')
     if value == undefined
       @_liOrRootUL.removeAttribute(name)
     else
       @_liOrRootUL.setAttribute(name, value)
+
+    if isInOutline
+      outline.endUpdates()
 
   ###
   Section: Body Text
@@ -304,6 +293,9 @@ class Item
   # - `location` Start location character index.
   # - `length` Range length.
   replaceBodyTextInRange: (insertedText, location, length) ->
+    if @isRoot
+      return
+
     attributedBodyText = @attributedBodyText
     isInOutline = @isInOutline
     outline = @outline
@@ -337,24 +329,18 @@ class Item
 
       outline.beginUpdates()
 
-    @_replaceBodyTextInRangeIgnoringAliases(insertedText, location, length)
-
-    if @isAliased
-      for eachAlias in @aliases
-        eachInOutline = eachAlias.isInOutline
-        eachOutline = eachAlias.outline
-
-        if eachInOutline
-          eachOutline.beginUpdates()
-
-        eachAlias._replaceBodyTextInRangeIgnoringAliases(
-          insertedText,
-          location,
-          length
-        )
-
-        if eachInOutline
-          eachOutline.endUpdates()
+    li = @_liOrRootUL
+    bodyP = _bodyP(li)
+    attributedBodyText = @attributedBodyText
+    ownerDocument = li.ownerDocument
+    attributedBodyText.replaceCharactersInRange(insertedText, location, length)
+    newBodyPContent = ItemBodyEncoder.attributedStringToDocumentFragment(
+      attributedBodyText,
+      ownerDocument
+    )
+    newBodyP = ownerDocument.createElement('P')
+    newBodyP.appendChild(newBodyPContent)
+    li.replaceChild(newBodyP, bodyP)
 
     if isInOutline
       outline.endUpdates()
@@ -371,23 +357,6 @@ class Item
         text = new AttributedString text
       text.addAttributesInRange elements, 0, text.length
     @replaceBodyTextInRange text, @bodyText.length, 0
-
-  _replaceBodyTextInRangeIgnoringAliases: (insertedText, location, length) ->
-    if @isRoot
-      return
-
-    li = @_liOrRootUL
-    bodyP = _bodyP(li)
-    attributedBodyText = @attributedBodyText
-    ownerDocument = li.ownerDocument
-    attributedBodyText.replaceCharactersInRange(insertedText, location, length)
-    newBodyPContent = ItemBodyEncoder.attributedStringToDocumentFragment(
-      attributedBodyText,
-      ownerDocument
-    )
-    newBodyP = ownerDocument.createElement('P')
-    newBodyP.appendChild(newBodyPContent)
-    li.replaceChild(newBodyP, bodyP)
 
   ###
   Section: Outline Structure
@@ -611,12 +580,6 @@ class Item
   # - `children` {Array} of {Item}s to insert.
   # - `referenceSibling` (optional) The referenced sibling {Item}.
   insertChildrenBefore: (children, referenceSibling) ->
-    _aliasChildren = (children) ->
-      aliases = []
-      for each in children
-        aliases.push each.aliasItem()
-      aliases
-
     isInOutline = @isInOutline
     outline = @outline
 
@@ -627,32 +590,6 @@ class Item
         @removeChildren(children)
       outline.beginUpdates()
 
-    @_insertChildrenBeforeIgnoringAliases(children, referenceSibling)
-
-    if @isAliased
-      if referenceSibling
-        for eachReferenceSiblingAlias in referenceSibling.aliases
-          eachReferenceSiblingAlias.parent._insertChildrenBeforeIgnoringAliases(
-            _aliasChildren(children),
-            eachReferenceSiblingAlias
-          )
-      else
-        for eachAlias in @aliases
-          eachInOutline = eachAlias.isInOutline
-          eachOutline = eachAlias.outline
-          if eachInOutline
-            eachOutline.beginUpdates()
-          eachAlias._insertChildrenBeforeIgnoringAliases(
-            _aliasChildren(children),
-            null
-          )
-          if eachInOutline
-            eachOutline.endUpdates()
-
-    if isInOutline
-      outline.endUpdates()
-
-  _insertChildrenBeforeIgnoringAliases: (children, referenceSibling) ->
     ownerDocument = @_liOrRootUL.ownerDocument
     documentFragment = ownerDocument.createDocumentFragment()
     referenceSiblingLI = referenceSibling?._liOrRootUL
@@ -666,6 +603,9 @@ class Item
       documentFragment.appendChild(each._liOrRootUL)
 
     childrenUL.insertBefore(documentFragment, referenceSiblingLI)
+
+    if isInOutline
+      outline.endUpdates()
 
   # Public: Append the new children to this item's list of children.
   #
@@ -696,46 +636,24 @@ class Item
         @insertChildrenBefore(children, nextSibling)
       outline.beginUpdates()
 
-    @_removeChildrenIgnoringAliases(children)
-
-    if @isAliased
-      for eachAlias in @aliases
-        eachInOutline = eachAlias.isInOutline
-        eachOutline = eachAlias.outline
-
-        if eachInOutline
-          eachOutline.beginUpdates()
-
-        eachAliasChildrenToRemove = []
-        for eachChild in children
-          for eachChildAlias in eachChild.aliases
-            if eachChildAlias.parent == eachAlias
-              eachAliasChildrenToRemove.push(eachChildAlias)
-
-        eachAlias._removeChildrenIgnoringAliases(eachAliasChildrenToRemove)
-
-        if eachInOutline
-          eachOutline.endUpdates()
-
-    if isInOutline
-      outline.endUpdates()
-
-  _removeChildrenIgnoringAliases: (children) ->
     siblingChildren = []
     outerThis = this
     lastSibling
 
     for each in children
       if lastSibling and lastSibling.nextSibling != each
-        @_removeSiblingChildrenIgnoringAliases(siblingChildren)
+        @_removeSiblingChildren(siblingChildren)
         siblingChildren = [each]
       else
         siblingChildren.push(each)
       lastSibling = each
 
-    @_removeSiblingChildrenIgnoringAliases(siblingChildren)
+    @_removeSiblingChildren(siblingChildren)
 
-  _removeSiblingChildrenIgnoringAliases: (siblingChildren) ->
+    if isInOutline
+      outline.endUpdates()
+
+  _removeSiblingChildren: (siblingChildren) ->
     if @isInOutline
       first = siblingChildren[0]
       last = siblingChildren[siblingChildren.length - 1]
@@ -760,19 +678,6 @@ class Item
   # Public: Remove this item from it's parent item if it has a parent.
   removeFromParent: ->
     @parent?.removeChild(this)
-
-  ###
-  Section: Aliases
-  ###
-
-  Object.defineProperty @::, 'isAliased',
-    get: -> @_aliases != null
-
-  Object.defineProperty @::, 'aliases',
-    get: -> @_aliases
-
-  aliasItem: ->
-    @outline.aliasItem(this)
 
   ###
   Section: Editor State
