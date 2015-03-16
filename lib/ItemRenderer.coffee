@@ -1,7 +1,7 @@
-ChildrenULAnimation = require './animations/ChildrenULAnimation'
-LIInsertAnimation = require './animations/LIInsertAnimation'
-LIRemoveAnimation = require './animations/LIRemoveAnimation'
-LIMoveAnimation = require './animations/LIMoveAnimation'
+ChildrenAnimation = require './animations/ChildrenAnimation'
+InsertAnimation = require './animations/InsertAnimation'
+RemoveAnimation = require './animations/RemoveAnimation'
+MoveAnimation = require './animations/MoveAnimation'
 ItemBodyEncoder = require './ItemBodyEncoder'
 Constants = require './Constants'
 Mutation = require './Mutation'
@@ -368,16 +368,16 @@ class ItemRenderer
     animation
 
   animateExpandRenderedChildrenUL: (item, renderedLI) ->
-    @animationForItem(item, ChildrenULAnimation).expand renderedLI, @editorElement.animationContext()
+    @animationForItem(item, ChildrenAnimation).expand renderedLI, @editorElement.animationContext()
 
   animateCollapseRenderedChildrenUL: (item, renderedLI) ->
-    @animationForItem(item, ChildrenULAnimation).collapse renderedLI, @editorElement.animationContext()
+    @animationForItem(item, ChildrenAnimation).collapse renderedLI, @editorElement.animationContext()
 
   animateInsertRenderedItemLI: (item, renderedLI) ->
-    @animationForItem(item, LIInsertAnimation).insert renderedLI, @editorElement.animationContext()
+    @animationForItem(item, InsertAnimation).insert renderedLI, @editorElement.animationContext()
 
   animateRemoveRenderedItemLI: (item, renderedLI) ->
-    @animationForItem(item, LIRemoveAnimation).remove renderedLI, @editorElement.animationContext()
+    @animationForItem(item, RemoveAnimation).remove renderedLI, @editorElement.animationContext()
 
   renderedItemLIPosition: (renderedLI) ->
     renderedPRect = ItemRenderer.renderedBodyTextPForRenderedLI(renderedLI).getBoundingClientRect()
@@ -414,7 +414,7 @@ class ItemRenderer
             startPosition.left += startOffset.xOffset
             startPosition.top += startOffset.yOffset
             startPosition.bottom += startOffset.yOffset
-          @animationForItem(each, LIMoveAnimation).beginMove renderedLI, startPosition
+          @animationForItem(each, MoveAnimation).beginMove renderedLI, startPosition
 
     firstItem = items[0]
     lastItem = items[items.length - 1]
@@ -463,7 +463,7 @@ class ItemRenderer
 
     if animate
       for each in items
-        animation = animations[each.id + LIMoveAnimation.id]
+        animation = animations[each.id + MoveAnimation.id]
         renderedLI = @renderedLIForItem each
 
         if animation

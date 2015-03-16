@@ -4,9 +4,9 @@ Velocity = require 'velocity-animate'
 Util = require '../Util'
 
 module.exports =
-class LIMoveAnimation
+class MoveAnimation
 
-  @id = 'ItemLIMove'
+  @id = 'MoveAnimation'
 
   constructor: (id, item, itemRenderer) ->
     @_id = id

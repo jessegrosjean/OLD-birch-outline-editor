@@ -6,9 +6,9 @@ assert = require 'assert'
 Util = require '../Util'
 
 module.exports =
-class ChildrenULAnimation
+class ChildrenAnimation
 
-  @id = 'ChildrenUL'
+  @id = 'Children'
 
   constructor: (id, item, itemRenderer) ->
     @itemRenderer = itemRenderer

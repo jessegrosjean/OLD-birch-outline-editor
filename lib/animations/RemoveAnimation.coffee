@@ -5,9 +5,9 @@ Constants = require '../Constants'
 Util = require '../Util'
 
 module.exports =
-class LIRemoveAnimation
+class RemoveAnimation
 
-  @id = 'ItemLIRemove'
+  @id = 'RemoveAnimation'
 
   constructor: (id, item, itemRenderer) ->
     @itemRenderer = itemRenderer

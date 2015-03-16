@@ -1,9 +1,9 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-ChildrenULAnimation = require './animations/ChildrenULAnimation'
-LIInsertAnimation = require './animations/LIInsertAnimation'
-LIRemoveAnimation = require './animations/LIRemoveAnimation'
-LIMoveAnimation = require './animations/LIMoveAnimation'
+ChildrenAnimation = require './animations/ChildrenAnimation'
+InsertAnimation = require './animations/InsertAnimation'
+RemoveAnimation = require './animations/RemoveAnimation'
+MoveAnimation = require './animations/MoveAnimation'
 FocusElement = require './elements/FocusElement'
 AttributedString = require './AttributedString'
 ItemBodyEncoder = require './ItemBodyEncoder'
