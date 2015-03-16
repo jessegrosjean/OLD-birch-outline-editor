@@ -486,7 +486,7 @@ class ItemRenderer
     if UL
       itemContentDIV = ItemRenderer.renderedItemContentDIVForRenderedLI LI
       itemContentRect = itemContentDIV.getBoundingClientRect()
-      if clientY > itemContentRect.top and clientY < itemContentRect.bottom
+      if clientY < itemContentRect.bottom
         @pickBodyTextP clientX, clientY, ItemRenderer.renderedBodyTextPForRenderedLI LI
       else
         children = UL.children
