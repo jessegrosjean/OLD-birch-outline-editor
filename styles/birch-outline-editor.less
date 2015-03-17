@@ -1,24 +1,32 @@
-// The ui-variables file is provided by base themes provided by Atom.
-//
-// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
-// for a full listing of what's available.
 
-// Once Atom supports LESS 2.4 should (optionally) so this will also run in browser.
-@syntax-text-color: black;
-@syntax-background-color: white;
+
+@import "default-ui-variables";
+@import "default-syntax-variables";
+
 @syntax-selection-color: #a7caff;
 @syntax-secondary-selection-color: #EDF4FF;
 @syntax-cursor-color: #007aff;
-@syntax-invisible-character-color: #ccc;
+
+@ui-site-color-1: @background-color-success; // green
+@ui-site-color-2: @background-color-info; // blue
+@ui-site-color-3: @background-color-warning; // orange
+@ui-site-color-4: #db2ff4; // purple
+@ui-site-color-5: #f5e11d; // yellow
 
 //@import "ui-variables";
 //@import "syntax-variables";
+
+@import "../packages/status.less";
+@import "../packages/tags.less";
+@import "../packages/mentions.less";
+@import "../packages/priorities.less";
 
 @font-size: 16px;
 @font-family: 'Open Sans', Helvetica;
 @line-height: round(@font-size * 1.5);
 @item-indent-spacing: round(@font-size * 1.5);
 @item-vertical-spacing: round(@font-size / 4.0);
+@item-badge-spacing: round(@line-height / 4);
 
 birch-outline-editor {
   color: @syntax-text-color;
@@ -79,7 +87,7 @@ birch-outline-editor > ul {
 }
 
 //
-// Outline Structure
+// Structure
 //
 
 .bitem {
@@ -141,47 +149,51 @@ birch-outline-editor > ul {
   user-select: all;
   user-modify: read-write;
   white-space: pre-wrap;
-  margin-right: round(@line-height / 4);
+  margin-right: @item-badge-spacing;
   &:focus {
     outline-color: transparent;
     outline-style: none;
   }
 }
 
-.bbadges {
-  display: inline-block;
-  vertical-align: middle;
-  font-size: round(@font-size * 0.7);
-  line-height: round(@line-height * 0.7);
-}
-
-.bbadges > a {
-  padding: 0px 2px;
-  border-radius: 2px;
-  color: white;
-  text-decoration:none;
-}
-
-.bbadges > .btag {
-  background: #5bc0de;
-}
-
-.bbadges > .btag:before {
-  content: "#";
-}
-
-.bbadges > .bmention {
-  background: #E0FFE0;
-}
-
-.bbadges > .bmention:before {
-  content: "@";
-}
-
 .bchildren {
   list-style-type: none;
   padding-left: 0;
   margin: 0;
+}
+
+//
+// Badges
+//
+
+.bbadges {
+  display: inline-block;
+  vertical-align: baseline;
+  font-size: round(@font-size * 0.7);
+  line-height: round(@line-height * 0.7);
+}
+
+.bbadge {
+  display: inline-block;
+  vertical-align: baseline;
+  padding: 0px 2px;
+  border-radius: 2px;
+  margin-right: @item-badge-spacing;
+  color: white;
+  background: @syntax-invisible-character-color;
+  text-decoration:none;
+}
+
+.bduration {
+  &:before {
+    content: "Timer";
+  }
+}
+
+.bdue {
+  &:before {
+    content: "Alarm";
+  }
 }
 
 //
@@ -253,6 +265,10 @@ birch-outline-editor > ul {
 .bdropafter > .bbranch > .bitemcontent::after {
   margin: -@drop-ball-radius + @item-vertical-spacing 0 0 -@drop-ball-diameter;
 }
+
+//
+// Attributes
+//
 
 /*
 
@@ -387,11 +403,4 @@ birch-link-editor {
   }
 }
 
-//
-// Type styling, move this out of core.
-//
-
-.bitem[data-done] > .bcontent > .bbody {
-  text-decoration: line-through;
-}
 */

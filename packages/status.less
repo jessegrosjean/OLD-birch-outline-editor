@@ -1,0 +1,19 @@
+.bbadge.bstatus {
+  &[data-status="waiting"] {
+    &:before {
+      content: "waiting";
+    }
+  }
+  &[data-priority="doing"] {
+    &:before {
+      content: "doing";
+    }
+  }
+  &[data-priority="done"] {
+  	display: none;
+  }
+}
+
+.bitem[data-status="done"] > .bbranch > .bitemcontent > .bbodytext {
+  text-decoration: line-through;
+}
