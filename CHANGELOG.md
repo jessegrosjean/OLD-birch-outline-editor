@@ -2,6 +2,10 @@
 
 ## 1.2.0
 
+- Added support for rendering item badges.
+- Added support for rendering syntax highlighted body text.
+- Added many new allowed formatting elements in file format.
+- Changed runtime DOM structure, any custom styles likely need updating.
 - Fixed bug in some cases of shifting items to the left.
 
 ## 1.1.0
