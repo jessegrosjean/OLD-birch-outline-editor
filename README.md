@@ -84,6 +84,8 @@ Things to notice:
 
 4. The `ul`, `li`, `p` tag structure is fixed, you can't omit or add new elements into that structure.
 
-5. Formatting tags are allowed inside the `p` element. Right now they are limited to `a`, `b`, `i`, `s`, `code`, `span`, and `u`.
+
+
+5. [Inline text semantics](https://developer.mozilla.org/en-US/docs/Web/HTML/Element#Inline_text_semantics) elements are allowed inside the `p` element (including: `a`, `b`, `i`, etc.). In addition `audio`, `img`, `video`, `del`, and `ins` are allowed.
 
 6. You can extend the format to store custom data by adding attributes to `li` elements and formatting elements.
