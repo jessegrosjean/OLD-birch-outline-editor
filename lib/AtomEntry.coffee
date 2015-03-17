@@ -48,6 +48,12 @@ module.exports = BirchOutlineEditor =
     atom.workspace.onDidAddOutlineEditor = outlineEditorService.onDidAddOutlineEditor.bind(outlineEditorService)
     atom.workspace.observeOutlineEditors = outlineEditorService.observeOutlineEditors.bind(outlineEditorService)
 
+    require '../packages/durations'
+    require '../packages/mentions'
+    require '../packages/priorities'
+    require '../packages/status'
+    require '../packages/tags'
+
     #@initializeGlobalOutlineEditorStyleSheet()
     #@observeTextEditorFontConfig()
 

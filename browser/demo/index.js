@@ -1,7 +1,14 @@
-var OutlineEditor = require('birch/OutlineEditor'),
-	Outline = require('birch/Outline'),
+var OutlineEditorService = require('birch/OutlineEditorService'),
+	OutlineEditor = OutlineEditorService.OutlineEditor,
+	Outline = OutlineEditorService.Outline,
 	date = new Date(),
 	count = 1;
+
+require('../../packages/durations');
+require('../../packages/mentions');
+require('../../packages/priorities');
+require('../../packages/status');
+require('../../packages/tags');
 
 function createBranch(outline, depth, breadth) {
 	var item = outline.createItem(count++ + ' ' + date);
@@ -50,6 +57,9 @@ for (var i = 0; i < 10000; i++) {
 outline.root.appendChild(outline.createItem('a'));
 outline.root.appendChild(outline.createItem('b'));
 outline.root.appendChild(outline.createItem('c'));
+
+outline.root.firstChild.setAttribute('data-tags', 'one, two, three');
+outline.root.lastChild.setAttribute('data-mentions', 'jesse');
 
 var outline3 = new Outline();
 outline3.root.appendChild(outline3.createItem('three'));
