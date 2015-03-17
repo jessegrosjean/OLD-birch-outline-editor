@@ -30,6 +30,11 @@ document.addEventListener('keydown', (e) ->
 window.atom =
   commands: commands
   keymaps: keymaps
+  workspace:
+    getPaneItems: -> []
+    onDidAddPaneItem: (callback) ->
+      new Disposable()
+
   deserializers:
   	add: ->
   inBrowserMode: -> true
