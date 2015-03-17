@@ -438,7 +438,7 @@ class OutlineEditor extends Model
     @toggleFoldItems items, true
 
   ###
-  Section: Item Filter Path
+  Section: Filtering Items
   ###
 
   itemFilterPath: ->
@@ -479,6 +479,58 @@ class OutlineEditor extends Model
         eachState.matchedAncestor = true
         itemFilterPathItems.push(each)
       each = each.parent
+
+  ###
+  Section: Rendering Items
+  ###
+
+  # Public: Render additional text formatting elements in an {Item}'s body
+  # text. Intended to support syntax highlighting.
+  #
+  # ## Examples
+  #
+  # ```coffee
+  # editor.addItemBodyTextRenderer (item, renderElementInBodyTextRange) ->
+  #   highlight = 'super!'
+  #   while (index = item.bodyText.indexOf highlight, index) != -1
+  #     renderElementInBodyTextRange 'B', null, index, highlight.length
+  #     index += highlight.length
+  # ```
+  #
+  # * `callback` {Function} Text rendering function.
+  #   * `item` {Item} being rendered.
+  #   * `renderElementInBodyTextRange` {Function} Render text element, accepts the same parameters as {Item::addElementInBodyTextRange}.
+  # * `priority` (optional) {Number} Determines rendering order.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to remove the renderer.
+  addItemBodyTextRenderer: (callback, priority=0) ->
+    @outlineEditorElement.itemRenderer.addTextRenderer callback, priority
+
+  # Public: Render item badges after an {Item}'s body text. Item badges are
+  # intended to make visible item attribute values. For example badges are
+  # used to display the `data-priority` attribute of an item.
+  #
+  # ## Examples
+  #
+  # ```coffee
+  # editor.addItemBadgeRenderer (item, renderBadgeElement) ->
+  #   if tags = item.attribute 'data-tags'
+  #     for each in tags.split ','
+  #       span = document.createElement 'A'
+  #       span.className = 'btag'
+  #       span.textContent = each.trim()
+  #       renderBadgeElement span
+  # ```
+  #
+  # * `callback` {Function} Badge rendering function.
+  #   * `item` {Item} being rendered.
+  #   * `renderBadgeElement` {Function} Render passed in badge element.
+  #     * `badge` {Element} DOM badge element.
+  # * `priority` (optional) {Number} Determines rendering order.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to remove the renderer.
+  addItemBadgeRenderer: (callback, priority=0) ->
+    @outlineEditorElement.itemRenderer.addBadgeRenderer callback, priority
 
   ###
   Section: Item Visibility

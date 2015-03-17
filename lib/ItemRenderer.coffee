@@ -2,10 +2,19 @@ ChildrenAnimation = require './animations/ChildrenAnimation'
 InsertAnimation = require './animations/InsertAnimation'
 RemoveAnimation = require './animations/RemoveAnimation'
 MoveAnimation = require './animations/MoveAnimation'
+{Disposable, CompositeDisposable} = require 'atom'
 ItemBodyEncoder = require './ItemBodyEncoder'
 Constants = require './Constants'
 Mutation = require './Mutation'
 Util = require './Util'
+
+sortPriority = (a, b) ->
+  if a.priority < b.priority
+    -1
+  else if a.priority > b.priority
+    1
+  else
+    0
 
 module.exports =
 class ItemRenderer
@@ -13,20 +22,15 @@ class ItemRenderer
   editor: null
   editorElement: null
   idsToLIs: null
-  renderers: null
+  textRenderers: null
+  badgeRenderers: null
   animations: null
 
   constructor: (@editor, @editorElement) ->
     @idsToLIs = {}
     @animations = {}
-    @renderers = []
-    @renderers.push
-      renderBadges: (item, renderer)->
-        if item.attribute('data-done')
-          span = document.createElement 'A'
-          span.className = 'btag'
-          span.textContent = 'done'
-          renderer span
+    @textRenderers = []
+    @badgeRenderers = []
 
   destroyed: ->
     @editor = null
@@ -127,33 +131,32 @@ class ItemRenderer
     bbodytext
 
   renderBodyTextInnerHTML: (item) ->
-    if @renderers
-      highlighted = null
-
-      for each in @renderers
-        if each.highlightBodyText
-          each.highlightBodyText item, (tagName, attributes, location, length) ->
-            unless highlighted
-              highlighted = item.attributedBodyText.copy()
-            highlighted.addAttributeInRange tagName, attributes, location, length
-
-      if highlighted
-        ItemBodyEncoder.attributedStringToDocumentFragment highlighted, document
+    if @textRenderers
+      renderedText = null
+      for each in @textRenderers
+        each.render item, (tagName, attributes, location, length) ->
+          unless renderedText
+            renderedText = item.attributedBodyText.copy()
+          renderedText.addAttributeInRange tagName, attributes, location, length
+      if renderedText
+        p = document.createElement 'p'
+        p.appendChild ItemBodyEncoder.attributedStringToDocumentFragment renderedText, document
+        p.innerHTML
       else
         item.bodyHTML
     else
       item.bodyHTML
 
   renderBadgesSPAN: (item) ->
-    if @renderers
+    if @badgeRenderers
       bbadges = null
-      for each in @renderers
-        if each.renderBadges
-          each.renderBadges item, (badge) ->
-            unless bbadges
-              bbadges = document.createElement 'SPAN'
-              bbadges.className = 'bbadges'
-            bbadges.appendChild badge
+      for each in @badgeRenderers
+        each.render item, (badgeElement) ->
+          unless bbadges
+            bbadges = document.createElement 'SPAN'
+            bbadges.className = 'bbadges'
+          badgeElement.classList.add 'bbadge'
+          bbadges.appendChild badgeElement
       bbadges
 
   renderChildrenUL: (item) ->
@@ -167,6 +170,32 @@ class ItemRenderer
             bchildren.appendChild @renderItemLI each
           each = each.nextSibling
         bchildren
+
+  addBadgeRenderer: (callback, priority=0) ->
+    renderer =
+      priority: priority
+      render: callback
+
+    @badgeRenderers.push renderer
+    @badgeRenderers.sort sortPriority
+
+    new Disposable =>
+      index = @badgeRenderers.indexOf renderer
+      unless index is -1
+        @badgeRenderers.splice index, 1
+
+  addTextRenderer: (callback, priority=0) ->
+    renderer =
+      priority: priority
+      render: callback
+
+    @textRenderers.push renderer
+    @textRenderers.sort sortPriority
+
+    new Disposable =>
+      index = @textRenderers.indexOf renderer
+      unless index is -1
+        @textRenderers.splice index, 1
 
   ###
   Section: Item Lookup
