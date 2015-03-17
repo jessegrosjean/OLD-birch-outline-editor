@@ -97,8 +97,6 @@
   'cmd-K' : 'birch-outline-editor:edit-link'
   'ctrl-c' : 'birch-outline-editor:clear-formatting'
 
-  'cmd-d' : 'birch-outline-editor:toggle-done'
-
 'birch-outline-editor.outlineMode':
   'left' : 'editor:move-to-beginning-of-paragraph',
   'right' : 'editor:move-to-end-of-paragraph',
@@ -111,6 +109,4 @@
   'f i' : 'birch-outline-editor:hoist',
   'f o' : 'birch-outline-editor:unhoist',
 
-  '.' : 'birch-outline-editor:toggle-fold-items',
-
-  'd' : 'birch-outline-editor:toggle-done'
+  '.' : 'birch-outline-editor:toggle-fold-items'

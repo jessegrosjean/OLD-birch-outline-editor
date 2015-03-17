@@ -837,7 +837,6 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'birch-outline-editor:clear-formatting': -> @editor.clearFormatting()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
-  'birch-outline-editor:toggle-done': -> @editor.toggleDone()
 )
 
 atom.commands.add 'birch-outline-editor', stopEventPropagation(

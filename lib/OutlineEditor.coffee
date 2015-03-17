@@ -1506,24 +1506,6 @@ class OutlineEditor extends Model
     undoManager.endUndoGrouping()
     outline.endUpdates()
 
-  toggleDone: (e) ->
-    outline = @outline
-    undoManager = outline.undoManager
-    doneDate = new Date().toISOString()
-    selectedItems = @selection.items
-    firstItem = selectedItems[0]
-
-    if firstItem
-      if firstItem.hasAttribute('data-done')
-        doneDate = undefined
-
-      outline.beginUpdates()
-      undoManager.beginUndoGrouping()
-      for each in selectedItems
-        each.setAttribute('data-done', doneDate)
-      undoManager.endUndoGrouping()
-      outline.endUpdates()
-
   ###
   Section: Drag and Drop
   ###
