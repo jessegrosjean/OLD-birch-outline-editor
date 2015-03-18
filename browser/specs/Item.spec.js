@@ -46,6 +46,39 @@ describe('Item', function() {
 		]).should.eql([outlineSetup.three, outlineSetup.five]);
 	});
 
+	describe('Attributes', function() {
+		it('should set/get attribute', function () {
+			var five = outlineSetup.five;
+			should(five.getAttribute('test') === undefined);
+			five.setAttribute('test', 'hello');
+			five.getAttribute('test').should.equal('hello');
+		});
+
+		it('should get/set attribute as array', function () {
+			var five = outlineSetup.five;
+			five.setAttribute('test', ['one', 'two', 'three']);
+			five.getAttribute('test').should.equal('one,two,three');
+			five.getAttribute('test', true).should.eql(['one', 'two', 'three']);
+		});
+
+		it('should get/set number attributes', function () {
+			var five = outlineSetup.five;
+			five.setAttribute('test', [1, 2, 3]);
+			five.getAttribute('test').should.equal('1,2,3');
+			five.getAttribute('test', true).should.eql(['1', '2', '3']);
+			five.getAttribute('test', true, Number).should.eql([1, 2, 3]);
+		});
+
+		it('should get/set date attributes', function () {
+			var five = outlineSetup.five;
+			var date = new Date('11/27/76');
+			five.setAttribute('test', [date, date], Date);
+			five.getAttribute('test').should.equal('1976-11-27T05:00:00.000Z,1976-11-27T05:00:00.000Z');
+			five.getAttribute('test', true).should.eql(['1976-11-27T05:00:00.000Z', '1976-11-27T05:00:00.000Z']);
+			five.getAttribute('test', true, Date).should.eql([date, date]);
+		});
+	});
+
 	describe('Body', function() {
 		it('should get', function() {
 			outlineSetup.one.bodyText.should.equal('one');

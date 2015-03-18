@@ -7,7 +7,7 @@ togglePriority = (editor, priority) ->
   firstItem = selectedItems[0]
 
   if firstItem
-    if firstItem.attribute('data-priority') is priority
+    if firstItem.getAttribute('data-priority') is priority
       priority = undefined
 
     outline.beginUpdates()
@@ -19,7 +19,7 @@ togglePriority = (editor, priority) ->
 
 OutlineEditorService.observeOutlineEditors (editor) ->
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
-    if value = item.attribute 'data-priority'
+    if value = item.getAttribute 'data-priority'
       span = document.createElement 'A'
       span.className = 'bpriority'
       span.setAttribute 'data-priority', value

@@ -4,6 +4,7 @@ ItemBodyUndoOperation = require './ItemBodyUndoOperation'
 AttributedString = require './AttributedString'
 ItemBodyEncoder = require './ItemBodyEncoder'
 ItemEditorState = require './ItemEditorState'
+typechecker = require 'typechecker'
 Constants = require './Constants'
 assert = require 'assert'
 Util = require './Util'
@@ -89,6 +90,27 @@ class Item
   Section: Attributes
   ###
 
+  @attributeValueStringToObject: (value, clazz) ->
+    switch clazz
+      when Number
+        parseFloat value
+      when Date
+        new Date value
+      else
+        value
+
+  @objectToAttributeValueString: (object) ->
+    if typechecker.isString object
+      object
+    else if typechecker.isDate object
+      object.toISOString()
+    else if typechecker.isArray object
+      (Item.objectToAttributeValueString(each) for each in object).join ','
+    else if object
+      object.toString()
+    else
+      object
+
   # Public: Read-only unique and persistent {String} ID.
   id: null
   Object.defineProperty @::, 'id',
@@ -121,10 +143,24 @@ class Item
   # not exist will return `undefined`.
   #
   # - `name` The {String} attribute name.
+  # - `array` (optional) {Boolean} true if should split(/\s*,\s*/) value to create an array.
+  # - `clazz` (optional) {Class} ({Number} or {Date}) to convert string values too.
   #
   # Returns attribute value or `undefined`.
+  getAttribute: (name, array, clazz) ->
+    value
+    if value = @_liOrRootUL.getAttribute name
+      if array
+        value = value.split /\s*,\s*/
+        if clazz
+          value = (Item.attributeValueStringToObject(each, clazz) for each in value)
+      else if clazz
+        value = Item.attributeValueStringToObject value, clazz
+    value
+
   attribute: (name) ->
-    @_liOrRootUL.getAttribute(name) or undefined
+    console.log 'Item::attribute is deprecated: Call Item::getAttribute instead'
+    @getAttribute name
 
   # Public: Adds a new attribute or changes the value of an existing
   # attribute. `id` is reserved and an exception is thrown if you try to set
@@ -137,17 +173,18 @@ class Item
 
     outline = @outline
     isInOutline = @isInOutline
+    value = Item.objectToAttributeValueString value
 
     if isInOutline
-      oldValue = @attribute(name)
+      oldValue = @getAttribute name
       outline.undoManager.registerUndoOperation =>
-        @setAttribute(name, oldValue)
+        @setAttribute name, oldValue
       outline.beginUpdates()
 
     if value == undefined
-      @_liOrRootUL.removeAttribute(name)
+      @_liOrRootUL.removeAttribute name
     else
-      @_liOrRootUL.setAttribute(name, value)
+      @_liOrRootUL.setAttribute name, value
 
     if isInOutline
       outline.endUpdates()

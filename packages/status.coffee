@@ -8,7 +8,7 @@ toggleStatus = (editor, status) ->
   firstItem = selectedItems[0]
 
   if firstItem
-    if firstItem.attribute('data-status') is status
+    if firstItem.getAttribute('data-status') is status
       status = undefined
 
     outline.beginUpdates()
@@ -20,7 +20,7 @@ toggleStatus = (editor, status) ->
 
 OutlineEditorService.observeOutlineEditors (editor) ->
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
-    if status = item.attribute 'data-status'
+    if status = item.getAttribute 'data-status'
       span = document.createElement 'A'
       span.className = 'bstatus'
       span.setAttribute 'data-status', status

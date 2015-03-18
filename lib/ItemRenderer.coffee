@@ -45,7 +45,7 @@ class ItemRenderer
     li = document.createElement 'LI'
 
     for name in item.attributeNames
-      if value = item.attribute name
+      if value = item.getAttribute name
         li.setAttribute name, value
 
     li.id = item.id
@@ -278,7 +278,7 @@ class ItemRenderer
     renderedLI = @renderedLIForItem item
     if renderedLI
       if item.hasAttribute attributeName
-        renderedLI.setAttribute attributeName, item.attribute(attributeName)
+        renderedLI.setAttribute attributeName, item.getAttribute(attributeName)
       else
         renderedLI.removeAttribute attributeName
       @updateItemBodyContent item
