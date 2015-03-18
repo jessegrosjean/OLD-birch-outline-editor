@@ -46,7 +46,7 @@ class OutlineLiveQuery extends LiveQuery
     return unless @started
     try
       @xpathExpressionError = null
-      @results = @outline.itemsForXPath(
+      @results = @outline.getItemsForXPath(
         @xpathExpression,
         @namespaceResolver
       )

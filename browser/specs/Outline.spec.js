@@ -19,7 +19,7 @@ describe('Outline', function() {
 	it('should get item by id', function() {
 		var item = outline.createItem('hello');
 		outline.root.appendChild(item);
-		outline.itemForID(item.id).should.equal(item);
+		outline.getItemForID(item.id).should.equal(item);
 	});
 
 	it('should copy item', function() {
@@ -57,7 +57,7 @@ describe('Outline', function() {
 		});
 
 		it('should find items using xpath', function() {
-			var items = outline.itemsForXPath('//li');
+			var items = outline.getItemsForXPath('//li');
 			items.should.eql([
 				outlineSetup.one,
 				outlineSetup.two,
@@ -69,7 +69,7 @@ describe('Outline', function() {
 		});
 
 		it('should only return item once even if multiple xpath matches', function() {
-			var items = outline.itemsForXPath('//*');
+			var items = outline.getItemsForXPath('//*');
 			items.should.eql([
 				outlineSetup.root,
 				outlineSetup.one,

@@ -18,12 +18,12 @@ module.exports = function () {
 
 	var outline = new Outline({outlineStore: htmlDoc}),
 		root = outline.root,
-		one = outline.itemForID('1'),
-		two = outline.itemForID('2'),
-		three = outline.itemForID('3'),
-		four = outline.itemForID('4'),
-		five = outline.itemForID('5'),
-		six = outline.itemForID('6');
+		one = outline.getItemForID('1'),
+		two = outline.getItemForID('2'),
+		three = outline.getItemForID('3'),
+		four = outline.getItemForID('4'),
+		five = outline.getItemForID('5'),
+		six = outline.getItemForID('6');
 
 	return {
 		outline: outline,

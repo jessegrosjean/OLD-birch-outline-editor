@@ -73,7 +73,7 @@ class ItemRenderer
       else
         classes.push 'bitemselected'
 
-    if @editor.hoistedItem() is item
+    if @editor.getHoistedItem() is item
       classes.push 'bhoistedItem'
 
     if @editor.dropParentItem() is item
@@ -160,7 +160,7 @@ class ItemRenderer
       bbadges
 
   renderChildrenUL: (item) ->
-    if @editor.isExpanded(item) or @editor.hoistedItem() is item
+    if @editor.isExpanded(item) or @editor.getHoistedItem() is item
       each = item.firstChild
       if each
         bchildren = document.createElement 'UL'
@@ -205,7 +205,7 @@ class ItemRenderer
     outline = @editor.outline
     while renderedNode
       if id = renderedNode.id
-        if item = outline.itemForID id
+        if item = outline.getItemForID id
           return item
       renderedNode = renderedNode.parentNode
 
@@ -329,7 +329,7 @@ class ItemRenderer
         if animate
           outline = editor.outline
           for eachChildRenderedLI in addedChildrenLIs
-            eachChildItem = outline.itemForID eachChildRenderedLI.id
+            eachChildItem = outline.getItemForID eachChildRenderedLI.id
             @animateInsertRenderedItemLI eachChildItem, eachChildRenderedLI
 
   updateRefreshItemChildren: (item) ->
@@ -429,7 +429,7 @@ class ItemRenderer
     outline = editor.outline
     animate = @editorElement.isAnimationEnabled()
     savedSelectionRange = editor.selection
-    hoistedItem = editor.hoistedItem()
+    hoistedItem = editor.getHoistedItem()
     context = @editorElement.animationContext()
     animations = @animations
 
@@ -461,13 +461,13 @@ class ItemRenderer
     # fist item won't change. In those cases disable all animations except
     # for the slide
     disableAnimation =
-      (newParent is editor.previousVisibleSibling(firstItem) and
+      (newParent is editor.getPreviousVisibleSibling(firstItem) and
        !newNextSibling and
         (!newParentNeedsExpand or
          !newParent.firstChild)) or
       (newParent is firstItemParentParent and
        firstItemParent is lastItem.parent and
-       editor.lastVisibleChild(lastItem.parent) is lastItem)
+       editor.getLastVisibleChild(lastItem.parent) is lastItem)
 
     if disableAnimation
       @editorElement.disableAnimation()

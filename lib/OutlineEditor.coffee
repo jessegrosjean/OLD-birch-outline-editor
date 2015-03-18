@@ -87,7 +87,7 @@ class OutlineEditor extends Model
     {} =
       deserializer: 'OutlineEditor'
       hoistedItemIDs: (each.id for each in @_hoistStack)
-      expandedItemIDs: (each.id for each in @outline.items() when @isExpanded each)
+      expandedItemIDs: (each.id for each in @outline.getItems() when @isExpanded each)
       outline: @outline.serialize()
 
   loadSerializedState: ->
@@ -95,8 +95,8 @@ class OutlineEditor extends Model
     expandedItemIDs = @serializedState.expandedItemIDs
     unless expandedItemIDs
       expandedItemIDs = @outline.serializedState.expandedItemIDs or []
-    @setExpanded (@outline.itemsForIDs expandedItemIDs)
-    @setHoistedItemsStack @outline.itemsForIDs hoistedItemIDs
+    @setExpanded (@outline.getItemsForIDs expandedItemIDs)
+    @setHoistedItemsStack @outline.getItemsForIDs hoistedItemIDs
 
   subscribeToOutline: ->
     outline = @outline
@@ -144,8 +144,8 @@ class OutlineEditor extends Model
       @_overrideIsFocused = false
 
   outlineDidChange: (e) ->
-    if @itemFilterPath()
-      hoistedItem = @hoistedItem()
+    if @getItemFilterPath()
+      hoistedItem = @getHoistedItem()
       for eachMutation in e.mutations
         if eachMutation.type == Mutation.ChildrenChanged
           for eachItem in eachMutation.addedItems
@@ -276,7 +276,7 @@ class OutlineEditor extends Model
   ###
 
   # Public: Returns the current hoisted {Item}.
-  hoistedItem: ->
+  getHoistedItem: ->
     @_hoistStack[@_hoistStack.length - 1]
 
   # Public: Push a new hoisted {Item}.
@@ -284,22 +284,22 @@ class OutlineEditor extends Model
   # - `item` {Item} to hoist.
   hoist: (item) ->
     item ?= @selection.focusItem
-    if item and item != @hoistedItem()
+    if item and item != @getHoistedItem()
       stack = @_hoistStack.slice()
       stack.push(item)
       @setHoistedItemsStack(stack)
-      @moveSelectionRange(@firstVisibleChild(item))
+      @moveSelectionRange(@getFirstVisibleChild(item))
 
   # Public: Pop the current hoisted {Item}.
   unhoist: ->
-    unless @hoistedItem().isRoot
+    unless @getHoistedItem().isRoot
       stack = @_hoistStack.slice()
       lastHoisted = stack.pop()
       @setHoistedItemsStack(stack)
       @moveSelectionRange(lastHoisted)
 
   setHoistedItemsStack: (newHoistedItems) ->
-    oldHoistedItem = @hoistedItem()
+    oldHoistedItem = @getHoistedItem()
     outline = @outline
     next
 
@@ -322,7 +322,7 @@ class OutlineEditor extends Model
 
     @_hoistStack = newHoistedItems
 
-    newHoistedItem = @hoistedItem()
+    newHoistedItem = @getHoistedItem()
     if oldHoistedItem != newHoistedItem
       @outlineEditorElement.updateHoistedItem(oldHoistedItem, newHoistedItem)
 
@@ -330,7 +330,7 @@ class OutlineEditor extends Model
     @_updateBackgroundMessage()
 
   _updateBackgroundMessage: ->
-    if @firstVisibleItem()
+    if @getFirstVisibleItem()
       @outlineEditorElement.setBackgroundMessage ''
     else
       @outlineEditorElement.setBackgroundMessage 'Press <b>Return</b> to create a new item.'
@@ -381,7 +381,7 @@ class OutlineEditor extends Model
           @outlineEditorElement.updateItemExpanded(each)
     else
       # for better animations
-      for each in Item.commonAncestors(items)
+      for each in Item.getCommonAncestors(items)
         if @isExpanded(each) != expanded
           @editorState(each).expanded = expanded
           @outlineEditorElement.updateItemExpanded(each)
@@ -425,7 +425,7 @@ class OutlineEditor extends Model
       expand = not @isExpanded((each for each in items when each.hasChildren)[0])
 
     if fully
-      for each in Item.commonAncestors(items) when each.hasChildren and @isExpanded(each) != expand
+      for each in Item.getCommonAncestors(items) when each.hasChildren and @isExpanded(each) != expand
         foldItems.push each
         foldItems.push each for each in each.descendants when each.hasChildren and @isExpanded(each) != expand
     else
@@ -441,7 +441,7 @@ class OutlineEditor extends Model
   Section: Filtering Items
   ###
 
-  itemFilterPath: ->
+  getItemFilterPath: ->
     @_itemFilterPath
 
   setItemFilterPath: (itemFilterPath) ->
@@ -455,12 +455,12 @@ class OutlineEditor extends Model
 
     if itemFilterPath
       @_itemFilterPathItems = []
-      for each in @outline.itemsForXPath(itemFilterPath)
+      for each in @outline.getItemsForXPath(itemFilterPath)
         @_addItemFilterPathMatch(each)
     else
       @_itemFilterPathItems = null
 
-    @outlineEditorElement.updateHoistedItem(null, @hoistedItem())
+    @outlineEditorElement.updateHoistedItem(null, @getHoistedItem())
     @_revalidateSelectionRange()
 
   _addItemFilterPathMatch: (item) ->
@@ -514,8 +514,8 @@ class OutlineEditor extends Model
   #
   # ```coffee
   # editor.addItemBadgeRenderer (item, renderBadgeElement) ->
-  #   if tags = item.attribute 'data-tags'
-  #     for each in tags.split ','
+  #   if tags = item.getAttribute 'data-tags', true
+  #     for each in tags
   #       span = document.createElement 'A'
   #       span.className = 'btag'
   #       span.textContent = each.trim()
@@ -536,18 +536,6 @@ class OutlineEditor extends Model
   Section: Item Visibility
   ###
 
-  # Public: Returns first visible {Item} in editor.
-  firstVisibleItem: ->
-    @nextVisibleItem(@hoistedItem())
-
-  # Public: Returns last visible {Item} in editor.
-  lastVisibleItem: ->
-    last = @hoistedItem().lastDescendantOrSelf
-    if @isVisible(last)
-      last
-    else
-      @previousVisibleItem(last)
-
   # Public: Determine if an {Item} is visible. An item is visible if it
   # descends from the current hoisted item, and it isn't filtered, and all
   # ancestors up to hoisted node are expanded.
@@ -557,7 +545,7 @@ class OutlineEditor extends Model
   # Returns {Boolean} indicating if item is visible.
   isVisible: (item) ->
     parent = item?.parent
-    hoistedItem = @hoistedItem()
+    hoistedItem = @getHoistedItem()
 
     while parent != hoistedItem
       return false unless @isExpanded(parent)
@@ -579,10 +567,10 @@ class OutlineEditor extends Model
 
     return if @isVisible item
 
-    hoistedItem = @hoistedItem()
+    hoistedItem = @getHoistedItem()
     while not hoistedItem.contains item
       @unhoist()
-      hoistedItem = @hoistedItem()
+      hoistedItem = @getHoistedItem()
 
     parentsToExpand = []
     eachParent = item.parent
@@ -593,14 +581,26 @@ class OutlineEditor extends Model
 
     @setExpanded parentsToExpand
 
-  visibleParent: (item) ->
+  # Public: Returns first visible {Item} in editor.
+  getFirstVisibleItem: ->
+    @getNextVisibleItem(@getHoistedItem())
+
+  # Public: Returns last visible {Item} in editor.
+  getLastVisibleItem: ->
+    last = @getHoistedItem().lastDescendantOrSelf
+    if @isVisible(last)
+      last
+    else
+      @getPreviousVisibleItem(last)
+
+  getVisibleParent: (item) ->
     if @isVisible(item?.parent)
       item.parent
 
   # Public: Returns previous visible sibling {Item} relative to given item.
   #
   # - `item` {Item}
-  previousVisibleSibling: (item) ->
+  getPreviousVisibleSibling: (item) ->
     item = item?.previousSibling
     while item
       if @isVisible(item)
@@ -610,7 +610,7 @@ class OutlineEditor extends Model
   # Public: Returns next visible sibling {Item} relative to given item.
   #
   # - `item` {Item}
-  nextVisibleSibling: (item) ->
+  getNextVisibleSibling: (item) ->
     item = item?.nextSibling
     while item
       if @isVisible(item)
@@ -620,7 +620,7 @@ class OutlineEditor extends Model
   # Public: Returns next visible {Item} relative to given item.
   #
   # - `item` {Item}
-  nextVisibleItem: (item) ->
+  getNextVisibleItem: (item) ->
     item = item?.nextItem
     while item
       if @isVisible(item)
@@ -630,7 +630,7 @@ class OutlineEditor extends Model
   # Public: Returns previous visible {Item} relative to given item.
   #
   # - `item` {Item}
-  previousVisibleItem: (item) ->
+  getPreviousVisibleItem: (item) ->
     item = item?.previousItem
     while item
       if @isVisible(item)
@@ -640,47 +640,47 @@ class OutlineEditor extends Model
   # Public: Returns first visible child {Item} relative to given item.
   #
   # - `item` {Item}
-  firstVisibleChild: (item) ->
+  getFirstVisibleChild: (item) ->
     firstChild = item?.firstChild
     if @isVisible(firstChild)
       return firstChild
-    @nextVisibleSibling(firstChild)
+    @getNextVisibleSibling(firstChild)
 
   # Public: Returns last visible child {Item} relative to given item.
   #
   # - `item` {Item}
-  lastVisibleChild: (item) ->
+  getLastVisibleChild: (item) ->
     lastChild = item?.lastChild
     if @isVisible(lastChild)
       return lastChild
-    @previousVisibleSibling(lastChild)
+    @getPreviousVisibleSibling(lastChild)
 
-  lastVisibleDescendantOrSelf: (item) ->
-    lastChild = item.lastVisibleChild(item)
+  getLastVisibleDescendantOrSelf: (item) ->
+    lastChild = item.getLastVisibleChild(item)
     if lastChild
-      @lastVisibleDescendantOrSelf(lastChild)
+      @getLastVisibleDescendantOrSelf(lastChild)
     else
       item
 
   # Public: Returns previous visible branch {Item} relative to given item.
   #
   # - `item` {Item}
-  previousVisibleBranch: (item) ->
+  getPreviousVisibleBranch: (item) ->
     previousBranch = item?.previousBranch
     if @isVisible(previousBranch)
       previousBranch
     else
-      @previousVisibleBranch(previousBranch)
+      @getPreviousVisibleBranch(previousBranch)
 
   # Public: Returns next visible branch {Item} relative to given item.
   #
   # - `item` {Item}
-  nextVisibleBranch: (item) ->
+  getNextVisibleBranch: (item) ->
     nextBranch = item?.nextBranch
     if @isVisible(nextBranch)
       nextBranch
     else
-      @nextVisibleBranch(nextBranch)
+      @getNextVisibleBranch(nextBranch)
 
   ###
   Section: Focus
@@ -930,7 +930,7 @@ class OutlineEditor extends Model
   selectAll: ->
     if @isOutlineMode()
       @_disableScrollToSelection = true
-      @moveSelectionRange(@firstVisibleItem(), undefined, @lastVisibleItem(), undefined)
+      @moveSelectionRange(@getFirstVisibleItem(), undefined, @getLastVisibleItem(), undefined)
       @_disableScrollToSelection = false
     else
       selectionRange = @selection
@@ -1013,9 +1013,9 @@ class OutlineEditor extends Model
         formattingOffset = currentSelection.startOffset + 1
 
       if formattingOffset > 0
-        @setTypingFormattingTags(focusItem.elementsAtBodyTextIndex(formattingOffset - 1))
+        @setTypingFormattingTags(focusItem.getElementsAtBodyTextIndex(formattingOffset - 1))
       else
-        @setTypingFormattingTags(focusItem.elementsAtBodyTextIndex(formattingOffset))
+        @setTypingFormattingTags(focusItem.getElementsAtBodyTextIndex(formattingOffset))
     else
       @setTypingFormattingTags({})
 
@@ -1106,7 +1106,7 @@ class OutlineEditor extends Model
         @insertItem('', true)
         @moveSelectionRange(focusItem, 0)
       else
-        splitText = focusItem.attributedBodyTextSubstring(focusOffset, -1)
+        splitText = focusItem.getAttributedBodyTextSubstring(focusOffset, -1)
         undoManager = @outline.undoManager
         undoManager.beginUndoGrouping()
         focusItem.replaceBodyTextInRange('', focusOffset, -1)
@@ -1129,7 +1129,7 @@ class OutlineEditor extends Model
     if above
       selectedItem = selectedItems[0]
       if not selectedItem
-        parent = @hoistedItem()
+        parent = @getHoistedItem()
         insertBefore = parent.firstChild
       else
         parent = selectedItem.parent
@@ -1137,7 +1137,7 @@ class OutlineEditor extends Model
     else
       selectedItem = selectedItems[selectedItems.length - 1]
       if not selectedItem
-        parent = @hoistedItem()
+        parent = @getHoistedItem()
         insertBefore = parent.firstChild
       else if @isExpanded(selectedItem)
         parent = selectedItem
@@ -1215,24 +1215,24 @@ class OutlineEditor extends Model
       newParent
 
       if direction == 'up'
-        newNextSibling  = @previousVisibleSibling(startItem)
+        newNextSibling  = @getPreviousVisibleSibling(startItem)
         if newNextSibling
           newParent = startItem.parent
       else if direction == 'down'
         endItem = selectedItems[selectedItems.length - 1]
-        newNextSibling = @nextVisibleSibling(endItem)
+        newNextSibling = @getNextVisibleSibling(endItem)
         if newNextSibling
           newParent = endItem.parent
-          newNextSibling = @nextVisibleSibling(newNextSibling)
+          newNextSibling = @getNextVisibleSibling(newNextSibling)
       else if direction == 'left'
         startItemParent = startItem.parent
-        if startItemParent != @hoistedItem()
+        if startItemParent != @getHoistedItem()
           newParent = startItemParent.parent
-          newNextSibling = @nextVisibleSibling(startItemParent)
+          newNextSibling = @getNextVisibleSibling(startItemParent)
           while newNextSibling and newNextSibling in selectedItems
-            newNextSibling = @nextVisibleSibling(newNextSibling)
+            newNextSibling = @getNextVisibleSibling(newNextSibling)
       else if direction == 'right'
-        newParent = @previousVisibleSibling(startItem)
+        newParent = @getPreviousVisibleSibling(startItem)
 
       if newParent
         @moveItems(selectedItems, newParent, newNextSibling)
@@ -1331,7 +1331,7 @@ class OutlineEditor extends Model
           if startItem == endItem
             startItem.replaceBodyTextInRange('', startOffset, endOffset - startOffset)
           else
-            startItem.replaceBodyTextInRange(endItem.attributedBodyTextSubstring(endOffset, -1), startOffset, -1)
+            startItem.replaceBodyTextInRange(endItem.getAttributedBodyTextSubstring(endOffset, -1), startOffset, -1)
             startItem.appendChildren(endItem.children)
             for each in selectionRange.items[1...]
               each.removeFromParent()
@@ -1345,8 +1345,8 @@ class OutlineEditor extends Model
         startItem = selectedItems[0]
         endItem = selectedItems[selectedItems.length - 1]
         parent = startItem.parent
-        nextSibling = @nextVisibleSibling(endItem)
-        previousSibling = @previousVisibleItem(startItem)
+        nextSibling = @getNextVisibleSibling(endItem)
+        previousSibling = @getPreviousVisibleItem(startItem)
         nextSelection = null
 
         if Selection.isUpstreamDirection(direction)
@@ -1380,7 +1380,7 @@ class OutlineEditor extends Model
         focusItem = selectionRange.focusItem
         startOffset = selectionRange.startOffset
         endOffset = selectionRange.endOffset
-        selectedText = focusItem.attributedBodyTextSubstring(startOffset, endOffset - startOffset)
+        selectedText = focusItem.getAttributedBodyTextSubstring(startOffset, endOffset - startOffset)
         p = document.createElement('P')
         p.appendChild(ItemBodyEncoder.attributedStringToDocumentFragment(selectedText, document))
         dataTransfer.setData('text/plain', selectedText.string())
@@ -1400,7 +1400,7 @@ class OutlineEditor extends Model
     if items.itemFragmentString
       @insertText(items.itemFragmentString)
     else if items.length
-      parent = @hoistedItem()
+      parent = @getHoistedItem()
       insertBefore = null
 
       if selectionRange.isValid
@@ -1445,12 +1445,12 @@ class OutlineEditor extends Model
 
     if selection.isCollapsed
       longestRange = {}
-      linkAttributes = focusItem.elementAtBodyTextIndex('A', selection.focusOffset, null, longestRange)
+      linkAttributes = focusItem.getElementAtBodyTextIndex('A', selection.focusOffset, null, longestRange)
       if linkAttributes?.href != undefined
         @moveSelectionRange(focusItem, longestRange.location, focusItem, longestRange.end)
         selection = @selection
     else
-      linkAttributes = focusItem.elementAtBodyTextIndex('A', selection.focusOffset or 0)
+      linkAttributes = focusItem.getElementAtBodyTextIndex('A', selection.focusOffset or 0)
 
     birchLinkEditor = document.createElement 'birch-link-editor'
     birchLinkEditor.setAttribute 'label', 'Link destination:'
@@ -1501,7 +1501,7 @@ class OutlineEditor extends Model
     if @selection.isCollapsed
       @toggleTypingFormattingTag(tagName)
     else if startItem
-      tagAttributes = startItem.elementAtBodyTextIndex(tagName, @selection.startOffset or 0)
+      tagAttributes = startItem.getElementAtBodyTextIndex(tagName, @selection.startOffset or 0)
       addingTag = tagAttributes is undefined
 
       @_transformSelectedText (eachItem, start, end) ->
@@ -1524,7 +1524,7 @@ class OutlineEditor extends Model
       if focusOffset is focusTextLength
         focusOffset--
 
-      elements = focusItem.elementsAtBodyTextIndex(focusOffset, null, longestRange)
+      elements = focusItem.getElementsAtBodyTextIndex(focusOffset, null, longestRange)
       unless Object.keys(elements).length
         return
 
@@ -1585,7 +1585,7 @@ class OutlineEditor extends Model
 
   setDragState: (state) ->
     if state.dropParentItem and not state.dropInsertBeforeItem
-      state.dropInsertAfterItem = @lastVisibleChild(state.dropParentItem)
+      state.dropInsertAfterItem = @getLastVisibleChild(state.dropParentItem)
 
     oldState = @_dragState
     @outline._draggedItemHack = state.draggedItem

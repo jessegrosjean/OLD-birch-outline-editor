@@ -39,7 +39,7 @@ describe('Item', function() {
 	});
 
 	it('should calculate cover items', function() {
-		Item.commonAncestors([
+		Item.getCommonAncestors([
 			outlineSetup.three,
 			outlineSetup.five,
 			outlineSetup.six,
@@ -110,13 +110,13 @@ describe('Item', function() {
 		describe('Inline Elements', function() {
 			it('should get elements', function() {
 				outlineSetup.one.bodyHTML = '<b>one</b> <img src="boo.png">two three';
-				outlineSetup.one.elementsAtBodyTextIndex(0).should.eql({ B: null });
-				outlineSetup.one.elementsAtBodyTextIndex(4).should.eql({ IMG: { src: 'boo.png' } });
+				outlineSetup.one.getElementsAtBodyTextIndex(0).should.eql({ B: null });
+				outlineSetup.one.getElementsAtBodyTextIndex(4).should.eql({ IMG: { src: 'boo.png' } });
 			});
 
 			it('should get empty elements', function() {
 				outlineSetup.one.bodyText = 'one two three';
-				outlineSetup.one.elementsAtBodyTextIndex(0).should.eql({});
+				outlineSetup.one.getElementsAtBodyTextIndex(0).should.eql({});
 			});
 
 			it('should add elements', function() {

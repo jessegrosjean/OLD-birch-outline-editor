@@ -6,6 +6,7 @@
 - Added support for rendering syntax highlighted body text.
 - Added many new allowed formatting elements in file format.
 - Changed runtime DOM structure, any custom styles likely need updating.
+- Changed API to use 'get' style accessors to better match DOM conventions.
 - Fixed bug in some cases of shifting items to the left.
 
 ## 1.1.0

@@ -47,7 +47,7 @@ Util = require './Util'
 # effectiveRange = end: 0
 # textLength = item.bodyText.length
 # while effectiveRange.end < textLength
-#   console.log item.elementsAtBodyTextIndex effectiveRange.end, effectiveRange
+#   console.log item.getElementsAtBodyTextIndex effectiveRange.end, effectiveRange
 #```
 module.exports =
 class Item
@@ -90,27 +90,6 @@ class Item
   Section: Attributes
   ###
 
-  @attributeValueStringToObject: (value, clazz) ->
-    switch clazz
-      when Number
-        parseFloat value
-      when Date
-        new Date value
-      else
-        value
-
-  @objectToAttributeValueString: (object) ->
-    if typechecker.isString object
-      object
-    else if typechecker.isDate object
-      object.toISOString()
-    else if typechecker.isArray object
-      (Item.objectToAttributeValueString(each) for each in object).join ','
-    else if object
-      object.toString()
-    else
-      object
-
   # Public: Read-only unique and persistent {String} ID.
   id: null
   Object.defineProperty @::, 'id',
@@ -143,8 +122,8 @@ class Item
   # not exist will return `undefined`.
   #
   # - `name` The {String} attribute name.
-  # - `array` (optional) {Boolean} true if should split(/\s*,\s*/) value to create an array.
-  # - `clazz` (optional) {Class} ({Number} or {Date}) to convert string values too.
+  # - `array` (optional) {Boolean} true if should split comma separated value to create an array.
+  # - `clazz` (optional) {Class} ({Number} or {Date}) to convert string values into.
   #
   # Returns attribute value or `undefined`.
   getAttribute: (name, array, clazz) ->
@@ -158,13 +137,10 @@ class Item
         value = Item.attributeValueStringToObject value, clazz
     value
 
-  attribute: (name) ->
-    console.log 'Item::attribute is deprecated: Call Item::getAttribute instead'
-    @getAttribute name
-
   # Public: Adds a new attribute or changes the value of an existing
   # attribute. `id` is reserved and an exception is thrown if you try to set
-  # it.
+  # it. Non string values (such as {Date}s) will be converted to appropriate
+  # string format so that they can be read back using {::getAttribute()}.
   #
   # - `name` The {String} attribute name.
   # - `value` The new attribute value.
@@ -189,11 +165,33 @@ class Item
     if isInOutline
       outline.endUpdates()
 
+  @attributeValueStringToObject: (value, clazz) ->
+    switch clazz
+      when Number
+        parseFloat value
+      when Date
+        new Date value
+      else
+        value
+
+  @objectToAttributeValueString: (object) ->
+    if typechecker.isString object
+      object
+    else if typechecker.isDate object
+      object.toISOString()
+    else if typechecker.isArray object
+      (Item.objectToAttributeValueString(each) for each in object).join ','
+    else if object
+      object.toString()
+    else
+      object
+
   ###
   Section: Body Text
   ###
 
   # Public: Read-only true if this item has body text
+  hasBodyText: null
   Object.defineProperty @::, 'hasBodyText',
     get: -> _bodyP(@_liOrRootUL).innerHTML.length > 0
 
@@ -207,18 +205,18 @@ class Item
       if @_bodyAttributedString
         @_bodyAttributedString.string()
       else
-        ItemBodyEncoder.bodyEncodedTextContent(_bodyP(@_liOrRootUL))
+        ItemBodyEncoder.bodyEncodedTextContent _bodyP(@_liOrRootUL)
     set: (text) ->
-      @replaceBodyTextInRange(text, 0, @bodyText.length)
+      @replaceBodyTextInRange text, 0, @bodyText.length
 
   # Public: Body text as HTML {String}.
   bodyHTML: null
   Object.defineProperty @::, 'bodyHTML',
     get: -> _bodyP(@_liOrRootUL).innerHTML
     set: (html) ->
-      p = @_liOrRootUL.ownerDocument.createElement('P')
+      p = @_liOrRootUL.ownerDocument.createElement 'P'
       p.innerHTML = html
-      @attributedBodyText = ItemBodyEncoder.elementToAttributedString(p, true)
+      @attributedBodyText = ItemBodyEncoder.elementToAttributedString p, true
 
   # Public: Body text as {AttributedString}.
   attributedBodyText: null
@@ -226,19 +224,16 @@ class Item
     get: ->
       if @isRoot
         return new AttributedString
-      @_bodyAttributedString ?= ItemBodyEncoder.elementToAttributedString(
-        _bodyP(@_liOrRootUL),
-        true
-      )
+      @_bodyAttributedString ?= ItemBodyEncoder.elementToAttributedString _bodyP(@_liOrRootUL), true
 
     set: (attributedText) ->
-      @replaceBodyTextInRange(attributedText, 0, @bodyText.length);
+      @replaceBodyTextInRange attributedText, 0, @bodyText.length
 
   # Public: Returns an {AttributedString} substring of this item's body text.
   #
   # - `location` Substring's strart location.
   # - `length` Length of substring to extract.
-  attributedBodyTextSubstring: (location, length) ->
+  getAttributedBodyTextSubstring: (location, length) ->
     @attributedBodyText.attributedSubstring(location, length)
 
   # Public: Looks to see if there's an element with the given `tagName` at the
@@ -253,7 +248,7 @@ class Item
   #    properties will be set to longest effective range of element.
   #
   # Returns elements attribute values as an {Object} or {undefined}
-  elementAtBodyTextIndex: (tagName, index, effectiveRange, longestEffectiveRange) ->
+  getElementAtBodyTextIndex: (tagName, index, effectiveRange, longestEffectiveRange) ->
     assert(tagName == tagName.toUpperCase(), 'Tag Names Must be Uppercase')
     @attributedBodyText.attributeAtIndex(
       tagName,
@@ -270,7 +265,7 @@ class Item
   #    properties will be set to effective range of element.
   # - `longestEffectiveRange` (optional) {Object} whose `location` and `length`
   #    properties will be set to longest effective range of element.
-  elementsAtBodyTextIndex: (index, effectiveRange, longestEffectiveRange) ->
+  getElementsAtBodyTextIndex: (index, effectiveRange, longestEffectiveRange) ->
     @attributedBodyText.attributesAtIndex(
       index,
       effectiveRange,
@@ -296,7 +291,7 @@ class Item
         eachTagName == eachTagName.toUpperCase(),
         'Tag Names Must be Uppercase'
       )
-    changedText = @attributedBodyTextSubstring(location, length)
+    changedText = @getAttributedBodyTextSubstring(location, length)
     changedText.addAttributesInRange(elements, 0, length)
     @replaceBodyTextInRange(changedText, location, length)
 
@@ -316,7 +311,7 @@ class Item
         eachTagName == eachTagName.toUpperCase(),
         'Tag Names Must be Uppercase'
       )
-    changedText = @attributedBodyTextSubstring(location, length)
+    changedText = @getAttributedBodyTextSubstring(location, length)
     changedText.removeAttributesInRange(tagNames, 0, length)
     @replaceBodyTextInRange(changedText, location, length)
 
@@ -565,7 +560,7 @@ class Item
   # - `items` {Array} of {Items}.
   #
   # Returns a {Array} of common ancestor {Items}.
-  @commonAncestors: (items) ->
+  @getCommonAncestors: (items) ->
     commonAncestors = []
     itemIDs = {}
 

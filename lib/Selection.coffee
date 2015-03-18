@@ -316,7 +316,7 @@ class Selection
         focusItem = if upstream then @startItem else @endItem
       next.offsetItem = focusItem
     else
-      next.offsetItem = if upstream then editor.lastVisibleItem() else editor.firstVisibleItem()
+      next.offsetItem = if upstream then editor.getLastVisibleItem() else editor.getFirstVisibleItem()
 
     switch granularity
       when 'sentenceboundary'
@@ -349,7 +349,7 @@ class Selection
             if focusOffset > 0
               next.offset = focusOffset - 1
             else
-              prevItem = editor.previousVisibleItem(focusItem)
+              prevItem = editor.getPreviousVisibleItem(focusItem)
               if prevItem
                 next.offsetItem = prevItem
                 next.offset = prevItem.bodyText.length
@@ -363,7 +363,7 @@ class Selection
             if focusOffset < focusItem.bodyText.length
               next.offset = focusOffset + 1
             else
-              nextItem = editor.nextVisibleItem(focusItem)
+              nextItem = editor.getNextVisibleItem(focusItem)
               if nextItem
                 next.offsetItem = nextItem
                 next.offset = 0
@@ -377,7 +377,7 @@ class Selection
         )
 
         if next.offset is focusOffset
-          nextItem = if upstream then editor.previousVisibleItem(focusItem) else editor.nextVisibleItem(focusItem)
+          nextItem = if upstream then editor.getPreviousVisibleItem(focusItem) else editor.getNextVisibleItem(focusItem)
           if nextItem
             direction = if upstream then 'backward' else 'forward'
             editorSelection = new Selection(@editor, nextItem, if upstream then nextItem.bodyText.length else 0)
@@ -391,42 +391,42 @@ class Selection
         next = @nextItemOffsetByLineFromFocus(focusItem, focusOffset, direction)
 
       when 'paragraph'
-        prevItem = if upstream then editor.previousVisibleItem(focusItem) else editor.nextVisibleItem(focusItem)
+        prevItem = if upstream then editor.getPreviousVisibleItem(focusItem) else editor.getNextVisibleItem(focusItem)
         if prevItem
           next.offsetItem = prevItem
 
       when 'branch'
-        prevItem = if upstream then editor.previousVisibleBranch(focusItem) else editor.nextVisibleBranch(focusItem)
+        prevItem = if upstream then editor.getPreviousVisibleBranch(focusItem) else editor.getNextVisibleBranch(focusItem)
         if prevItem
           next.offsetItem = prevItem
 
       when 'list'
         if upstream
-          next.offsetItem = editor.firstVisibleChild(focusItem.parent)
+          next.offsetItem = editor.getFirstVisibleChild(focusItem.parent)
           unless next.offsetItem
             next = @nextItemOffsetUpstream(direction, 'branch', extending)
         else
-          next.offsetItem = editor.lastVisibleChild(focusItem.parent)
+          next.offsetItem = editor.getLastVisibleChild(focusItem.parent)
           unless next.offsetItem
             next = @nextItemOffsetDownstream(direction, 'branch', extending)
 
       when 'parent'
-        next.offsetItem = editor.visibleParent(focusItem)
+        next.offsetItem = editor.getVisibleParent(focusItem)
         unless next.offsetItem
           next = @nextItemOffsetUpstream(direction, 'branch', extending)
 
       when 'firstchild'
-        next.offsetItem = editor.firstVisibleChild(focusItem)
+        next.offsetItem = editor.getFirstVisibleChild(focusItem)
         unless next.offsetItem
           next = @nextItemOffsetDownstream(direction, 'branch', extending)
 
       when 'lastchild'
-        next.offsetItem = editor.lastVisibleChild(focusItem)
+        next.offsetItem = editor.getLastVisibleChild(focusItem)
         unless next.offsetItem
           next = @nextItemOffsetDownstream(direction, 'branch', extending)
 
       when 'documentboundary'
-        next.offsetItem = if upstream then editor.firstVisibleItem() else editor.lastVisibleItem()
+        next.offsetItem = if upstream then editor.getFirstVisibleItem() else editor.getLastVisibleItem()
 
       else
         throw new Error 'Unexpected Granularity ' + granularity
@@ -465,9 +465,9 @@ class Selection
       nextItem
 
       if upstream
-        nextItem = editor.previousVisibleItem(focusItem)
+        nextItem = editor.getPreviousVisibleItem(focusItem)
       else
-        nextItem = editor.nextVisibleItem(focusItem)
+        nextItem = editor.getNextVisibleItem(focusItem)
 
       if nextItem
         editor.scrollToItemIfNeeded(nextItem) # pick breaks for offscreen items
@@ -507,10 +507,10 @@ class Selection
         items.push(each)
         if each is endItem
           break
-        each = editor.nextVisibleItem(each)
+        each = editor.getNextVisibleItem(each)
 
     @items = items
-    @itemsCommonAncestors = Item.commonAncestors(items)
+    @itemsCommonAncestors = Item.getCommonAncestors(items)
     @startItem = items[0]
     @endItem = items[items.length - 1]
 

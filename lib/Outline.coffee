@@ -20,7 +20,7 @@ Q = require 'q'
 # Internally a {HTMLDocument} is used to store the underlying outline data.
 # You should never modify the content of this HTMLDocument directly, but you
 # can query it using {::evaluateXPath}. The structure of this document is
-# described in [Birch Markdown Language](README#birch-markup-language).
+# described in [Birch Markup Language](README#birch-markup-language).
 #
 # ## Examples
 #
@@ -54,7 +54,7 @@ Q = require 'q'
 # Use XPath to list all items with bold text:
 #
 # ```coffeescript
-# for each in outline.itemsForXPath('//b')
+# for each in outline.getItemsForXPath('//b')
 #   console.log each
 # ```
 class Outline
@@ -167,13 +167,13 @@ class Outline
   # Public: Returns existing {Outline} instance with the given outline id.
   #
   # - `id` {String} outline id.
-  @outlineForID: (id) ->
+  @getOutlineForID: (id) ->
     Outline.idsToOutlines[id]
 
   # Public: Returns existing {Outline} instance with the given file path.
   #
   # - `filePath` {String} outline file path.
-  @outlineForFilePath: (filePath) ->
+  @getOutlineForFilePath: (filePath) ->
     Outline.pathsToOutlines[filePath]
 
   ###
@@ -274,7 +274,7 @@ class Outline
 
   # Public: Returns an {Array} of all {Item}s in the outline (except the
   # root) in outline order.
-  items: ->
+  getItems: ->
     @root.descendants
 
   isEmpty: ->
@@ -286,18 +286,18 @@ class Outline
   # Public: Returns {Item} for given id.
   #
   # - `id` {String} id.
-  itemForID: (id) ->
+  getItemForID: (id) ->
     @outlineStore.getElementById(id)?._item
 
   # Public: Returns {Array} of {Item}s for given {Array} of ids.
   #
   # - `ids` {Array} of ids.
-  itemsForIDs: (ids) ->
+  getItemsForIDs: (ids) ->
     return [] unless ids
 
     items = []
     for each in ids
-      each = @itemForID each
+      each = @getItemForID each
       if each
         items.push each
     items
@@ -376,38 +376,6 @@ class Outline
   Section: Querying Items
   ###
 
-  # Public: XPath query internal HTML structure for matching {Items}.
-  #
-  # Items are considered to match if they, or a node contained in their body
-  # text, matches the XPath.
-  #
-  # - `xpathExpression` {String} xpath expression
-  # - `namespaceResolver` (optional) {String}
-  #
-  # Returns an {Array} of all {Item} matching the
-  # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
-  itemsForXPath: (xpathExpression, namespaceResolver) ->
-    xpathResult = @evaluateXPath(
-      xpathExpression,
-      null,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE
-    )
-    each = xpathResult.iterateNext()
-    lastItem = undefined
-    items = []
-
-    while each
-      while each and not each._item
-        each = each.parentNode
-      if each
-        eachItem = each._item
-        if eachItem != lastItem
-          items.push(eachItem)
-          lastItem = eachItem
-      each = xpathResult.iterateNext()
-
-    return items
-
   # Public: XPath query internal HTML structure.
   #
   # - `xpathExpression` {String} xpath expression
@@ -430,6 +398,38 @@ class Outline
       resultType,
       result
     )
+
+  # Public: XPath query internal HTML structure for matching {Items}.
+  #
+  # Items are considered to match if they, or a node contained in their body
+  # text, matches the XPath.
+  #
+  # - `xpathExpression` {String} xpath expression
+  # - `namespaceResolver` (optional) {String}
+  #
+  # Returns an {Array} of all {Item} matching the
+  # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
+  getItemsForXPath: (xpathExpression, namespaceResolver) ->
+    xpathResult = @evaluateXPath(
+      xpathExpression,
+      null,
+      XPathResult.ORDERED_NODE_ITERATOR_TYPE
+    )
+    each = xpathResult.iterateNext()
+    lastItem = undefined
+    items = []
+
+    while each
+      while each and not each._item
+        each = each.parentNode
+      if each
+        eachItem = each._item
+        if eachItem != lastItem
+          items.push(eachItem)
+          lastItem = eachItem
+      each = xpathResult.iterateNext()
+
+    return items
 
   ###
   Section: Grouping Changes
@@ -636,7 +636,7 @@ class Outline
 
   release: (editorID) ->
     @refcount--
-    for each in @items()
+    for each in @getItems()
       each.clearEditorState editorID
     @destroy() unless @isRetained()
     this

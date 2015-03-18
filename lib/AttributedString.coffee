@@ -11,7 +11,7 @@ Util = require './Util'
 # text and attributes from on {Item}s body text to another items body text.
 # See:
 #
-# - {Item::attributedBodyTextSubstring}
+# - {Item::getAttributedBodyTextSubstring}
 # - {Item::replaceBodyTextInRange}
 class AttributedString
 

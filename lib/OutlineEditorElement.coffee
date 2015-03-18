@@ -182,7 +182,7 @@ class OutlineEditorElement extends HTMLElement
     items = []
     while each and each != endItem
       items.push(each)
-      each = @editor.nextVisibleItem(each)
+      each = @editor.getNextVisibleItem(each)
     results
 
   viewportRect: ->
@@ -555,7 +555,7 @@ class OutlineEditorElement extends HTMLElement
     #  editorID = draggedIDs.editorID
     #  itemID = draggedIDs.itemID
     #  if @id is editorID
-    #    return @editor.outline.itemForID itemID
+    #    return @editor.outline.getItemForID itemID
     #catch
 
   _isInvalidDrop: (dropTarget, draggedItem) ->
@@ -582,11 +582,11 @@ class OutlineEditorElement extends HTMLElement
       if pickedItem.firstChild and @editor.isExpanded(pickedItem)
         {} =
           parent: pickedItem
-          insertBefore: @editor.firstVisibleChild(pickedItem)
+          insertBefore: @editor.getFirstVisibleChild(pickedItem)
       else
         {} =
           parent: pickedItem.parent
-          insertBefore: @editor.nextVisibleSibling(pickedItem)
+          insertBefore: @editor.getNextVisibleSibling(pickedItem)
 
   ###
   Section: Util

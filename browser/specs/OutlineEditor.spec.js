@@ -20,13 +20,13 @@ describe('OutlineEditor', function() {
 
 	describe('Hoisting', function() {
 		it('should hoist root by default', function() {
-			editor.hoistedItem().should.equal(outline.root);
-			editor.isVisible(editor.hoistedItem()).should.be.false;
+			editor.getHoistedItem().should.equal(outline.root);
+			editor.isVisible(editor.getHoistedItem()).should.be.false;
 		});
 
 		it('should make children of hoisted item visible', function() {
 			editor.hoist(outlineSetup.two);
-			editor.isVisible(editor.hoistedItem()).should.be.false;
+			editor.isVisible(editor.getHoistedItem()).should.be.false;
 			editor.isVisible(outlineSetup.three).should.be.true;
 			editor.isSelected(outlineSetup.three).should.be.true;
 			editor.isVisible(outlineSetup.four).should.be.true;
