@@ -105,12 +105,13 @@ class EventRegistery
 
     @emitter.emit 'will-dispatch', syntheticEvent
 
-    while currentTarget
+    while currentTarget and currentTarget.webkitMatchesSelector # second condiation a hack.. otherwise error when currentTarget is window
       for eachListener in listeners
         if matchesSelector(currentTarget, eachListener.selector)
           matched = true
           break if immediatePropagationStopped
           eachListener.callback.call(currentTarget, syntheticEvent)
+
       break if propagationStopped
       break if currentTarget is rootElement
       currentTarget = currentTarget.parentElement ? window
