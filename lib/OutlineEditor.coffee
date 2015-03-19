@@ -1263,6 +1263,22 @@ class OutlineEditor extends Model
         @moveItems(trailingSiblings, item, null)
         @outline.undoManager.setActionName('Demote Siblings')
 
+  groupItems: ->
+    selectedItems = @selection.itemsCommonAncestors
+    if selectedItems.length > 0
+      first = selectedItems[0]
+      group = @outline.createItem ''
+
+      undoManager = @outline.undoManager
+      undoManager.beginUndoGrouping()
+
+      first.parent.insertChildBefore group, first
+      @moveSelectionRange group, 0
+      @moveItems selectedItems, group
+
+      undoManager.endUndoGrouping()
+      undoManager.setActionName('Group Items')
+
   moveItems: (items, newParent, newNextSibling, startOffset) ->
     undoManager = newParent.outline.undoManager
     undoManager.beginUndoGrouping()
