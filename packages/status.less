@@ -1,19 +1,26 @@
+@priority-color-3: #f4ce33; // yellow
+@priority-color-4: #6ccb49; // green
+
 .bbadge.bstatus {
   &[data-status="waiting"] {
+    background: @priority-color-3;
     &:before {
       content: "waiting";
     }
   }
-  &[data-priority="doing"] {
+  &[data-status="active"] {
+    background: @priority-color-4;
     &:before {
-      content: "doing";
+      content: "active";
     }
   }
-  &[data-priority="done"] {
-  	display: none;
+  &[data-status="complete"] {
+    &:before {
+      content: "complete";
+    }
   }
 }
 
-.bitem[data-status="done"] > .bbranch > .bitemcontent > .bbodytext {
+.bitem[data-status="complete"] > .bbranch > .bitemcontent > .bbodytext {
   text-decoration: line-through;
 }

@@ -37,16 +37,17 @@ class OutlineEditorElement extends HTMLElement
     @editor = editor
     @itemRenderer = new ItemRenderer editor, this
     @_animationDisabled = 0
-    @_animationContexts = [Constants.DefaultItemAnimactionContext]
     @_maintainSelection = null
-    @_extendingSelection = false
-    @_extendingSelectionLastScrollTop = undefined
+    @_disableScrolling = 0
+    @_extendingSelectionInteraction = false
+    @_extendingSelectionInteractionLastScrollTop = undefined
     @_extendSelectionDisposables = new CompositeDisposable()
 
     @backgroundMessage = document.createElement('UL')
     @backgroundMessage.classList.add 'background-message'
     @backgroundMessage.classList.add 'centered'
     @backgroundMessage.style.display = 'none'
+    @backgroundMessage.style.position = 'absolute'
     @backgroundMessage.appendChild document.createElement 'LI'
     @appendChild @backgroundMessage
 
@@ -109,6 +110,9 @@ class OutlineEditorElement extends HTMLElement
   Section: Updates
   ###
 
+  prepareUpdateHoistedItem: (oldHoistedItem, newHoistedItem) ->
+    @itemRenderer.prepareUpdateHoistedItem oldHoistedItem, newHoistedItem
+
   updateHoistedItem: (oldHoistedItem, newHoistedItem) ->
     @itemRenderer.updateHoistedItem oldHoistedItem, newHoistedItem
 
@@ -149,15 +153,6 @@ class OutlineEditorElement extends HTMLElement
   enableAnimation: ->
     @_animationDisabled--
 
-  animationContext: ->
-    @_animationContexts[@_animationContexts.length - 1]
-
-  pushAnimationContext: (context) ->
-    @_animationContexts.push(context)
-
-  popAnimationContext: ->
-    @_animationContexts.pop()
-
   animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
     @itemRenderer.animateMoveItems items, newParent, newNextSibling, startOffset
 
@@ -186,42 +181,111 @@ class OutlineEditorElement extends HTMLElement
     results
 
   viewportRect: ->
-    scrollTop = @scrollTop
+    top = @scrollTopWithOverscroll
+    left = @scrollLeftWithOverscroll
     rect = @getBoundingClientRect()
     {} =
-      top: scrollTop
-      left: 0
-      bottom: scrollTop + rect.height
-      right: 0 + rect.width
+      top: top
+      left: left
+      bottom: top + rect.height
+      right: left + rect.width
       width: rect.width
       height: rect.height
 
-  scrollTo: (offset) ->
-    topListElement = @topListElement
+  ###
+  Section: Scrolling
+  ###
 
-    Velocity(topListElement, 'stop', true)
+  isScrollingEnabled: ->
+    @_disableScrolling is 0
 
-    if @scrollTop == offset
+  disableScrolling: ->
+    @_disableScrolling++
+
+  enableScrolling: ->
+    @_disableScrolling--
+
+  Object.defineProperty @::, 'scrollTopWithOverscroll',
+    get: -> @scrollTop + -parseFloat(@topListElement.style.top or '0')
+
+  Object.defineProperty @::, 'scrollLeftWithOverscroll',
+    get: -> -parseFloat(@topListElement.style.left or '0')
+
+  scrollTo: (newScrollLeft, newScrollTop, allowOverscroll) ->
+    # Scrolling is a bit odd... The issues are that out of bounds scrolling
+    # isn't allowed (so for example scrollTop = -10), but we need to get that
+    # negative scroll effect to make hoist animations look right. The other
+    # issue is that scrollLeft is disabled by CSS (I think) because generally
+    # we don't want horizonal scrolling in the editor. But we do need it for
+    # hoist animations.
+    #
+    # To resolve these issues scrolling is implmented in two ways. When
+    # possible normal .scrollTop is used to scroll the editor. But in cases
+    # where that isn't flexible enought then topUL.style.left and
+    # topUL.style.top are used. Generally those cases should only happen
+    # during hoist animations.
+    unless @isScrollingEnabled()
+      return
+
+    scrollLeft = @scrollLeftWithOverscroll
+    scrollTop = @scrollTopWithOverscroll
+    newScrollLeft = scrollLeft if newScrollLeft is undefined
+    newScrollTop = scrollTop if newScrollTop is undefined
+
+    unless allowOverscroll
+      newScrollLeft = 0
+      bottomBoundary = @topListElement.scrollHeight - @viewportRect().height
+      newScrollTop = Math.max 0, newScrollTop
+      newScrollTop = Math.min bottomBoundary, newScrollTop
+
+    Velocity this, 'stop', true
+
+    if scrollLeft is newScrollLeft and scrollTop is newScrollTop
       return
 
     if @isAnimationEnabled()
-      context = @animationContext()
-      Velocity topListElement, 'scroll',
-        duration: context.duration
-        easing: context.easing
-        container: this
-        offset: offset
+      Velocity
+        e: this
+        p:
+          tween: 1
+        o:
+          duration: Constants.ScrollAnimationContext.duration
+          easing: Constants.ScrollAnimationContext.easing
+          progress: (elements, percentComplete, timeRemaining, timeStart, tweenValue) =>
+            nextScrollLeft = scrollLeft + ((newScrollLeft - scrollLeft) * tweenValue)
+            nextScrollTop = scrollTop + ((newScrollTop - scrollTop) * tweenValue)
+            @_scrollTo nextScrollLeft, nextScrollTop
+          complete: (elements) =>
+            @_scrollTo newScrollLeft, newScrollTop
     else
-      @scrollTop = offset
+      @_scrollTo newScrollLeft, newScrollTop
+
+  _scrollTo: (newScrollLeft, newScrollTop) ->
+    topUL = @topListElement
+    scrollHeight = topUL.scrollHeight
+    viewportHeight = @viewportRect().height
+
+    @scrollTop = newScrollTop
+
+    if newScrollTop < 0
+      topUL.style.top = -newScrollTop + 'px'
+    else
+      needMore = newScrollTop - (scrollHeight - viewportHeight)
+      if needMore > 0
+        topUL.style.top = -needMore + 'px'
+      else
+        topUL.style.top = '0px'
+
+    topUL.style.left = -newScrollLeft + 'px'
 
   scrollBy: (delta) ->
-    @scrollTo(@scrollTop + delta)
+    @scrollTo(0, @scrollTop + delta)
 
   scrollToBeginningOfDocument: (e) ->
-    @scrollTo(0)
+    @scrollTo(0, 0)
 
   scrollToEndOfDocument: (e) ->
-    @scrollTo(@topListElement.getBoundingClientRect().height - @viewportRect().height)
+    @scrollTo(0, @topListElement.getBoundingClientRect().height - @viewportRect().height)
 
   scrollPageUp: (e) ->
     @scrollBy(-@viewportRect().height)
@@ -234,11 +298,13 @@ class OutlineEditorElement extends HTMLElement
     align = align or 'center'
     switch align
       when 'top'
-        @scrollTo(startOffset)
+        @scrollTo(0, startOffset)
       when 'center'
-        @scrollTo(startOffset + ((endOffset - startOffset) / 2.0) - (viewportRect.height / 2.0))
+        offsetCenter = startOffset + ((endOffset - startOffset) / 2.0)
+        offsetViewportCenter = offsetCenter - (viewportRect.height / 2.0)
+        @scrollTo(0, offsetViewportCenter)
       when 'bottom'
-        @scrollTo(endOffset - viewportRect.height)
+        @scrollTo(0, endOffset - viewportRect.height)
 
   scrollToOffsetRangeIfNeeded: (startOffset, endOffset, center) ->
     viewportRect = @viewportRect()
@@ -320,6 +386,9 @@ class OutlineEditorElement extends HTMLElement
 
     new Selection(@editor)
 
+  isPerformingExtendSelectionInteraction: ->
+    @_extendingSelectionInteraction
+
   beginExtendSelectionInteraction: (e) ->
     editor = @editor
     pick = @pick(e.clientX, e.clientY)
@@ -337,10 +406,10 @@ class OutlineEditorElement extends HTMLElement
     # e.preventDefault()
 
     if e.button == 0
-      editor._disableScrollToSelection = true
+      @disableScrolling()
       editor._disableSyncDOMSelectionToEditor = true
-      @_extendingSelection = true
-      @_extendingSelectionLastScrollTop = editor.outlineEditorElement.scrollTop
+      @_extendingSelectionInteraction = true
+      @_extendingSelectionInteractionLastScrollTop = editor.outlineEditorElement.scrollTop
       @_extendSelectionDisposables = new CompositeDisposable(
         EventRegistery.listen(document, 'mouseup', @onDocumentMouseUp.bind(this)), # Listen to document otherwise will miss some mouse ups
         EventRegistery.listen('.beditor', 'mousemove', Util.debounce(@onMouseMove.bind(this))),
@@ -360,7 +429,7 @@ class OutlineEditorElement extends HTMLElement
       @editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
   onScroll: (e) ->
-    lastScrollTop = @_extendingSelectionLastScrollTop
+    lastScrollTop = @_extendingSelectionInteractionLastScrollTop
     scrollTop = @scrollTop
     item
 
@@ -372,14 +441,14 @@ class OutlineEditorElement extends HTMLElement
     if item
       @editor.extendSelectionRange(item, undefined)
 
-    @_extendingSelectionLastScrollTop = scrollTop
+    @_extendingSelectionInteractionLastScrollTop = scrollTop
 
   onDocumentMouseUp: (e) ->
     @endExtendSelectionInteraction()
 
   endExtendSelectionInteraction: (e) ->
     editor = @editor
-    editor._disableScrollToSelection = false
+    @enableScrolling()
     editor._disableSyncDOMSelectionToEditor = false
     selectionRange = editor.selection
 
@@ -390,7 +459,7 @@ class OutlineEditorElement extends HTMLElement
 
     @_extendSelectionDisposables.dispose()
     @_extendSelectionDisposables = new CompositeDisposable
-    @_extendingSelection = false
+    @_extendingSelectionInteraction = false
 
   updateSimulatedCursor: ->
     if @useStyledTextCaret
@@ -648,7 +717,6 @@ Event and Command registration
 
 EventRegistery.listen 'birch-outline-editor > ul',
   'mousedown': (e) ->
-    console.log e.target
     editorElement = findOutlineEditorElement e
     editorElement.editor.focus()
     setTimeout ->
@@ -658,7 +726,7 @@ EventRegistery.listen '.bbodytext',
   'focusin': (e) ->
     editorElement = findOutlineEditorElement e
     editor = editorElement.editor
-    unless editorElement._extendingSelection
+    unless editorElement.isPerformingExtendSelectionInteraction()
       focusItem = editorElement.itemForViewNode e.target
       if editor.selection.focusItem != focusItem
         editor.moveSelectionRange focusItem
@@ -752,9 +820,9 @@ EventRegistery.listen '.bhandle',
       setTimeout ->
         if maintainSelection.isTextMode
           editor.focus()
-          editor._disableScrollToSelection = true
+          @disableScrolling()
           editor.moveSelectionRange maintainSelection
-          editor._disableScrollToSelection = false
+          @enableScrolling()
         else
           editor.focus()
 
@@ -764,7 +832,7 @@ EventRegistery.listen '.bhandle',
     editor = editorElement.editor
     if item
       if e.shiftKey
-        editor.hoist item
+        editor.hoistItem item
       else if item.firstChild
         editor.toggleFoldItems item
     e.stopPropagation()
@@ -826,6 +894,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'editor:move-line-down': -> @editor.moveItemsDown()
   'birch-outline-editor:promote-child-items': -> @editor.promoteChildItems()
   'birch-outline-editor:demote-trailing-sibling-items': -> @editor.demoteTrailingSiblingItems()
+  'birch-outline-editor:group-items': -> @editor.groupItems()
   'deleteItemsBackward': -> @editor.deleteItemsBackward()
   'deleteItemsForward': -> @editor.deleteItemsForward()
   'birch-outline-editor:toggle-bold': -> @editor.toggleBold()
@@ -879,7 +948,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:select-paragraph-forward': -> @editor.moveParagraphForwardAndModifySelection()
   'core:select-all': -> @editor.selectAll()
   'editor:select-line': -> @editor.selectLine()
-  'birch-outline-editor:hoist': -> @editor.hoist()
+  'birch-outline-editor:hoist': -> @editor.hoistItem()
   'birch-outline-editor:unhoist': -> @editor.unhoist()
   'editor:scroll-to-top': -> @editor.scrollToBeginningOfDocument()
   'editor:scroll-to-bottom': -> @editor.scrollToEndOfDocument()

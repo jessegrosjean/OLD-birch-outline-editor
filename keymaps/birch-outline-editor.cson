@@ -66,7 +66,8 @@
   'ctrl-cmd-left' : 'editor:outdent-selected-rows'
   'ctrl-cmd-right' : 'editor:indent-selected-rows'
 
-  'cmd-/': 'birch-outline-editor:toggle-line-comments'
+  'alt-cmd-g': 'birch-outline-editor:group-items'
+
   'cmd-j': 'editor:join-lines'
   'cmd-D': 'editor:duplicate-lines'
   'cmd-L': 'editor:split-selections-into-lines'

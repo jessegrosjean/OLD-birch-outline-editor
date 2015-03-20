@@ -248,28 +248,63 @@ class ItemRenderer
   Section: Updates
   ###
 
-  updateHoistedItem: (oldHoistedItem, newHoistedItem) ->
-    #if @editorElement.isAnimationEnabled && oldHoistedItem && newHoistedItem
-      # 1. Find "RelativeToItem" that's visible in both views
-      # 2. Get rect of item in first view.
-      # 3. Disable animation
-      # 4. Render next view
-      # 5. Enable animation
-      # 6. Get rect of item in second view.
-      # 7. Animate topListElement relative based on differece between those two rects.
-      #relativeToItem
-      #oldVisible = editor.isVisible(oldHoistedItem),
-      #  newVisible = editor.isVisible(newHoistedItem);
+  prepareUpdateHoistedItem: (oldHoistedItem, newHoistedItem) ->
+    unless oldHoistedItem
+      return
 
-      #if (newVisible) {
-        # fade out all roots that do not contain new hoisted item.
-        # disable animate
-        # means we are zooming in.
-      #}
-    @editorElement.topListElement.innerHTML = ''
+    editor = @editor
+
+    # Find the first item that's visiible in the old hoisted view and visible
+    # in the new hoisted view. Iterate over visible items in old hoisted view
+    # looking for first that's also visible in next hoisted view.
+    start = oldHoistedItem.firstChild
+    end = oldHoistedItem.nextBranch
+    hoistCommonItem
+    each = start
+
+    while each and each != end and !hoistCommonItem
+      if editor.isVisible each, oldHoistedItem
+        if editor.isVisible each, newHoistedItem
+          hoistCommonItem = each
+        else
+          each = each.nextItem
+      else
+        each = each.nextBranch
+
+    # Couldn't find any currently visible item that's also visible in next
+    # view. So instead search up through ancestors for common item.
+    unless hoistCommonItem
+      hoistCommonItem = editor.getFirstVisibleAncestorOrSelf oldHoistedItem, newHoistedItem
+
+    @hoistAnchorItem = hoistCommonItem
+    @hoistAnchorItemRect = @renderedLIForItem(hoistCommonItem)?.getBoundingClientRect()
+
+  updateHoistedItem: (oldHoistedItem, newHoistedItem) ->
+    editorElement = @editorElement
+    topUL = editorElement.topListElement
+    topUL.innerHTML = ''
     @idsToLIs = {}
     if newHoistedItem
-      @editorElement.topListElement.appendChild @renderItemLI(newHoistedItem)
+      topUL.appendChild @renderItemLI(newHoistedItem)
+
+    if editorElement.isAnimationEnabled()
+      oldAnchorRect = @hoistAnchorItemRect
+      newAnchorRect = @renderedLIForItem(@hoistAnchorItem)?.getBoundingClientRect()
+      if oldAnchorRect and newAnchorRect
+        editorElement.disableAnimation()
+        editorElement.scrollTo(newAnchorRect.left - oldAnchorRect.left, newAnchorRect.top - oldAnchorRect.top, true)
+        editorElement.enableAnimation()
+
+    if @hoistAnchorItem and !oldHoistedItem.contains newHoistedItem
+      # unhoist case, goal is to scroll up as far as possible such that new
+      # anchorRect remains on screen and we do not scroll backward past zero.
+      #@editorElement.scrollTo 0, Math.max(@editorElement.scrollTopWithOverscroll, 0)
+      @editorElement.scrollToItem @hoistAnchorItem, 'bottom'
+    else
+      @editorElement.scrollTo 0, 0
+
+    @hoistAnchorItem = null
+    @hoistAnchorItemRect = null
 
   updateItemClass: (item) ->
     @renderedLIForItem(item)?.className = @renderItemLIClasses item
@@ -400,16 +435,16 @@ class ItemRenderer
     animation
 
   animateExpandRenderedChildrenUL: (item, renderedLI) ->
-    @animationForItem(item, ChildrenAnimation).expand renderedLI, @editorElement.animationContext()
+    @animationForItem(item, ChildrenAnimation).expand renderedLI, Constants.DefaultAnimationContext
 
   animateCollapseRenderedChildrenUL: (item, renderedLI) ->
-    @animationForItem(item, ChildrenAnimation).collapse renderedLI, @editorElement.animationContext()
+    @animationForItem(item, ChildrenAnimation).collapse renderedLI, Constants.DefaultAnimationContext
 
   animateInsertRenderedItemLI: (item, renderedLI) ->
-    @animationForItem(item, InsertAnimation).insert renderedLI, @editorElement.animationContext()
+    @animationForItem(item, InsertAnimation).insert renderedLI, Constants.DefaultAnimationContext
 
   animateRemoveRenderedItemLI: (item, renderedLI) ->
-    @animationForItem(item, RemoveAnimation).remove renderedLI, @editorElement.animationContext()
+    @animationForItem(item, RemoveAnimation).remove renderedLI, Constants.DefaultAnimationContext
 
   renderedItemLIPosition: (renderedLI) ->
     renderedPRect = ItemRenderer.renderedBodyTextSPANForRenderedLI(renderedLI).getBoundingClientRect()
@@ -430,7 +465,6 @@ class ItemRenderer
     animate = @editorElement.isAnimationEnabled()
     savedSelectionRange = editor.selection
     hoistedItem = editor.getHoistedItem()
-    context = @editorElement.animationContext()
     animations = @animations
 
     # Complete all existing animations
@@ -488,7 +522,7 @@ class ItemRenderer
     # Fast temporarily forward all animations to final position. Animation
     # system will automatically continue normal animations on next tick.
     for own key, animation of animations
-      animation.fastForward context
+      animation.fastForward Constants.DefaultAnimationContext
 
     scrollToTop = Number.MAX_VALUE
     scrollToBottom = Number.MIN_VALUE
@@ -502,7 +536,7 @@ class ItemRenderer
           position = @renderedItemLIPosition renderedLI, true
           scrollToTop = Math.min position.top, scrollToTop
           scrollToBottom = Math.max position.bottom, scrollToBottom
-          animation.performMove renderedLI, position, context
+          animation.performMove renderedLI, position, Constants.DefaultAnimationContext
 
     if scrollToTop != Number.MAX_VALUE
       @editorElement.scrollToOffsetRangeIfNeeded scrollToTop, scrollToBottom, true
@@ -522,7 +556,14 @@ class ItemRenderer
         @pickBodyTextSPAN clientX, clientY, ItemRenderer.renderedBodyTextSPANForRenderedLI LI
       else
         children = UL.children
-        high = children.length - 1
+        length = children.length
+
+        if length is 0
+          return {} =
+            nodeCaretPosition: {}
+            itemCaretPosition: {}
+
+        high = length - 1
         low = 0
 
         while low <= high

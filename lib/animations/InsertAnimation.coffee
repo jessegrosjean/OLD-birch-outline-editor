@@ -31,14 +31,15 @@ class InsertAnimation
     @_insertLI = LI
     @_targetHeight = targetHeight
 
-    properties =
-      height: targetHeight
-
-    Velocity LI, properties,
-      easing: context.easing
-      duration: context.duration
-      begin: (elements) ->
-        LI.style.height = '0px'
-        LI.style.overflowY = 'hidden'
-      complete: (elements) =>
-        @complete()
+    Velocity
+      e: LI
+      p:
+        height: targetHeight
+      o:
+        easing: context.easing
+        duration: context.duration
+        begin: (elements) ->
+          LI.style.height = '0px'
+          LI.style.overflowY = 'hidden'
+        complete: (elements) =>
+          @complete()

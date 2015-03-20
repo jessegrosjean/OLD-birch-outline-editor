@@ -106,10 +106,8 @@ birch-outline-editor > ul {
 }
 
 .bhandle {
-  cursor: default;
+  cursor: pointer;
   pointer-events: all;
-  width: @item-indent-spacing;
-  background: none;
   line-height: @line-height;
   font-size: @font-size;
   text-decoration:none;
@@ -118,11 +116,28 @@ birch-outline-editor > ul {
   color: @syntax-text-color;
 }
 
+.bhandle:hover {
+  color: @syntax-text-color;
+}
+
+@handleImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{syntax-text-color}" cx="12px" cy="12px" r="2.5px" /></g></svg>');
+@expandableHandleBackgroundColor: fade(@syntax-text-color, 15%);
+@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{expandableHandleBackgroundColor}" cx="12px" cy="12px" r="8px" /></g></svg>');
+//@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><polygon fill="red" points="14,20 20,20 20,14 14,20"/></g></svg>');
+
+
 .bhandle:before {
-  font-size: @font-size;
-  line-height: @line-height;
+  display: inline-block;
+  width: @item-indent-spacing;
   font-weight: normal;
-  content: '▸';
+  content: '•';
+}
+
+.bhasChildren:not(.bexpanded) > .bbranchcontrols > .bhandle:before {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: @line-height;
+  background-image: @expandableHandleBackgroundImage;
 }
 
 .bborder {
@@ -154,6 +169,10 @@ birch-outline-editor > ul {
     outline-color: transparent;
     outline-style: none;
   }
+  a {
+    color: @syntax-text-color;
+    text-decoration: underline;
+  }
 }
 
 .bchildren {
@@ -179,7 +198,7 @@ birch-outline-editor > ul {
   padding: 0px 2px;
   border-radius: 2px;
   margin-right: @item-badge-spacing;
-  color: white;
+  color: @syntax-background-color;
   background: @syntax-invisible-character-color;
   text-decoration:none;
 }
@@ -264,6 +283,21 @@ birch-outline-editor > ul {
 
 .bdropafter > .bbranch > .bitemcontent::after {
   margin: -@drop-ball-radius + @item-vertical-spacing 0 0 -@drop-ball-diameter;
+}
+
+//
+// UI Styling, move this out of core?
+//
+
+birch-link-editor {
+  .buttonRow {
+    text-align: right;
+  }
+
+  button {
+    min-width: 100px;
+    text-align: right
+  }
 }
 
 //
@@ -386,21 +420,6 @@ birch-outline-editor > ul {
 
 .bdropafter > .bcontent > .bbody::after {
   margin: (@item-spacing - @drop-ball-radius) 0 0 -@drop-ball-diameter;
-}
-
-//
-// UI Styling, move this out of core?
-//
-
-birch-link-editor {
-  .buttonRow {
-    text-align: right;
-  }
-
-  button {
-    min-width: 100px;
-    text-align: right
-  }
 }
 
 */

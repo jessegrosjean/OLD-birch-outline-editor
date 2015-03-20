@@ -62,8 +62,10 @@ outline.root.firstChild.setAttribute('data-tags', 'one, two, three');
 outline.root.lastChild.setAttribute('data-mentions', 'jesse');
 
 var outline3 = new Outline();
+outline3.root.appendChild(outline3.createItem('one'));
+outline3.root.appendChild(outline3.createItem('two'));
 outline3.root.appendChild(outline3.createItem('three'));
-outline3.root.firstChild.appendChild(outline3.createItem('four'));
+outline3.root.lastChild.appendChild(outline3.createItem('four'));
 outline3.root.appendChild(outline3.createItem('five'));
 
 var container1 = document.getElementById('container1'),
@@ -75,6 +77,8 @@ var container1 = document.getElementById('container1'),
 	//keyMap1 = new KeyMap(editor1.shadowRoot, editor1.outlineEditorElement),
 	//keyMap2 = new KeyMap(editor2.shadowRoot, editor2.outlineEditorElement),
 	//keyMap3 = new KeyMap(editor3.shadowRoot, editor3.outlineEditorElement);
+
+editor3.setExpanded(outline3.root.lastChild.previousSibling);
 
 //editor1.tag1 = true;
 //editor2.tag2 = true;

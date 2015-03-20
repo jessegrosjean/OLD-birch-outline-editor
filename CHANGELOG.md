@@ -2,12 +2,17 @@
 
 ## 1.2.0
 
-- Added support for rendering item badges.
-- Added support for rendering syntax highlighted body text.
-- Added many new allowed formatting elements in file format.
+- Added API for rendering item badges.
+- Added API for rendering syntax highlighted body text.
+- Added new allowed formatting elements in file format.
+- Added vertical alignment guides (hide with LESS/CSS)
+- Added Focus-in and Focus-out animations.
 - Added "Group Items" command.
+- Changed item mode selection to include item handle.
+- Changed create a new child when focus-in on an item with no children.
 - Changed runtime DOM structure, any custom styles likely need updating.
 - Changed API to use 'get' style accessors to better match DOM conventions.
+- Changed handle to Workflowy style. Its cleaner and I think will work better when using different icons to indicate different types.
 - Fixed bug in some cases of shifting items to the left.
 
 ## 1.1.0
@@ -31,7 +36,7 @@
 - Fixed clearing formatting at end of line.
 - Fixed dragging scroller to not modify selection.
 - Fixed text caret positioning problems at text wrap boundaries.
-- Started version numbers at 1.0.0 as recommadned by npm.
+- Started version numbers at 1.0.0 as recommended by npm.
 
 ## 0.1.0
 

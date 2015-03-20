@@ -75,14 +75,15 @@ describe('OutlineEditorElement', function() {
 		});
 
 		describe('Editor State', function() {
-			it('should rendered selection state', function() {
+			it('should render selection state', function() {
 				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
-				li.classList.contains('bitemselected').should.be.false;
 				editor.moveSelectionRange(outlineSetup.one);
 				li.classList.contains('bitemselected').should.be.true;
+				editor.moveSelectionRange(outlineSetup.two);
+				li.classList.contains('bitemselected').should.be.false;
 			});
 
-			it('should rendered expanded state', function() {
+			it('should render expanded state', function() {
 				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
 				li.classList.contains('bexpanded').should.be.true;
 				editor.setCollapsed(outlineSetup.one);
@@ -119,6 +120,12 @@ describe('OutlineEditorElement', function() {
 			itemCaretPosition.offsetItem.should.eql(outlineSetup.six);
 			itemCaretPosition.offset.should.eql(3);
 		});
+
+		it('should pick with no items without stackoverflow', function() {
+			outlineSetup.one.removeFromParent()
+			var pick = outlineEditorElement.pick(0, 0);
+		});
+
 	});
 
 	describe('Offset Encoding', function() {

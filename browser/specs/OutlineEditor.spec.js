@@ -25,11 +25,36 @@ describe('OutlineEditor', function() {
 		});
 
 		it('should make children of hoisted item visible', function() {
-			editor.hoist(outlineSetup.two);
+			editor.hoistItem(outlineSetup.two);
 			editor.isVisible(editor.getHoistedItem()).should.be.false;
 			editor.isVisible(outlineSetup.three).should.be.true;
-			editor.isSelected(outlineSetup.three).should.be.true;
 			editor.isVisible(outlineSetup.four).should.be.true;
+		});
+
+		describe('Auto Create Child', function() {
+			it('should autocreate child when needed', function() {
+				should(outlineSetup.three.firstChild).not.be.ok;
+				editor.hoistItem(outlineSetup.three);
+				outlineSetup.three.firstChild.should.be.ok;
+			});
+
+			it('should select autocreated child', function() {
+				editor.hoistItem(outlineSetup.three);
+				editor.isSelected(outlineSetup.three.firstChild).should.be.true;
+			});
+
+			it('should delete autocreated child if empty', function() {
+				editor.hoistItem(outlineSetup.three);
+				editor.unhoist();
+				should(outlineSetup.three.firstChild).not.be.ok;
+			});
+
+			it('should not delete autocreated child if not empty', function() {
+				editor.hoistItem(outlineSetup.three);
+				outlineSetup.three.firstChild.bodyText = 'save me!';
+				editor.unhoist();
+				outlineSetup.three.firstChild.should.be.ok;
+			});
 		});
 	});
 
@@ -80,10 +105,6 @@ describe('OutlineEditor', function() {
 	});
 
 	describe('Selection', function() {
-		it('should be empty by default', function() {
-			editor.selection.items.should.eql([]);
-		});
-
 		it('should select item', function() {
 			editor.moveSelectionRange(outlineSetup.one);
 			editor.selection.items.should.eql([outlineSetup.one]);

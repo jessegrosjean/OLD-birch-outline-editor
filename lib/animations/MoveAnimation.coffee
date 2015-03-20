@@ -71,17 +71,18 @@ class MoveAnimation
 
     Velocity movingLIClone, 'stop', true
 
-    properties =
-      top: position.top
-      left: position.left
-      width: position.width
-
-    Velocity movingLIClone, properties,
-      easing: context.easing
-      duration: context.duration
-      begin: (elements) ->
-        LI.style.opacity = '0'
-      complete: (elements) =>
-        LI.style.opacity = null
-        Util.removeFromDOM movingLIClone
-        @itemRenderer.completedAnimation @_id
+    Velocity
+      e: movingLIClone
+      p:
+        top: position.top
+        left: position.left
+        width: position.width
+      o:
+        easing: context.easing
+        duration: context.duration
+        begin: (elements) ->
+          LI.style.opacity = '0'
+        complete: (elements) =>
+          LI.style.opacity = null
+          Util.removeFromDOM movingLIClone
+          @itemRenderer.completedAnimation @_id

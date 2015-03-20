@@ -37,23 +37,24 @@ class RemoveAnimation
     @_targetHeight = targetHeight
     Velocity LI, 'stop', true
 
-    properties =
-      tween: [targetHeight, startHeight]
-      height: targetHeight
-
-    Velocity LI, properties,
-      easing: context.easing
-      duration: context.duration
-      begin: (elements) ->
-        LI.style.overflowY = 'hidden'
-        LI.style.height = startHeight
-        LI.style.visibility = 'hidden'
-        LI.style.pointerEvents = 'none'
-      progress: (elements, percentComplete, timeRemaining, timeStart, tweenLIHeight) ->
-        if tweenLIHeight < 0
-          LI.style.height = '0px'
-          LI.style.marginBottom = tweenLIHeight + 'px'
-        else
-          LI.style.marginBottom = null
-      complete: (elements) =>
-        @complete()
+    Velocity
+      e: LI
+      p:
+        tween: [targetHeight, startHeight]
+        height: targetHeight
+      o:
+        easing: context.easing
+        duration: context.duration
+        begin: (elements) ->
+          LI.style.overflowY = 'hidden'
+          LI.style.height = startHeight
+          LI.style.visibility = 'hidden'
+          LI.style.pointerEvents = 'none'
+        progress: (elements, percentComplete, timeRemaining, timeStart, tweenLIHeight) ->
+          if tweenLIHeight < 0
+            LI.style.height = '0px'
+            LI.style.marginBottom = tweenLIHeight + 'px'
+          else
+            LI.style.marginBottom = null
+        complete: (elements) =>
+          @complete()

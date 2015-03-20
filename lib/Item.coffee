@@ -86,6 +86,15 @@ class Item
   cloneItem: ->
     @outline.cloneItem(this)
 
+  # Public: Read-only {Boolean} true if this item has no body text and no
+  # attributes and no children.
+  isEmpty: null
+  Object.defineProperty @::, 'isEmpty',
+    get: ->
+      !@hasBodyText and
+      !@firstChild and
+      @attributeNames.length is 0
+
   ###
   Section: Attributes
   ###
@@ -164,6 +173,14 @@ class Item
 
     if isInOutline
       outline.endUpdates()
+
+  # Public: Removes an attribute from the specified item. Attempting to remove
+  # an attribute that is not on the item doesn't raise an exception.
+  #
+  # - `name` The {String} attribute name.
+  removeAttribute: (name) ->
+    if @hasAttribute name
+      @setAttribute name, undefined
 
   @attributeValueStringToObject: (value, clazz) ->
     switch clazz
