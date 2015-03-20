@@ -1,7 +1,7 @@
 {
   "name": "birch-outline-editor",
   "main": "./lib/AtomEntry",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Simple and clean outline editor",
   "repository": "https://github.com/jessegrosjean/birch-outline-editor",
   "license": "Commercial",
