@@ -1,6 +1,10 @@
 # ChangeLog
 
-## 1.2.0
+## 1.3.0
+
+-
+
+## 1.2.1
 
 - Added API for rendering item badges.
 - Added API for rendering syntax highlighted body text.
