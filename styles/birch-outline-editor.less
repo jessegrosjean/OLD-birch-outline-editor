@@ -13,6 +13,34 @@
 @ui-site-color-4: #db2ff4; // purple
 @ui-site-color-5: #f5e11d; // yellow
 
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  font-style: normal;
+  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  font-style: italic;
+  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-Italic.ttf');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: normal;
+  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: italic;
+  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-BoldItalic.ttf');
+}
+
 @import "ui-variables";
 @import "syntax-variables";
 
@@ -83,7 +111,6 @@ birch-outline-editor > ul {
   > .bbranch > .bitemcontent {
     display: none;
   }
-  //margin: @item-vertical-spacing 0;
 }
 
 //
@@ -230,7 +257,7 @@ birch-outline-editor > ul {
 }
 
 .bitemselected {
-  > .bbranchcontrols > .bhandle {
+  > .bbranchcontrols {
     background: @syntax-selection-color;
   }
   > .bbranch {
