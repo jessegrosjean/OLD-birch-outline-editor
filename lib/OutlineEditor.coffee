@@ -746,11 +746,14 @@ class OutlineEditor extends Model
     else
       activeElement = @DOMGetActiveElement()
       outlineEditorElement = @outlineEditorElement
-      activeElement and (outlineEditorElement == activeElement or outlineEditorElement.contains(activeElement))
+      activeElement and (outlineEditorElement is activeElement or outlineEditorElement.contains(activeElement))
 
   # Public: Focus this editor.
   focus: ->
     @outlineEditorElement.focus()
+
+  focusIfNeeded: ->
+    @focus() unless @isFocused()
 
   ###
   Section: Selection
@@ -1014,9 +1017,7 @@ class OutlineEditor extends Model
         newSelection = @_textModeExtendingFromSnapbackRange
         @_textModeExtendingFromSnapbackRange = null
 
-    selectionDidChange = currentSelection.equals(newSelection)
-
-    if not selectionDidChange
+    if not currentSelection.equals(newSelection)
       wasSelectedMarker = 'marker'
       newRangeItems = newSelection.items
       currentRangeItems = currentSelection.items

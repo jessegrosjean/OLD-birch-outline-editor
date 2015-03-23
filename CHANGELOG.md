@@ -3,6 +3,7 @@
 ## 1.3.0
 
 -
+- Fixed problem where editor could lose focus when hoisting.
 
 ## 1.2.1
 

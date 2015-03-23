@@ -281,11 +281,16 @@ class ItemRenderer
 
   updateHoistedItem: (oldHoistedItem, newHoistedItem) ->
     editorElement = @editorElement
+    editor = editorElement.editor
     topUL = editorElement.topListElement
+    focused = editor.isFocused()
     topUL.innerHTML = ''
     @idsToLIs = {}
+
     if newHoistedItem
       topUL.appendChild @renderItemLI(newHoistedItem)
+      if focused
+        editor.focusIfNeeded()
 
     if editorElement.isAnimationEnabled()
       oldAnchorRect = @hoistAnchorItemRect
