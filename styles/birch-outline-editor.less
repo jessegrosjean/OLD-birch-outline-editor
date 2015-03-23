@@ -98,7 +98,7 @@ input[is="outline-editor-focus"] {
 birch-outline-editor > ul {
   cursor: text;
   margin: 0 auto;
-  padding: 0;
+  padding: round(@line-height / 2);
   overflow: hidden;
   min-height: 100%;
   position: relative;
@@ -114,6 +114,7 @@ birch-outline-editor > ul {
   > .bbranch > .bitemcontent {
     display: none;
   }
+
 }
 
 //
@@ -195,13 +196,13 @@ birch-outline-editor > ul {
   user-modify: read-write;
   white-space: pre-wrap;
   margin-right: @item-badge-spacing;
-  &:focus {
-    outline-color: transparent;
-    outline-style: none;
-  }
   a {
     color: @syntax-text-color;
     text-decoration: underline;
+  }
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
   }
 }
 
