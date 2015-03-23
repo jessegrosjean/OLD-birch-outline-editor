@@ -158,7 +158,7 @@ class Outline
   Section: Finding Outlines
   ###
 
-  # Public: Read-only unique, but not persistent, {String} ID.
+  # Public: Read-only unique (not persistent) {String} outline ID.
   id: null
 
   @idsToOutlines: {}

@@ -98,13 +98,14 @@ input[is="outline-editor-focus"] {
 birch-outline-editor > ul {
   cursor: text;
   margin: 0 auto;
-  padding: round(@line-height / 2);
+  padding: 0;
   overflow: hidden;
   min-height: 100%;
   position: relative;
 }
 
 .bhoistedItem {
+  margin: round(@line-height / 2);
   > .bbranchcontrols {
     display: none;
   }
@@ -112,9 +113,23 @@ birch-outline-editor > ul {
     display: none;
   }
   > .bbranch > .bitemcontent {
-    display: none;
+    color: @syntax-cursor-color;
+    cursor: pointer;
+    padding:0;
+    &:before {
+      content: '↖︎';
+    }
+    > .bbodytext {
+      display: none;
+    }
+    > .bbadges {
+      display: none;
+    }
   }
+}
 
+#Birch.bhoistedItem > .bbranch > .bitemcontent::before {
+  display: none;
 }
 
 //
@@ -176,7 +191,7 @@ birch-outline-editor > ul {
 }
 
 .bexpanded > .bbranchcontrols > .bborder {
-  border-left: 1px solid @syntax-invisible-character-color;
+  border-left: 1px dotted @syntax-indent-guide-color;
 }
 
 .bbranch {

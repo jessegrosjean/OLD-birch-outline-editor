@@ -2,8 +2,10 @@
 
 ## 1.3.0
 
+- Added UI indication when outline is hoisted.
 - Dropping file on editor inserts a link to the file.
 - Drag and drop no longer allows dragging item as child of itself.
+- Changed root id in .bml file from `Birch.Root` to `Birch`
 - Fixed problem where editor could lose focus when hoisting.
 
 ## 1.2.1

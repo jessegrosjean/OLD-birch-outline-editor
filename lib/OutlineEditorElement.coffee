@@ -161,19 +161,19 @@ class OutlineEditorElement extends HTMLElement
   Section: Viewport
   ###
 
-  viewportFirstItem: ->
+  getViewportFirstItem: ->
     rect = @getBoundingClientRect()
     midX = rect.left + (rect.width / 2.0)
     @pick(midX, rect.top).itemCaretPosition?.offsetItem
 
-  viewportLastItem: ->
+  getViewportLastItem: ->
     rect = @getBoundingClientRect()
     midX = rect.left + (rect.width / 2.0)
     @pick(midX, rect.bottom - 1).itemCaretPosition?.offsetItem
 
-  viewportItems: ->
-    startItem = @viewportFirstItem()
-    endItem = @viewportLastItem()
+  getViewportItems: ->
+    startItem = @getViewportFirstItem()
+    endItem = @getViewportLastItem()
     each = startItem
     items = []
     while each and each != endItem
@@ -181,7 +181,7 @@ class OutlineEditorElement extends HTMLElement
       each = @editor.getNextVisibleItem(each)
     results
 
-  viewportRect: ->
+  getViewportRect: ->
     top = @scrollTopWithOverscroll
     left = @scrollLeftWithOverscroll
     rect = @getBoundingClientRect()
@@ -235,7 +235,7 @@ class OutlineEditorElement extends HTMLElement
 
     unless allowOverscroll
       newScrollLeft = 0
-      bottomBoundary = @topListElement.scrollHeight - @viewportRect().height
+      bottomBoundary = @topListElement.scrollHeight - @getViewportRect().height
       newScrollTop = Math.max 0, newScrollTop
       newScrollTop = Math.min bottomBoundary, newScrollTop
 
@@ -264,7 +264,7 @@ class OutlineEditorElement extends HTMLElement
   _scrollTo: (newScrollLeft, newScrollTop) ->
     topUL = @topListElement
     scrollHeight = topUL.scrollHeight
-    viewportHeight = @viewportRect().height
+    viewportHeight = @getViewportRect().height
 
     @scrollTop = newScrollTop
 
@@ -286,16 +286,16 @@ class OutlineEditorElement extends HTMLElement
     @scrollTo(0, 0)
 
   scrollToEndOfDocument: (e) ->
-    @scrollTo(0, @topListElement.getBoundingClientRect().height - @viewportRect().height)
+    @scrollTo(0, @topListElement.getBoundingClientRect().height - @getViewportRect().height)
 
   scrollPageUp: (e) ->
-    @scrollBy(-@viewportRect().height)
+    @scrollBy(-@getViewportRect().height)
 
   scrollPageDown: (e) ->
-    @scrollBy(@viewportRect().height)
+    @scrollBy(@getViewportRect().height)
 
   scrollToOffsetRange: (startOffset, endOffset, align) ->
-    viewportRect = @viewportRect()
+    viewportRect = @getViewportRect()
     align = align or 'center'
     switch align
       when 'top'
@@ -308,7 +308,7 @@ class OutlineEditorElement extends HTMLElement
         @scrollTo(0, endOffset - viewportRect.height)
 
   scrollToOffsetRangeIfNeeded: (startOffset, endOffset, center) ->
-    viewportRect = @viewportRect()
+    viewportRect = @getViewportRect()
     rangeHeight = endOffset - startOffset
     scrollTop = viewportRect.top
     scrollBottom = viewportRect.bottom
@@ -335,7 +335,7 @@ class OutlineEditorElement extends HTMLElement
   scrollToItem: (item, align) ->
     viewP = @itemViewPForItem(item)
     if viewP
-      viewportRect = @viewportRect()
+      viewportRect = @getViewportRect()
       scrollTop = viewportRect.top
       itemClientRect = viewP.getBoundingClientRect()
       thisClientRect = @getBoundingClientRect()
@@ -346,7 +346,7 @@ class OutlineEditorElement extends HTMLElement
   scrollToItemIfNeeded: (item, center) ->
     viewP = @itemViewPForItem(item)
     if viewP
-      viewportRect = @viewportRect()
+      viewportRect = @getViewportRect()
       scrollTop = viewportRect.top
       itemClientRect = viewP.getBoundingClientRect()
       thisClientRect = @getBoundingClientRect()
@@ -435,9 +435,9 @@ class OutlineEditorElement extends HTMLElement
     item
 
     if scrollTop < lastScrollTop
-      item = @viewportFirstItem() # Scrolling Up
+      item = @getViewportFirstItem() # Scrolling Up
     else if scrollTop > lastScrollTop
-      item = @viewportLastItem() # Scrolling Down
+      item = @getViewportLastItem() # Scrolling Down
 
     if item
       @editor.extendSelectionRange(item, undefined)
@@ -850,6 +850,12 @@ EventRegistery.listen '.bhandle',
 #
 # Handle clicking on file links
 #
+
+EventRegistery.listen '.bhoistedItem > .bbranch > .bitemcontent',
+  click: (e) ->
+    editorElement = findOutlineEditorElement e
+    editor = editorElement.editor
+    editor.unhoist()
 
 EventRegistery.listen '.bbodytext a',
   click: (e) ->

@@ -80,26 +80,11 @@ class Item
       else
         _bodyP(liOrRootUL).textContent = text
 
-  # Public: Deep clones this item.
-  #
-  # Returns a duplicate {Item}.
-  cloneItem: ->
-    @outline.cloneItem(this)
-
-  # Public: Read-only {Boolean} true if this item has no body text and no
-  # attributes and no children.
-  isEmpty: null
-  Object.defineProperty @::, 'isEmpty',
-    get: ->
-      !@hasBodyText and
-      !@firstChild and
-      @attributeNames.length is 0
-
   ###
   Section: Attributes
   ###
 
-  # Public: Read-only unique and persistent {String} ID.
+  # Public: Read-only unique and persistent {String} item ID.
   id: null
   Object.defineProperty @::, 'id',
     get: -> @_liOrRootUL.id
@@ -202,6 +187,22 @@ class Item
       object.toString()
     else
       object
+
+  ###
+  Section: User Data
+  ###
+
+  getUserData: (userKey) ->
+    @userData?[userKey]
+
+  setUserData: (userKey, userData) ->
+    unless @userData
+      @userData = {}
+
+    if userData is undefined
+      delete @userData[userKey]
+    else
+      @userData[userKey] = userData
 
   ###
   Section: Body Text
@@ -416,6 +417,15 @@ class Item
   Object.defineProperty @::, 'isRoot',
     get: -> @id == Constants.RootID
 
+  # Public: Read-only {Boolean} true if this item has no body text and no
+  # attributes and no children.
+  isEmpty: null
+  Object.defineProperty @::, 'isEmpty',
+    get: ->
+      !@hasBodyText and
+      !@firstChild and
+      @attributeNames.length is 0
+
   # Public: Read-only true if item is part of owning {Outline}
   isInOutline: null
   Object.defineProperty @::, 'isInOutline',
@@ -570,6 +580,12 @@ class Item
   # Returns a {Number} bitmask.
   comparePosition: (item) ->
     @_liOrRootUL.compareDocumentPosition(item._liOrRootUL)
+
+  # Public: Deep clones this item.
+  #
+  # Returns a duplicate {Item}.
+  cloneItem: ->
+    @outline.cloneItem(this)
 
   # Public: Given an array of items determines and returns the common
   # ancestors of those items.

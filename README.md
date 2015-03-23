@@ -57,7 +57,7 @@ Birch Markup Language (BML) is subset of HTML for storing outline data. Birch us
 ```html
 <html>
   <body>
-    <ul id="Birch.Root">
+    <ul id="Birch">
       <li id="my7pJv4v">
         <p>one</p>
       </li>

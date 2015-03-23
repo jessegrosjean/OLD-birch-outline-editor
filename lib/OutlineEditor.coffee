@@ -171,14 +171,19 @@ class OutlineEditor extends Model
 
   destroyed: ->
     @unsubscribe()
-    @outline.release(@outlineEditorElement.id)
+    @outline.release @id
     @outlineEditorElement.destroyed()
     @outlineEditorElement = null
     @emitter.emit 'did-destroy'
 
   ###
-  Section: Model
+  Section: Attributes
   ###
+
+  # Public: Read-only unique (not persistent) {String} editor ID.
+  id: null
+  Object.defineProperty @::, 'id',
+    get: -> @outlineEditorElement.id
 
   # Public: The {Outline} that is being edited.
   outline: null
@@ -287,7 +292,11 @@ class OutlineEditor extends Model
   # - `item` {Item} to hoist.
   hoistItem: (item) ->
     item ?= @selection.focusItem
-    if item and item != @getHoistedItem()
+    hoistedItem = @getHoistedItem()
+
+    if item and item != hoistedItem
+      if hoistedItem
+        hoistedItem.setUserData(@id + '-unhoist-viewport-top', @outlineEditorElement.getViewportRect().top)
       stack = @_hoistStack.slice()
       stack.push item
       @setHoistedItemsStack stack
@@ -1796,7 +1805,7 @@ class OutlineEditor extends Model
   ###
 
   editorState: (item) ->
-    item?.editorState(@outlineEditorElement.id)
+    item?.editorState @id
 
   #OutlineEditor::DOMGetElementById(id) {
   #  let shadowRoot = this._shadowRoot;

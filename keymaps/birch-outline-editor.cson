@@ -90,6 +90,9 @@
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
   'cmd-.': 'birch-outline-editor:toggle-fold-items'
 
+  'cmd-alt-down' : 'birch-outline-editor:hoist',
+  'cmd-alt-up' : 'birch-outline-editor:unhoist',
+
   'cmd-b' : 'birch-outline-editor:toggle-bold'
   'cmd-i' : 'birch-outline-editor:toggle-italic'
   'cmd-u' : 'birch-outline-editor:toggle-underline'
@@ -106,8 +109,5 @@
 
   'o' : 'editor:newline',
   'O' : 'editor:newline-above',
-
-  'f i' : 'birch-outline-editor:hoist',
-  'f o' : 'birch-outline-editor:unhoist',
 
   '.' : 'birch-outline-editor:toggle-fold-items'

@@ -110,6 +110,10 @@ itemsFromHTML = (htmlString, outline, editor) ->
   parser = new DOMParser()
   htmlDocument = parser.parseFromString(htmlString, 'text/html')
   rootUL = htmlDocument.getElementById(Constants.RootID)
+  unless rootUL
+    rootUL = htmlDocument.getElementById('Birch.Root')
+    if rootUL
+      rootUL.id = Constants.RootID
   expandedItemIDs = {}
   metaState = {}
   items = []

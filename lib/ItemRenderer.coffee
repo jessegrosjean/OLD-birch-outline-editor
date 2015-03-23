@@ -304,7 +304,11 @@ class ItemRenderer
       # unhoist case, goal is to scroll up as far as possible such that new
       # anchorRect remains on screen and we do not scroll backward past zero.
       #@editorElement.scrollTo 0, Math.max(@editorElement.scrollTopWithOverscroll, 0)
-      @editorElement.scrollToItem @hoistAnchorItem, 'bottom'
+      unhoistViewportTop = newHoistedItem?.getUserData(editor.id + '-unhoist-viewport-top')
+      unless unhoistViewportTop is undefined
+        @editorElement.scrollTo 0, unhoistViewportTop
+      else
+        @editorElement.scrollToItem @hoistAnchorItem, 'bottom'
     else
       @editorElement.scrollTo 0, 0
 
