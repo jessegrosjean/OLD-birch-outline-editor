@@ -2,10 +2,13 @@
 
 ## 1.3.0
 
-- Added UI indication when outline is hoisted.
+- Added indication when outline is hoisted.
+- Option-Command-Up/Down to hoist/un-hoist.
+- Command-Click on item handle to hoist the item.
 - Dropping file on editor inserts a link to the file.
 - Drag and drop no longer allows dragging item as child of itself.
 - Changed root id in .bml file from `Birch.Root` to `Birch`
+- Changed Shift-Click on item handle to fully expand/collapse.
 - Fixed problem where editor could lose focus when hoisting.
 
 ## 1.2.1

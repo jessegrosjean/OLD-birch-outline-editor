@@ -89,6 +89,7 @@
   'cmd-k cmd-8': 'editor:fold-at-indent-level-8'
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
   'cmd-.': 'birch-outline-editor:toggle-fold-items'
+  'shift-cmd-.': 'birch-outline-editor:toggle-fully-fold-items'
 
   'cmd-alt-down' : 'birch-outline-editor:hoist',
   'cmd-alt-up' : 'birch-outline-editor:unhoist',

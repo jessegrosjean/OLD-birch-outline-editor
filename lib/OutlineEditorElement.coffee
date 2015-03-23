@@ -841,10 +841,14 @@ EventRegistery.listen '.bhandle',
     item = editorElement.itemForViewNode e.target
     editor = editorElement.editor
     if item
-      if e.shiftKey
+      if e.metaKey
         editor.hoistItem item
       else if item.firstChild
-        editor.toggleFoldItems item
+        if e.shiftKey
+          editor.toggleFullyFoldItems item
+        else
+          editor.toggleFoldItems item
+
     e.stopPropagation()
 
 #
@@ -992,6 +996,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:fold-current-row': -> @editor.foldItems()
   'editor:unfold-current-row': -> @editor.unfoldItems()
   'birch-outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
+  'birch-outline-editor:toggle-fully-fold-items': -> @editor.toggleFullyFoldItems()
   'editor:copy-path': -> @editor.copyPathToClipboard()
 )
 

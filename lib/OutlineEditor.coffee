@@ -476,7 +476,7 @@ class OutlineEditor extends Model
     if foldItems.length
       @_setExpandedState foldItems, expand
 
-  toggleFullyExpandItems: (items) ->
+  toggleFullyFoldItems: (items) ->
     @toggleFoldItems items, true
 
   ###
