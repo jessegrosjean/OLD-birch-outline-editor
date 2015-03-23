@@ -561,7 +561,7 @@ class ItemRenderer
     if UL
       itemContentP = ItemRenderer.renderedItemContentPForRenderedLI LI
       itemContentRect = itemContentP.getBoundingClientRect()
-      if clientY < itemContentRect.bottom
+      if itemContentRect.height > 0 and clientY < itemContentRect.bottom
         @pickBodyTextSPAN clientX, clientY, ItemRenderer.renderedBodyTextSPANForRenderedLI LI
       else
         children = UL.children
