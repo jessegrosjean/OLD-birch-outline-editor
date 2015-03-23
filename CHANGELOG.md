@@ -2,7 +2,8 @@
 
 ## 1.3.0
 
--
+- Dropping file on editor inserts a link to the file.
+- Drag and drop no longer allows dragging item as child of itself.
 - Fixed problem where editor could lose focus when hoisting.
 
 ## 1.2.1

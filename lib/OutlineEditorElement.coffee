@@ -14,6 +14,7 @@ ItemRenderer = require './ItemRenderer'
 Velocity = require 'velocity-animate'
 Selection = require './Selection'
 Constants = require './Constants'
+Outline = require './Outline'
 diff = require 'fast-diff'
 Util = require './Util'
 
@@ -483,17 +484,19 @@ class OutlineEditorElement extends HTMLElement
   ###
 
   onDragStart: (e) ->
-    item = @itemForViewNode(e.target)
-    li = @itemViewLIForItem(item)
+    item = @itemForViewNode e.target
+    li = @itemViewLIForItem item
     liRect = li.getBoundingClientRect()
     x = e.clientX - liRect.left
     y = e.clientY - liRect.top
 
     e.stopPropagation()
     e.dataTransfer.effectAllowed = 'all'
-    e.dataTransfer.setDragImage(li, x, y)
-    e.dataTransfer.setData('application/json', JSON.stringify({ itemID: item.id, editorID: @id }))
-    ItemSerializer.writeItems([item], @editor, e.dataTransfer)
+    e.dataTransfer.setDragImage li, x, y
+    e.dataTransfer.setData 'application/json', JSON.stringify
+      outlineID: item.outline.id
+      itemID: item.id
+    ItemSerializer.writeItems [item], @editor, e.dataTransfer
 
     @editor._hackDragItemMouseOffset =
       xOffset: x
@@ -504,11 +507,12 @@ class OutlineEditorElement extends HTMLElement
   onDrag: (e) ->
     e.stopPropagation()
     item = @itemForViewNode e.target
-    draggedItem = @_draggedItemForEvent e
+    draggedItem = @editor.draggedItem()
     if item != draggedItem
       e.preventDefault()
 
   onDragEnd: (e) ->
+    # Should remove item if was a move. Remove item
     @editor.setDragState {}
     e.stopPropagation()
 
@@ -519,83 +523,67 @@ class OutlineEditorElement extends HTMLElement
     e.stopPropagation()
     e.preventDefault()
 
-    draggedItem = @_draggedItemForEvent e
+    draggedItem = @editor.draggedItem()
     dropTarget = @_dropTargetForEvent e
+    dropEffect = e.dataTransfer.effectAllowed
 
-    unless e.ctrlKey or e.altKey
-      e.dataTransfer.dropEffect = 'move'
+    if dropEffect is 'all'
+      dropEffect = 'move'
 
-
-    ###
-    if e.ctrlKey
-      e.dataTransfer.dropEffect = 'link'
-    else if e.altKey
-      e.dataTransfer.dropEffect = 'copy'
-    else
-      e.dataTransfer.dropEffect = 'move'
-
-    if @_isInvalidDrop(dropTarget, draggedItem) and e.dataTransfer.dropEffect == 'move'
-      e.dataTransfer.dropEffect = 'none'
+    unless @_isValidDrop dropTarget, draggedItem, dropEffect
       dropTarget.parent = null
       dropTarget.insertBefore = null
-    ###
+      dropEffect = 'none'
+
+    e.dataTransfer.dropEffect = dropEffect
 
     @editor.debouncedSetDragState
       'draggedItem': draggedItem
-      'dropEffect' : e.dataTransfer.dropEffect
+      'dropEffect' : dropEffect
       'dropParentItem' : dropTarget.parent
       'dropInsertBeforeItem' : dropTarget.insertBefore
 
   onDragLeave: (e) ->
     @editor.debouncedSetDragState
-      'draggedItem': @_draggedItemForEvent e
+      'draggedItem': @editor.draggedItem()
       'dropEffect' : e.dataTransfer.dropEffect
 
   onDrop: (e) ->
-    e.stopPropagation();
+    e.stopPropagation()
+    e.preventDefault()
 
-    # For some reason "dropEffect is always set to 'none' on e. So track
-    # it in store state instead.
+    # For some reason "dropEffect is always set to 'none' on e. So track it in
+    # store state instead. Not sure if I'm doing something wrong or what.
     dropEffect = @editor.dropEffect()
-    draggedItem = @_draggedItemForEvent e
+    droppedItem = @_itemToInsertForEvent e
     dropParentItem = @editor.dropParentItem()
     dropInsertBeforeItem = @editor.dropInsertBeforeItem()
 
-    #unless draggedItem
-      #Pasteboard.setClipboardEvent(e);
-      #draggedItem = Pasteboard.readNodes(editor.tree())[0];
-      #Pasteboard.setClipboardEvent(null);
-
-    if draggedItem and dropParentItem
-      console.log 'dropEffect: ' + dropEffect
-      console.log 'e.dataTransfer.dropEffect: ' + e.dataTransfer.dropEffect
-      console.log 'effectAllowed: ' + e.dataTransfer.effectAllowed
-
-      insertNode
-      if dropEffect == 'move'
-        insertNode = draggedItem
+    if droppedItem and dropParentItem
+      insertItem
+      if dropEffect is 'all' or dropEffect is 'move'
+        insertItem = droppedItem
       else if dropEffect == 'copy'
-        insertNode = draggedItem.cloneItem()
+        insertItem = droppedItem.cloneItem()
       else if dropEffect == 'link'
         console.log 'link'
 
-      if insertNode and insertNode != dropInsertBeforeItem
+      if insertItem and insertItem != dropInsertBeforeItem
         outline = dropParentItem.outline
         undoManager = outline.undoManager
 
-        if insertNode.parent
-          if insertNode.outline == outline
-            compareTo = dropInsertBeforeItem ? dropInsertBeforeItem : dropParentItem.lastChild
-            unless compareTo
-              compareTo = dropParentItem
+        if insertItem.parent
+          compareTo = dropInsertBeforeItem ? dropInsertBeforeItem : dropParentItem.lastChild
+          unless compareTo
+            compareTo = dropParentItem
 
-            if insertNode.comparePosition(compareTo) & Node.DOCUMENT_POSITION_FOLLOWING
-              @scrollBy(-@itemViewLIForItem(insertNode).clientHeight)
+          if insertItem.comparePosition(compareTo) & Node.DOCUMENT_POSITION_FOLLOWING
+            @scrollBy(-@itemViewLIForItem(insertItem).clientHeight)
 
         moveStartOffset
 
-        if draggedItem == insertNode
-          viewLI = @itemViewLIForItem(draggedItem)
+        if droppedItem is insertItem
+          viewLI = @itemViewLIForItem(droppedItem)
           if viewLI
             editorElementRect = @getBoundingClientRect()
             viewLIRect = viewLI.getBoundingClientRect()
@@ -612,23 +600,29 @@ class OutlineEditorElement extends HTMLElement
               xOffset: editorX - editorLILeft
               yOffset: editorY - editorLITop
 
-        @editor.moveItems([insertNode], dropParentItem, dropInsertBeforeItem, moveStartOffset)
+        @editor.moveItems([insertItem], dropParentItem, dropInsertBeforeItem, moveStartOffset)
         undoManager.setActionName('Drag and Drop')
 
     @editor.debouncedSetDragState({})
 
-  _draggedItemForEvent: (e) ->
-    @editor.draggedItem()
-    #try
-    #  draggedIDs = JSON.parse(e.dataTransfer.getData('application/json'))
-    #  editorID = draggedIDs.editorID
-    #  itemID = draggedIDs.itemID
-    #  if @id is editorID
-    #    return @editor.outline.getItemForID itemID
-    #catch
+  _itemToInsertForEvent: (e) ->
+    draggedItem = @editor.draggedItem()
+    return draggedItem if draggedItem
 
-  _isInvalidDrop: (dropTarget, draggedItem) ->
-    return !draggedItem or !dropTarget.parent or (dropTarget.parent == draggedItem or draggedItem.contains(dropTarget.parent));
+    try
+      # If item is from another outline must import it into this outline.
+      draggedBirchIDs = JSON.parse e.dataTransfer.getData('application/json')
+      outline = Outline.getOutlineForID draggedBirchIDs.outlineID
+      draggedItem = outline.getItemForID draggedBirchIDs.itemID
+      draggedItem = @editor.outline.importItem draggedItem.cloneItem()
+      return draggedItem if draggedItem
+    catch error
+
+    items = ItemSerializer.readItems @editor, e.dataTransfer
+    if items.itemFragmentString
+      @editor.outline.createItem items.itemFragmentString
+    else
+      items[0]
 
   _dropTargetForEvent: (e) ->
     picked = @pick(e.clientX, e.clientY)
@@ -656,6 +650,22 @@ class OutlineEditorElement extends HTMLElement
         {} =
           parent: pickedItem.parent
           insertBefore: @editor.getNextVisibleSibling(pickedItem)
+
+  _isValidDrop: (dropTarget, draggedItem, dropEffect) ->
+    unless draggedItem
+      # 'application/json' only seems present on drop event, not in dragOver.
+      # 'Also want to support dropping of plain text and other things... so
+      # 'validate all drops that don't have an item. Accept/reject will be
+      # 'determined in drop handler.
+      true
+    else
+      if dropEffect is 'move'
+        if draggedItem and dropTarget.parent
+          dropTarget.parent != draggedItem and not draggedItem.contains dropTarget.parent
+        else
+          false
+      else
+        true
 
   ###
   Section: Util
@@ -836,6 +846,19 @@ EventRegistery.listen '.bhandle',
       else if item.firstChild
         editor.toggleFoldItems item
     e.stopPropagation()
+
+#
+# Handle clicking on file links
+#
+
+EventRegistery.listen '.bbodytext a',
+  click: (e) ->
+    if href = e.target.href
+      if href.indexOf('file://') is 0
+        e.preventDefault()
+        e.stopPropagation()
+        atom.workspace.open href.substring(7),
+          searchAllPanes: true
 
 #
 # Handle Cut/Copy/Paste
