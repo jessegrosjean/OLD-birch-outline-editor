@@ -38,11 +38,8 @@ module.exports = BirchOutlineEditor =
         extension = path.extname(filePath).toLowerCase()
         switch extension
           when '.bml'
-            o = new Outline({
-              filePath: filePath,
-              load: true
-            })
-            new OutlineEditor(o)
+            Outline.getOutlineForPath(filePath).then (outline) ->
+              new OutlineEditor(outline)
 
     atom.workspace.getOutlineEditors = outlineEditorService.getOutlineEditors.bind(outlineEditorService)
     atom.workspace.onDidAddOutlineEditor = outlineEditorService.onDidAddOutlineEditor.bind(outlineEditorService)

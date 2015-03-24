@@ -80,53 +80,44 @@ class Outline
 
   # Public: Create a new outline.
   constructor: (params) ->
-    Outline.idsToOutlines[@id = shortid()] = this
+    @outlineStore = @createOutlineStoreIfNeeded params?.outlineStore
 
-    @outlineStore = @createOutlineStoreIfNeeded(params?.outlineStore)
-
+    rootElement = @outlineStore.getElementById Constants.RootID
     @loadingLIUsedIDs = {}
-    @root = @createItem(null, @outlineStore.getElementById(Constants.RootID))
+    @root = @createItem null, rootElement
     @loadingLIUsedIDs = null
 
-    @undoManager = undoManager = new UndoManager()
-    @emitter = new Emitter()
+    @undoManager = undoManager = new UndoManager
+    @emitter = new Emitter
 
     @loaded = false
-    @digestWhenLastPersisted = params?.digestWhenLastPersisted ? false
-    @modifiedWhenLastPersisted = params?.modifiedWhenLastPersisted ? false
-    @useSerializedText = @modifiedWhenLastPersisted isnt false
     @serializedState = {}
 
     @updateMutationObserver = new MutationObserver (mutations) =>
-      @updateMutations = @updateMutations.concat(mutations)
-    @updateMutationObserver.observe(
-      @outlineStore.getElementById(Constants.RootID),
-      {
-        attributes: true,
-        childList: true,
-        characterData: true,
-        subtree: true,
-        attributeOldValue: true,
-        characterDataOldValue: true
-      }
-    )
+      @updateMutations = @updateMutations.concat mutations
 
-    @undoSubscriptions = new CompositeDisposable(
-      undoManager.onDidCloseUndoGroup =>
-        unless undoManager.isUndoing or undoManager.isRedoing
-          @changeCount++
-          @scheduleModifiedEvents()
-      undoManager.onDidUndo =>
-        @changeCount--
-        @scheduleModifiedEvents()
-      undoManager.onDidRedo =>
+    @updateMutationObserver.observe rootElement,
+      attributes: true
+      childList: true
+      characterData: true
+      subtree: true
+      attributeOldValue: true
+      characterDataOldValue: true
+
+    @undoSubscriptions = new CompositeDisposable
+    @undoSubscriptions.add undoManager.onDidCloseUndoGroup =>
+      unless undoManager.isUndoing or undoManager.isRedoing
         @changeCount++
         @scheduleModifiedEvents()
-    )
+    @undoSubscriptions.add undoManager.onDidUndo =>
+      @changeCount--
+      @scheduleModifiedEvents()
+    @undoSubscriptions.add undoManager.onDidRedo =>
+      @changeCount++
+      @scheduleModifiedEvents()
 
     @setPath(params.filePath) if params?.filePath
     @load() if params?.load
-    #@loadSync()
 
   createOutlineStoreIfNeeded: (outlineStore) ->
     if not outlineStore
@@ -139,20 +130,10 @@ class Outline
   serialize: ->
     {} =
       deserializer: 'Outline'
-      text: @getText()
       filePath: @getPath()
-      modifiedWhenLastPersisted: @isModified()
-      digestWhenLastPersisted: @file?.getDigest()
 
   @deserialize: (data={}) ->
-    filePath = data.filePath
-    outline = Outline.pathsToOutlines[filePath]
-    unless outline
-      data.load = true
-      outline = new Outline(data)
-      if filePath
-        Outline.pathsToOutlines[filePath] = outline
-    outline
+    Outline.getOutlineForPathSync(data.filePath)
 
   ###
   Section: Finding Outlines
@@ -161,21 +142,88 @@ class Outline
   # Public: Read-only unique (not persistent) {String} outline ID.
   id: null
 
-  @idsToOutlines: {}
-  @pathsToOutlines: {}
+  @outlines = []
 
-  # Public: Returns existing {Outline} instance with the given outline id.
+  # Retrieves all open {Outlines}s.
+  #
+  # Returns an {Array} of {Outlines}s.
+  @getOutlines: ->
+    @outlines.slice()
+
+  # Public: Returns existing {Outline} with the given outline id.
   #
   # - `id` {String} outline id.
   @getOutlineForID: (id) ->
-    Outline.idsToOutlines[id]
+    for each in @outlines
+      if each.id is id
+        return each
 
-  # Public: Returns existing {Outline} instance with the given file path.
+  # Given a file path, this retrieves or creates a new {Outline}.
   #
   # - `filePath` {String} outline file path.
-  @getOutlineForFilePath: (filePath) ->
-    Outline.pathsToOutlines[filePath]
+  # - `createIfNeeded` (optional) {Boolean} create and return a new outline if can't find match.
+  #
+  # Returns a promise that resolves to the {Outline}.
+  @getOutlineForPath: (filePath, createIfNeeded=true) ->
+    absoluteFilePath = atom.project.resolvePath(filePath)
 
+    for each in @outlines
+      if each.getPath() is absoluteFilePath
+        return Q(each)
+
+    if createIfNeeded
+      Q(@buildOutline(absoluteFilePath))
+
+  @getOutlineForPathSync: (filePath, createIfNeeded=true) ->
+    absoluteFilePath = atom.project.resolvePath(filePath)
+
+    for each in @outlines
+      if each.getPath() is absoluteFilePath
+        return each
+
+    if createIfNeeded
+      @buildOutlineSync(absoluteFilePath)
+
+  @buildOutline: (absoluteFilePath) ->
+    outline = new Outline({filePath: absoluteFilePath})
+    @addOutline(outline)
+    outline.load()
+      .then((outline) -> outline)
+      .catch(=> @removeOutline(outline))
+
+  @buildOutlineSync: (absoluteFilePath) ->
+    outline = new Outline({filePath: absoluteFilePath})
+    @addOutline(outline)
+    outline.loadSync()
+    outline
+
+  @addOutline: (outline, options={}) ->
+    @addOutlineAtIndex(outline, @outlines.length, options)
+    @subscribeToOutline(outline)
+
+  @addOutlineAtIndex: (outline, index, options={}) ->
+    @outlines.splice(index, 0, outline)
+    @subscribeToOutline(outline)
+    outline
+
+  @removeOutline: (outline) ->
+    index = @outlines.indexOf(outline)
+    @removeOutlineAtIndex(index) unless index is -1
+
+  @removeOutlineAtIndex: (index, options={}) ->
+    [outline] = @outlines.splice(index, 1)
+    outline?.destroy()
+
+  @subscribeToOutline: (outline) ->
+    outline.onDidDestroy => @removeOutline(outline)
+    outline.onWillThrowWatchError ({error, handle}) ->
+      handle()
+      atom.notifications.addWarning """
+        Unable to read file after file `#{error.eventType}` event.
+        Make sure you have permission to access `#{outline.getPath()}`.
+        """,
+        detail: error.message
+        dismissable: true
   ###
   Section: Event Subscription
   ###
@@ -240,6 +288,15 @@ class Outline
   onDidSave: (callback) ->
     @emitter.on 'did-save', callback
 
+  # Public: Invoke the given callback after the file backing the outline is
+  # deleted.
+  #
+  # * `callback` {Function} to be called after the outline is deleted.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidDelete: (callback) ->
+    @emitter.on 'did-delete', callback
+
   # Public: Invoke the given callback before the outline is reloaded from the
   # contents of its file on disk.
   #
@@ -265,6 +322,19 @@ class Outline
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
+
+  # Public: Invoke the given callback when there is an error in watching the
+  # file.
+  #
+  # * `callback` {Function} callback
+  #   * `errorObject` {Object}
+  #     * `error` {Object} the error object
+  #     * `handle` {Function} call this to indicate you have handled the error.
+  #       The error will not be thrown if this function is called.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onWillThrowWatchError: (callback) ->
+    @emitter.on 'will-throw-watch-error', callback
 
   getStoppedChangingDelay: -> @stoppedChangingDelay
 
@@ -473,15 +543,22 @@ class Outline
   Section: File Details
   ###
 
-  # Public: Determine if the in-memory contents of the outline differ from its
-  # contents on disk.
+  # Public: Determine if the outline has changed since it was loaded.
   #
   # If the outline is unsaved, always returns `true` unless the outline is
   # empty.
   #
   # Returns a {Boolean}.
   isModified: ->
-    @changeCount != 0
+    return false unless @loaded
+    if @file
+      @changeCount != 0
+      #if @file.existsSync()
+      #  @getText() != @cachedDiskContents
+      #else
+      #  @wasModifiedBeforeRemove ? not @isEmpty()
+    else
+      not @isEmpty()
 
   # Public: Determine if the in-memory contents of the outline conflict with the
   # on-disk contents of its associated file.
@@ -532,7 +609,7 @@ class Outline
 
     @emitter.emit 'will-save', {path: filePath}
     @setPath(filePath)
-    @file.write(@getText(editor))
+    @file.writeSync(@getText(editor))
     @cachedDiskContents = @getText(editor)
     @conflict = false
     @changeCount = 0
@@ -606,17 +683,13 @@ class Outline
   finishLoading: ->
     if @isAlive()
       @loaded = true
-      if @useSerializedText and @digestWhenLastPersisted is @file?.getDigest()
-        @emitModifiedStatusChanged(true)
-      else
-        @reload()
+      @reload()
       @undoManager.removeAllActions()
     this
 
   destroy: ->
     unless @destroyed
-      delete Outline.idsToOutlines[@id]
-      delete Outline.pathsToOutlines[@getPath()]
+      Outline.removeOutline this
       @updateMutationObserver.disconnect()
       @cancelStoppedChangingTimeout()
       @undoSubscriptions?.dispose()
@@ -661,7 +734,13 @@ class Outline
         @reload()
 
     @fileSubscriptions.add @file.onDidDelete =>
-      @destroy() unless isModified()
+      modified = isModified()
+      @wasModifiedBeforeRemove = modified
+      @emitter.emit 'did-delete'
+      if modified
+        @updateCachedDiskContents()
+      else
+        @destroy()
 
     @fileSubscriptions.add @file.onDidRename =>
       @emitter.emit 'did-change-path', @getPath()

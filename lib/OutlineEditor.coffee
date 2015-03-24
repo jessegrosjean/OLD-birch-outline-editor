@@ -63,7 +63,7 @@ class OutlineEditor extends Model
       dropInsertBeforeItem: null
       dropInsertAfterItem: null
 
-    @outline = outline or new Outline
+    @outline = outline or Outline.buildOutlineSync()
     @subscribeToOutline()
 
     outlineEditorElement = new OutlineEditorElement().initialize(this)
