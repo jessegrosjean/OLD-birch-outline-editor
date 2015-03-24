@@ -759,7 +759,7 @@ class OutlineEditor extends Model
 
   # Public: Focus this editor.
   focus: ->
-    @outlineEditorElement.focus()
+    @outlineEditorElement?.focus()
 
   focusIfNeeded: ->
     @focus() unless @isFocused()
@@ -1082,35 +1082,8 @@ class OutlineEditor extends Model
     else
       @setTypingFormattingTags({})
 
-    if isFocused and not outlineEditorElement.isPerformingExtendSelectionInteraction()
-      renderedSelection = outlineEditorElement.editorRangeFromDOMSelection()
-      selection = @DOMGetSelection()
-
-      if currentSelection.isValid
-        if not currentSelection.equals(renderedSelection)
-          if currentSelection.isTextMode
-            nodeFocusOffset = outlineEditorElement.itemOffsetToNodeOffset(currentSelection.focusItem, currentSelection.focusOffset)
-            nodeAnchorOffset = outlineEditorElement.itemOffsetToNodeOffset(currentSelection.anchorItem, currentSelection.anchorOffset)
-            viewP = outlineEditorElement.itemViewPForItem(currentSelection.focusItem)
-            range = document.createRange()
-
-            selection.removeAllRanges()
-            range.setStart(nodeAnchorOffset.node, nodeAnchorOffset.offset)
-            selection.addRange(range)
-
-            viewP.focus()
-
-            if currentSelection.isCollapsed
-              rect = currentSelection.clientRectForItemOffset(currentSelection.focusItem, currentSelection.focusOffset)
-              if rect.positionedAtEndOfWrappingLine
-                selection.modify('move', 'backward', 'character')
-                selection.modify('move', 'forward', 'lineboundary')
-            else
-              selection.extend(nodeFocusOffset.node, nodeFocusOffset.offset)
-          else
-            @focus()
-      else
-        @focus()
+    if isFocused
+      @focus()
 
     classList = outlineEditorElement.classList
     if currentSelection.isTextMode

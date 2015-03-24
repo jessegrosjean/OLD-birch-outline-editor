@@ -366,8 +366,41 @@ class OutlineEditorElement extends HTMLElement
   ###
 
   focus: ->
-    @focusElement.select()
-    @focusElement.focus()
+    # Update DOM selection to match editor selection if in text mode.
+    # Otherwise give @focusElement focus when in outline mode.
+    unless @isPerformingExtendSelectionInteraction()
+      editor = @editor
+      selection = editor.DOMGetSelection()
+      renderedSelection = @editorRangeFromDOMSelection()
+      currentSelection = editor.selection
+
+      if currentSelection.isValid
+        if not currentSelection.equals(renderedSelection)
+          if currentSelection.isTextMode
+            nodeFocusOffset = @itemOffsetToNodeOffset(currentSelection.focusItem, currentSelection.focusOffset)
+            nodeAnchorOffset = @itemOffsetToNodeOffset(currentSelection.anchorItem, currentSelection.anchorOffset)
+            viewP = @itemViewPForItem(currentSelection.focusItem)
+            range = document.createRange()
+
+            selection.removeAllRanges()
+            range.setStart(nodeAnchorOffset.node, nodeAnchorOffset.offset)
+            selection.addRange(range)
+
+            viewP.focus()
+
+            if currentSelection.isCollapsed
+              rect = currentSelection.clientRectForItemOffset(currentSelection.focusItem, currentSelection.focusOffset)
+              if rect.positionedAtEndOfWrappingLine
+                selection.modify('move', 'backward', 'character')
+                selection.modify('move', 'forward', 'lineboundary')
+            else
+              selection.extend(nodeFocusOffset.node, nodeFocusOffset.offset)
+          else
+            @focusElement.select()
+            @focusElement.focus()
+      else
+        @focusElement.select()
+        @focusElement.focus()
 
   editorRangeFromDOMSelection: ->
     selection = @editor.DOMGetSelection()
