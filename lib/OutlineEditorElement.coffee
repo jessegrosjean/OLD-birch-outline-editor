@@ -369,6 +369,9 @@ class OutlineEditorElement extends HTMLElement
     # Update DOM selection to match editor selection if in text mode.
     # Otherwise give @focusElement focus when in outline mode.
     unless @isPerformingExtendSelectionInteraction()
+      @focusElement.select()
+      @focusElement.focus()
+
       editor = @editor
       selection = editor.DOMGetSelection()
       renderedSelection = @editorRangeFromDOMSelection()
@@ -395,12 +398,6 @@ class OutlineEditorElement extends HTMLElement
                 selection.modify('move', 'forward', 'lineboundary')
             else
               selection.extend(nodeFocusOffset.node, nodeFocusOffset.offset)
-          else
-            @focusElement.select()
-            @focusElement.focus()
-      else
-        @focusElement.select()
-        @focusElement.focus()
 
   editorRangeFromDOMSelection: ->
     selection = @editor.DOMGetSelection()

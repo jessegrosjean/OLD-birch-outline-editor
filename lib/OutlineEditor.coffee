@@ -299,9 +299,10 @@ class OutlineEditor extends Model
         hoistedItem.setUserData(@id + '-unhoist-viewport-top', @outlineEditorElement.getViewportRect().top)
       stack = @_hoistStack.slice()
       stack.push item
+      hadValidSelection = @selection.isValid
       @setHoistedItemsStack stack
       child = @getFirstVisibleChild item
-      if child and child.isEmpty
+      if child and (!hadValidSelection or child.isEmpty)
         @moveSelectionRange child, 0
 
   # Public: Pop the current hoisted {Item}.

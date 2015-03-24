@@ -2,7 +2,7 @@
 
 ## 1.4.0
 
-- Fixed focus is set correctly when creating a new outline.
+- Fixed focus is set correctly when opening an outline.
 - Fixed loading process to only display outline when fully loaded.
 - Fixed some flashing that happened when clicking to set selection.
 
