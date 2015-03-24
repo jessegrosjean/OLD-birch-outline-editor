@@ -336,7 +336,7 @@ class Selection
           ).itemCaretPosition
 
       when 'paragraphboundary'
-        next.offset = if upstream then 0 else focusItem.bodyText.length
+        next.offset = if upstream then 0 else focusItem?.bodyText.length
 
       when 'character'
         if upstream
