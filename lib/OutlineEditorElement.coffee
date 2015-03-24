@@ -729,23 +729,7 @@ EventRegistery.listen 'birch-outline-editor > ul',
   'mousedown': (e) ->
     editorElement = findOutlineEditorElement e
     editorElement.editor.focus()
-    setTimeout ->
-      editorElement.beginExtendSelectionInteraction e
-
-EventRegistery.listen '.bbodytext',
-  'focusin': (e) ->
-    editorElement = findOutlineEditorElement e
-    editor = editorElement.editor
-    unless editorElement.isPerformingExtendSelectionInteraction()
-      focusItem = editorElement.itemForViewNode e.target
-      if editor.selection.focusItem != focusItem
-        editor.moveSelectionRange focusItem
-
-  'mousedown': (e) ->
-    editorElement = findOutlineEditorElement e
-    editorElement.editor.focus()
     editorElement.beginExtendSelectionInteraction e
-    e.stopPropagation()
 
 #
 # Handle Text Input
