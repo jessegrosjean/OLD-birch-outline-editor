@@ -1,5 +1,4 @@
-
-
+@import "prefixer";
 @import "default-ui-variables";
 @import "default-syntax-variables";
 
@@ -65,7 +64,7 @@ birch-outline-editor {
   line-height: @line-height;
   overflow-y: auto;
   overflow-x: hidden;
-  user-select: none;
+  .user-select(none);
   width: 100%;
   height: 100%;
   &:focus {
@@ -146,7 +145,7 @@ birch-outline-editor > ul {
 }
 
 .bbranchcontrols {
-  user-select: none;
+  .user-select(none);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -211,8 +210,8 @@ birch-outline-editor > ul {
 }
 
 .bbodytext {
-  user-select: all;
-  user-modify: read-write;
+  .user-select(text);
+  .user-modify(read-write);
   white-space: pre-wrap;
   margin-right: @item-badge-spacing;
   a {

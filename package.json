@@ -35,7 +35,6 @@
     "velocity-animate": "^1.2.1"
   },
   "devDependencies": {
-    "autoprefixer-loader": "^1.1.0",
     "babel-core": "^4.3.0",
     "babel-loader": "^4.0.0",
     "coffee-loader": "^0.7.2",

@@ -17,9 +17,8 @@ module.exports = {
 	module: {
 		loaders: [
 			// required to write "require('./style.css')"
-			//{ test: /\.less$/, loader: "style-loader!css-loader!autoprefixer-loader!less-loader" },
-			{ test: /\.less$/, loader: "css-loader!autoprefixer-loader!less-loader" },
-
+			//{ test: /\.less$/, loader: "style-loader!css-loader!less-loader" },
+			{ test: /\.less$/, loader: "css-loader!less-loader" },
 
 			{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
 			{ test: /\.coffee$/, loader: "babel-loader!coffee-loader" },
