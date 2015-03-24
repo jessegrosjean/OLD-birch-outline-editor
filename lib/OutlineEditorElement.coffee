@@ -451,16 +451,16 @@ class OutlineEditorElement extends HTMLElement
     editor = @editor
     @enableScrolling()
     editor._disableSyncDOMSelectionToEditor = false
-    selectionRange = editor.selection
-
-    if selectionRange.isTextMode
-      editor.moveSelectionRange(@editorRangeFromDOMSelection()) # Read in selection from double-click, etc.
-    else
-      editor.moveSelectionRange(selectionRange)
 
     @_extendSelectionDisposables.dispose()
     @_extendSelectionDisposables = new CompositeDisposable
     @_extendingSelectionInteraction = false
+
+    selectionRange = editor.selection
+    if selectionRange.isTextMode
+      editor.moveSelectionRange(@editorRangeFromDOMSelection()) # Read in selection from double-click, etc.
+    else
+      editor.moveSelectionRange(selectionRange)
 
   updateSimulatedCursor: ->
     if @useStyledTextCaret
@@ -729,7 +729,15 @@ EventRegistery.listen 'birch-outline-editor > ul',
   'mousedown': (e) ->
     editorElement = findOutlineEditorElement e
     editorElement.editor.focus()
+    setTimeout ->
+      editorElement.beginExtendSelectionInteraction e
+
+EventRegistery.listen '.bbodytext',
+  'mousedown': (e) ->
+    editorElement = findOutlineEditorElement e
+    editorElement.editor.focus()
     editorElement.beginExtendSelectionInteraction e
+    e.stopPropagation()
 
 #
 # Handle Text Input

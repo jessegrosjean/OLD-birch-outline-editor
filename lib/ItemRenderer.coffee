@@ -598,12 +598,12 @@ class ItemRenderer
 
     if clientY < bodyTextRect.top
       itemAffinity = Constants.ItemAffinityAbove
-      clientX = Number.MIN_VALUE
+      #clientX = Number.MIN_VALUE
     else if clientY < bodyTextRectMid
       itemAffinity = Constants.ItemAffinityTopHalf
     else if clientY > bodyTextRect.bottom
       itemAffinity = Constants.ItemAffinityBelow
-      clientX = Number.MAX_VALUE
+      #clientX = Number.MAX_VALUE
     else
       itemAffinity = Constants.ItemAffinityBottomHalf
 
