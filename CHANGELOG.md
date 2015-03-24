@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.4.0
+
+- Fixed loading process to only display outline when fully loaded.
+- Fixed some flashing that happened when clicking to set selection.
+
 ## 1.3.0
 
 - Added indication when outline is hoisted.
