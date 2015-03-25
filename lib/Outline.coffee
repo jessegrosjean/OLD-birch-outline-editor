@@ -4,6 +4,7 @@
 ItemSerializer = require './ItemSerializer'
 UndoManager = require './UndoManager'
 Constants = require './Constants'
+ItemPath = require './ItemPath'
 Mutation = require './Mutation'
 {File} = require 'pathwatcher'
 emissary = require 'emissary'
@@ -446,9 +447,19 @@ class Outline
   Section: Querying Items
   ###
 
+  # Pubilc: Evaluate the item path starting with the root item and return all
+  # matching items.
+  #
+  # - `itemPath` {String} itempath expression
+  #
+  # Returns an {Array} of matching {Item}s.
+  evaluateItemPath: (itemPath, types) ->
+    ItemPath.evaluate itemPath, @root, types
+
   # Public: XPath query internal HTML structure.
   #
   # - `xpathExpression` {String} xpath expression
+  # - `contextItem` (optional)
   # - `namespaceResolver` (optional)
   # - `resultType` (optional)
   # - `result` (optional)
@@ -460,10 +471,11 @@ class Outline
   # Returns an [XPathResult](https://developer.mozilla.org/en-
   # US/docs/XPathResult) based on an [XPath](https://developer.mozilla.org/en-
   # US/docs/Web/XPath) expression and other given parameters.
-  evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
+  evaluateXPath: (xpathExpression, contextItem, namespaceResolver, resultType, result) ->
+    contextItem ?= @root
     @outlineStore.evaluate(
       xpathExpression,
-      @root._liOrRootUL,
+      contextItem._liOrRootUL,
       namespaceResolver,
       resultType,
       result
@@ -475,31 +487,38 @@ class Outline
   # text, matches the XPath.
   #
   # - `xpathExpression` {String} xpath expression
+  # - `contextItem` (optional) {String}
   # - `namespaceResolver` (optional) {String}
   #
   # Returns an {Array} of all {Item} matching the
   # [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) expression.
-  getItemsForXPath: (xpathExpression, namespaceResolver) ->
-    xpathResult = @evaluateXPath(
-      xpathExpression,
-      null,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE
-    )
-    each = xpathResult.iterateNext()
-    lastItem = undefined
-    items = []
-
-    while each
-      while each and not each._item
-        each = each.parentNode
-      if each
-        eachItem = each._item
-        if eachItem != lastItem
-          items.push(eachItem)
-          lastItem = eachItem
+  getItemsForXPath: (xpathExpression, contextItem, namespaceResolver, exceptionCallback) ->
+    try
+      xpathResult = @evaluateXPath(
+        xpathExpression,
+        contextItem,
+        null,
+        XPathResult.ORDERED_NODE_ITERATOR_TYPE
+      )
       each = xpathResult.iterateNext()
+      lastItem = undefined
+      items = []
 
-    return items
+      while each
+        while each and not each._item
+          each = each.parentNode
+        if each
+          eachItem = each._item
+          if eachItem != lastItem
+            items.push(eachItem)
+            lastItem = eachItem
+        each = xpathResult.iterateNext()
+
+      return items
+    catch error
+      exceptionCallback?(error)
+
+    []
 
   ###
   Section: Grouping Changes

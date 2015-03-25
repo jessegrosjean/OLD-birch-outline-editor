@@ -52,8 +52,8 @@ class OutlineEditor extends Model
     @_textModeTypingFormattingTags = {}
     @_selectionVerticalAnchor = undefined
     @_disableSyncDOMSelectionToEditor = false
-    @_itemFilterPathItems = []
-    @_itemFilterPath = null
+    @_searchItems = []
+    @_search = null
 
     @_hoistStack = []
     @_dragState =
@@ -147,13 +147,13 @@ class OutlineEditor extends Model
       @_overrideIsFocused = false
 
   outlineDidChange: (e) ->
-    if @getItemFilterPath()
+    if @getSearch()
       hoistedItem = @getHoistedItem()
       for eachMutation in e.mutations
         if eachMutation.type == Mutation.ChildrenChanged
           for eachItem in eachMutation.addedItems
             if hoistedItem.contains(eachItem)
-              @_addItemFilterPathMatch(eachItem)
+              @_addSearchMatch(eachItem)
 
     selectionRange = @selection
     @_overrideIsFocused = @isFocused()
@@ -279,6 +279,25 @@ class OutlineEditor extends Model
     callback @selection
     @onDidChangeSelection(callback)
 
+  # Public: Calls your `callback` when the hoisted {Item} changes in the
+  # editor.
+  #
+  # * `callback` {Function}
+  #   * `item` Hoisted {Item} in editor.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeHoistedItem: (callback) ->
+    @emitter.on 'did-change-hoisted-item', callback
+
+  # Public: Calls your `callback` when the editor's search changes.
+  #
+  # * `callback` {Function}
+  #   * `search` Editor's {Object} search.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeSearch: (callback) ->
+    @emitter.on 'did-change-search', callback
+
   ###
   Section: Hoisting Items
   ###
@@ -366,6 +385,8 @@ class OutlineEditor extends Model
         @outlineEditorElement.disableAnimation()
         @setCollapsed newHoistedItem
         @outlineEditorElement.enableAnimation()
+
+      @emitter.emit 'did-change-hoisted-item', newHoistedItem
 
     @outlineEditorElement.disableScrolling()
     @_revalidateSelectionRange()
@@ -481,33 +502,44 @@ class OutlineEditor extends Model
     @toggleFoldItems items, true
 
   ###
-  Section: Filtering Items
+  Section: Search
   ###
 
-  getItemFilterPath: ->
-    @_itemFilterPath
+  getSearch: ->
+    @_search
 
-  setItemFilterPath: (itemFilterPath) ->
-    @_itemFilterPath = itemFilterPath
+  setSearch: (search) ->
+    if @_search is search
+      return
 
-    for each in @_itemFilterPathItems
+    @_search = search
+
+    for each in @_searchItems
       eachState = @editorState(each)
       eachState.expanded = false
       eachState.matched = false
       eachState.matchedAncestor = false
 
-    if itemFilterPath
-      @_itemFilterPathItems = []
-      for each in @outline.getItemsForXPath(itemFilterPath)
-        @_addItemFilterPathMatch(each)
-    else
-      @_itemFilterPathItems = null
+    hoisted = @getHoistedItem()
 
-    @outlineEditorElement.updateHoistedItem(null, @getHoistedItem())
+    if search
+      @_searchItems = []
+      switch search.type
+        when 'itempath'
+          for each in hoisted.evaluateItemPath(search.query)
+            @_addSearchMatch(each)
+        when 'xpath'
+          for each in hoisted.getItemsForXPath(search.query)
+            @_addSearchMatch(each)
+    else
+      @_searchItems = []
+
+    @outlineEditorElement.updateHoistedItem(null, hoisted)
+    @emitter.emit 'did-change-search', search
     @_revalidateSelectionRange()
 
-  _addItemFilterPathMatch: (item) ->
-    itemFilterPathItems = @_itemFilterPathItems
+  _addSearchMatch: (item) ->
+    itemFilterPathItems = @_searchItems
     itemState = @editorState(item)
     itemState.matched = true
     itemFilterPathItems.push(item)
@@ -595,7 +627,7 @@ class OutlineEditor extends Model
       return false unless @isExpanded(parent)
       parent = parent.parent
 
-    return true unless @_itemFilterPath
+    return true unless @_search
     itemState = @editorState(item)
     itemState.matched or itemState.matchedAncestor
 

@@ -6,6 +6,7 @@ ItemBodyEncoder = require './ItemBodyEncoder'
 ItemEditorState = require './ItemEditorState'
 typechecker = require 'typechecker'
 Constants = require './Constants'
+ItemPath = require './ItemPath'
 assert = require 'assert'
 Util = require './Util'
 
@@ -433,6 +434,18 @@ class Item
       li = @_liOrRootUL
       li.ownerDocument.contains(li);
 
+  # Public: Read-only root {Item}.
+  root: null
+  Object.defineProperty @::, 'root',
+    get: ->
+      if @isInOutline
+        @outline.root
+      else
+        each = this
+        while each.parent
+          each = each.parent;
+        each
+
   # Public: Read-only parent {Item}.
   parent: null
   Object.defineProperty @::, 'parent',
@@ -743,6 +756,19 @@ class Item
   # Public: Remove this item from it's parent item if it has a parent.
   removeFromParent: ->
     @parent?.removeChild(this)
+
+  ###
+  Section: Querying Outline Structure
+  ###
+
+  evaluateItemPath: (itemPath, types) ->
+    ItemPath.evaluate itemPath, this, types
+
+  evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
+    @outline.evaluateXPath(xpathExpression, this, namespaceResolver, resultType, result)
+
+  getItemsForXPath: (xpathExpression, namespaceResolver, exceptionCallback) ->
+    @outline.getItemsForXPath(xpathExpression, this, namespaceResolver, exceptionCallback)
 
   ###
   Section: Editor State

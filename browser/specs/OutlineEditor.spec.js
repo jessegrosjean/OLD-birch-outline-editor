@@ -89,14 +89,14 @@ describe('OutlineEditor', function() {
 		});
 	});
 
-	describe('Matching', function() {
-		it('should set match path', function() {
-			editor.setItemFilterPath('//li/p[text()=\'two\']');
+	describe('Search', function() {
+		it('should set search', function() {
+			editor.setSearch({type: 'xpath', query: '//li/p[text()=\'two\']'});
 			editor.isVisible(outlineSetup.one).should.be.ok;
 			editor.isVisible(outlineSetup.two).should.be.ok;
 			editor.isVisible(outlineSetup.three).should.not.be.ok;
 			editor.isVisible(outlineSetup.five).should.not.be.ok;
-			editor.setItemFilterPath(null);
+			editor.setSearch(null);
 			editor.isVisible(outlineSetup.one).should.be.ok;
 			editor.isVisible(outlineSetup.two).should.not.be.ok;
 			editor.isVisible(outlineSetup.three).should.not.be.ok;

@@ -1,6 +1,6 @@
 {Disposable, CompositeDisposable} = require 'atom'
 
-class QueryFieldElement extends HTMLElement
+class ToolbarElement extends HTMLElement
   initialize: ->
     this
 
@@ -14,4 +14,4 @@ class QueryFieldElement extends HTMLElement
   attributeChangedCallback: (attrName, oldVal, newVal) ->
 
 module.exports = document.registerElement 'outline-editor-toolbar',
-  prototype: QueryFieldElement.prototype
+  prototype: ToolbarElement.prototype

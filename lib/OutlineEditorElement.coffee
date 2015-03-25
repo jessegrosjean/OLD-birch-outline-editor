@@ -18,6 +18,8 @@ Outline = require './Outline'
 diff = require 'fast-diff'
 Util = require './Util'
 
+#require './elements/SearchFieldElement'
+
 class OutlineEditorElement extends HTMLElement
 
   ###
@@ -27,6 +29,7 @@ class OutlineEditorElement extends HTMLElement
   createdCallback: ->
 
   attachedCallback: ->
+    #@parentElement.parentElement.insertBefore @searchElement, @parentElement
 
   detachedCallback: ->
     @_extendSelectionDisposables.dispose()
@@ -68,9 +71,8 @@ class OutlineEditorElement extends HTMLElement
     @focusElement = new FocusElement
     @appendChild(@focusElement)
 
-    #textField = document.createElement 'INPUT'
-    #textField.setAttribute 'type', 'text'
-    #@appendChild textField
+    #@searchElement = document.createElement('outline-editor-search')
+    #@searchElement.setEditor @editor
 
     topListElement = document.createElement('UL')
     @appendChild(topListElement)
@@ -106,6 +108,7 @@ class OutlineEditorElement extends HTMLElement
     @subscriptions.dispose()
     @dragSubscription.dispose()
     @itemRenderer.destroyed()
+    #@searchElement.destroyed()
 
   ###
   Section: Updates

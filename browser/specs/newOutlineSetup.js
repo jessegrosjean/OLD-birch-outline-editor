@@ -12,7 +12,7 @@ module.exports = function () {
 		parser = new DOMParser(),
 		htmlDoc;
 
-	xmlhttp.open('GET', './fixtures/newOutline.html', false);
+	xmlhttp.open('GET', './fixtures/newOutline.bml', false);
 	xmlhttp.send();
 	htmlDoc = parser.parseFromString(xmlhttp.responseText, 'text/html');
 

@@ -44,6 +44,7 @@ module.exports = BirchOutlineEditor =
     atom.workspace.getOutlineEditors = outlineEditorService.getOutlineEditors.bind(outlineEditorService)
     atom.workspace.onDidAddOutlineEditor = outlineEditorService.onDidAddOutlineEditor.bind(outlineEditorService)
     atom.workspace.observeOutlineEditors = outlineEditorService.observeOutlineEditors.bind(outlineEditorService)
+    atom.workspace.observeActiveOutlineEditor = outlineEditorService.observeActiveOutlineEditor.bind(outlineEditorService)
 
     require '../packages/durations'
     require '../packages/mentions'

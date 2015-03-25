@@ -53,7 +53,7 @@ describe('Outline', function() {
 
 	describe('Search', function() {
 		it('should find DOM using xpath', function() {
-			outline.evaluateXPath('//li', null, XPathResult.ANY_TYPE, null).iterateNext().should.equal(outlineSetup.one._liOrRootUL);
+			outline.evaluateXPath('//li', null, null, XPathResult.ANY_TYPE, null).iterateNext().should.equal(outlineSetup.one._liOrRootUL);
 		});
 
 		it('should find items using xpath', function() {
@@ -146,13 +146,13 @@ describe('Outline', function() {
 
 			this.timeout(5000);
 
-			xmlhttp.open('GET', './fixtures/performanceOutline.html', false);
+			xmlhttp.open('GET', './fixtures/performanceOutline.bml', false);
 			xmlhttp.send();
 			htmlDoc = parser.parseFromString(xmlhttp.responseText, 'text/html');
 
 			console.profile('Load Many');
 			console.time('Load Many');
-			var outline = new Outline(htmlDoc);
+			var outline = new Outline({outlineStore: htmlDoc});
 			console.timeEnd('Load Many');
 			console.profileEnd();
 		});
