@@ -18,7 +18,8 @@ Outline = require './Outline'
 diff = require 'fast-diff'
 Util = require './Util'
 
-#require './elements/SearchFieldElement'
+require './elements/ToolbarElement'
+require './elements/SearchFieldElement'
 
 class OutlineEditorElement extends HTMLElement
 
@@ -29,9 +30,11 @@ class OutlineEditorElement extends HTMLElement
   createdCallback: ->
 
   attachedCallback: ->
+    @toolbarElement.setEditor @editor
     #@parentElement.parentElement.insertBefore @searchElement, @parentElement
 
   detachedCallback: ->
+    @toolbarElement.parentElement?.removeChild @toolbarElement
     @_extendSelectionDisposables.dispose()
 
   attributeChangedCallback: ->
@@ -71,8 +74,10 @@ class OutlineEditorElement extends HTMLElement
     @focusElement = new FocusElement
     @appendChild(@focusElement)
 
-    #@searchElement = document.createElement('outline-editor-search')
-    #@searchElement.setEditor @editor
+    @toolbarElement = document.createElement('outline-editor-toolbar')
+    @searchElement = document.createElement('outline-editor-search')
+    @searchElement.setEditor @editor
+    @toolbarElement.appendChild @searchElement
 
     topListElement = document.createElement('UL')
     @appendChild(topListElement)
@@ -108,7 +113,8 @@ class OutlineEditorElement extends HTMLElement
     @subscriptions.dispose()
     @dragSubscription.dispose()
     @itemRenderer.destroyed()
-    #@searchElement.destroyed()
+    @toolbarElement.destroyed()
+    @searchElement.destroyed()
 
   ###
   Section: Updates
@@ -700,6 +706,9 @@ class OutlineEditorElement extends HTMLElement
       else
         true
 
+  showFindAndReplace: (e) ->
+    @searchElement.focus()
+
   ###
   Section: Util
   ###
@@ -982,6 +991,8 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'core:select-to-bottom': -> @editor.moveToEndOfDocumentAndModifySelection()
   'core:move-left': -> @editor.moveLeft()
   'core:select-left': -> @editor.moveLeftAndModifySelection()
+  'find-and-replace:show': -> @showFindAndReplace()
+  'find-and-replace:show-replace': -> @showFindAndReplace()
   'editor:move-to-beginning-of-word': -> @editor.moveWordLeft()
   'editor:select-to-beginning-of-word': -> @editor.moveWordLeftAndModifySelection()
   'editor:move-to-first-character-of-line': -> @editor.moveToBeginningOfLine()

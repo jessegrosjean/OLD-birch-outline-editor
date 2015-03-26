@@ -4,11 +4,6 @@ typechecker = require 'typechecker'
 module.exports=
 class ItemPath
 
-  @SHOW_ALL_PATH = '///*'
-  @DEFAULT_ATTRIBUTE_PATH = ['bodytext']
-  @DEFAULT_RELATIOIN = 'contains'
-  @DEFAULT_MODIFIER = 'i'
-
   @parse: (path, startRule, types) ->
     startRule ?= 'ItemPathExpression'
     exception = null
@@ -32,13 +27,20 @@ class ItemPath
       keywords: keywords
       error: exception
 
-  @evaluate: (itemPath, item, types) ->
+  @evaluate: (itemPath, rootItem, types) ->
     if typechecker.isString itemPath
       itemPath = new ItemPath itemPath, types or {}
-    itemPath.evaluate item
+    @rootItem = rootItem
+    results = itemPath.evaluate rootItem
+    @rootItem = null
+    results
 
   constructor: (@pathString, @types) ->
     @pathAST = @constructor.parse(@pathString, undefined, @types).parsedPath
+
+  ###
+  Section: Evaluation
+  ###
 
   evaluate: (item) ->
     if @pathAST
@@ -159,30 +161,30 @@ class ItemPath
     results
 
     if pathAST.absolute
-      item = item.root
+      item = @rootItem or item.root
 
     contexts.push item
 
-    for stepAST in pathAST.steps
+    for step in pathAST.steps
       results = []
       for context in contexts
         if results.length
           # If evaluating from multiple contexts and we have some results
           # already merge the new set of context results in with the existing.
           contextResults = []
-          @evaluateStep stepAST, context, contextResults
+          @evaluateStep step, context, contextResults
           results = @unionOutlineOrderedResults results, contextResults, outline
         else
-          @evaluateStep stepAST, context, results
+          @evaluateStep step, context, results
       contexts = results
     results
 
-  evaluateStep: (stepAST, item, results) ->
-    predicate = stepAST.predicate
+  evaluateStep: (step, item, results) ->
+    predicate = step.predicate
     from = results.length
-    type = stepAST.type
+    type = step.type
 
-    switch stepAST.axis
+    switch step.axis
       when 'ancestor-or-self'
         each = item
         while each
@@ -219,23 +221,6 @@ class ItemPath
           if @evaluatePredicate type, predicate, each
             results.push each
           each = each.nextItem
-
-      when 'filter-descendants'
-        end = item.nextBranch
-        each = item.firstChild
-        originalFrom = from
-        while each and each != end
-          if @evaluatePredicate type, predicate, each
-            lastMatch = results.lastObject()
-            eachAncestor = each.parent
-            # splice in ancestors as needed... this can be optimized
-            while eachAncestor != item and results.indexOf(eachAncestor) is -1
-              results.splice from, 0, eachAncestor
-              eachAncestor = eachAncestor.parent
-            results.push each
-            from = results.length
-          each = each.nextItem
-        results.splice originalFrom, 0, item
 
       when 'following-sibling'
         each = item.nextSibling
@@ -274,7 +259,7 @@ class ItemPath
         if @evaluatePredicate type, predicate, item
           results.push item
 
-    @sliceResultsFrom stepAST.slice, results, from
+    @sliceResultsFrom step.slice, results, from
 
   evaluatePredicate: (type, predicate, item) ->
     if type != '*' and type != item.getAttribute 'data-type'
@@ -293,13 +278,8 @@ class ItemPath
       modifier = predicate.modifier
       value = predicate.value
 
-      attributePath ?= ItemPath.DEFAULT_ATTRIBUTE_PATH
-
       if !relation and !value
         return @valueForAttributePath(attributePath, item) != null
-
-      relation ?= ItemPath.DEFAULT_RELATIOIN
-      modifier ?= ItemPath.DEFAULT_MODIFIER
 
       predicateValueCache = predicate.predicateValueCache
       unless predicateValueCache
@@ -315,10 +295,8 @@ class ItemPath
   valueForAttributePath: (attributePath, item) ->
     attributeName = attributePath[0]
     switch attributeName
-      when 'bodytext'
+      when 'text'
         item.bodyText
-      when 'bodyhtml'
-        item.bodyHTML
       else
         item.getAttribute attributeName
 
@@ -420,209 +398,90 @@ class ItemPath
         Array.prototype.splice.apply(results, [from, results.length - from].concat(sliced));
 
   ###
-  leftmostItemPath: (itemPath) ->
-    if itemPath.union
-      @leftmostItemPath itemPath.union[0]
-    else if itemPath.intersect
-      @leftmostItemPath itemPath.intersect[0]
-    else if itemPath.except
-      @leftmostItemPath itemPath.except[0]
-    else
-      itemPath
-
-  locationPathString: (minusLastPathStep) ->
-    leftMosItemPath = @leftmostItemPath @itemPath
-    path = JSON.parse(JSON.stringify(leftMosItemPath))
-    locationSteps = []
-
-    for each in steps
-      if each.axis is 'filter-descendants'
-        break
-      locationSteps.push each
-
-    if minusLastPathStep
-      locationSteps.pop()
-
-    if locationSteps.length is 0
-      return ''
-    else
-      path.steps = locationSteps;
-      @pathToString path
-
-  @setLocationPathString = function setLocationPathString(newLocationPathString) {
-    var oldLocationPathString = @locationPathString(),
-      newItemPathString = newLocationPathString + @toString().substr(oldLocationPathString.length);
-    @itemPath = ItemPath.parse(newItemPathString).parsedPath;
-    @itemPathString = newItemPathString;
-    return this;
-  };
-
-  @filterStepString = function filterStepString() {
-    var leftMosItemPath = @leftmostItemPath(@itemPath),
-      steps = leftMosItemPath.steps,
-      length = steps.length,
-      each,
-      i;
-
-    for (i = 0; i < length; i++) {
-      each = steps[i];
-      if (each.axis is 'filter-descendants') {
-        return @_stepToString(each).substr(2);
-      }
-    }
-
-    return '';
-  };
-
-  @setFilterStepString = function setFilterStepString(filterStepString) {
-    var newItemPathString = @locationPathString();
-
-    if (filterStepString) {
-      newItemPathString += '///' + filterStepString;
-    }
-
-    @itemPath = ItemPath.parse(newItemPathString).parsedPath;
-    @itemPathString = newItemPathString;
-
-    return this;
-  };
-
-  //
-  // Focus State
-  //
-
-  @updateItemPathByFocusingOutOneLevel = function updateItemPathByFocusingOutOneLevel() {
-    var filterStepString = @filterStepString();
-    if (filterStepString != '*') {
-      @setFilterStepString('*');
-    } else {
-      var locationPathString = @locationPathString(true);
-      if (!locationPathString) {
-        locationPathString = '';
-      }
-      @setLocationPathString(locationPathString);
-    }
-
-    return this;
-  };
-
-  //
-  // Convert to String
-  //
-
-  @_predicateToString = function _predicateToString(predicate, group) {
-    if (predicate is '*') {
-      return '*';
-    }
-
-    var openGroup = group ? '(' : '',
-      closeGroup = group ? ')' : '';
-
-    var and = predicate.and;
-    if (and) {
-      return openGroup + @_predicateToString(and[0], true) + ' and ' + @_predicateToString(and[1], true) + closeGroup;
-    }
-
-    var or = predicate.or;
-    if (or) {
-      return openGroup + @_predicateToString(or[0], true) + ' or ' + @_predicateToString(or[1], true) + closeGroup;
-    }
-
-    var not = predicate.not;
-    if (not) {
-      return 'not ' + @_predicateToString(not, true);
-    }
-
-    var attributePath = predicate.attributePath,
-      relation = predicate.relation,
-      modifier = predicate.modifier,
-      value = predicate.value,
-      result = [];
-
-    if (attributePath) {
-      result.push('@' + attributePath.join(':'));
-    }
-
-    if (relation) {
-      result.push(relation);
-    }
-
-    if (modifier) {
-      result.push('[' + modifier + ']');
-    }
-
-    if (value) {
-      try {
-        ItemPathParser.parse(value,  { startRule : 'Value' });
-      } catch (e) {
-        value = '"' + value + '"';
-      }
-
-      result.push(value);
-    }
-
-    return result.join(' ');
-  };
-
-  @_stepToString = function _stepToString(step) {
-    switch (step.axis) {
-    when 'child':
-      return @_predicateToString(step.predicate);
-    when 'descendant':
-      return '/' + @_predicateToString(step.predicate);
-    when 'filter-descendants':
-      return '//' + @_predicateToString(step.predicate);
-    when 'parent':
-      return '..' + @_predicateToString(step.predicate);
-    default:
-      return step.axis + '::' + @_predicateToString(step.predicate);
-    }
-  };
-
-  @pathToString = function pathToString(path) {
-    var stepStrings = [],
-      steps = path.steps,
-      stepsLength = steps.length,
-      step,
-      i;
-
-    for (i = 0; i < stepsLength; i++) {
-      stepStrings.push(@_stepToString(steps[i]));
-    }
-
-    if (path.absolute) {
-      return '/' + stepStrings.join('/');
-    } else {
-      return stepStrings.join('/');
-    }
-  };
-
-  @_itemPathToString = function _itemPathToString(itemPath, group) {
-    var openGroup = group ? '(' : '',
-      closeGroup = group ? ')' : '';
-
-    var union = itemPath.union;
-    if (union) {
-      return openGroup + @_itemPathToString(union[0], true) + ' union ' + @_itemPathToString(union[1], true) + closeGroup;
-    }
-
-    var intersect = itemPath.intersect;
-    if (intersect) {
-      return openGroup + @_itemPathToString(intersect[0], true) + ' intersect ' + @_itemPathToString(intersect[1], true) + closeGroup;
-    }
-
-    var except = itemPath.except;
-    if (except) {
-      return openGroup + @_itemPathToString(except[0], true) + ' except ' + @_itemPathToString(except[1], true) + closeGroup;
-    }
-
-    return @pathToString(itemPath);
-  };
-
-  @toString = function toString() {
-    return @_itemPathToString(@itemPath);
-  };
+  Section: AST To String
   ###
+
+  predicateToString: (predicate, group) ->
+    if predicate is '*'
+      return '*'
+    else
+      openGroup = if group then '(' else ''
+      closeGroup = if group then ')' else ''
+
+      if andAST = predicate.and
+        openGroup + @predicateToString(andAST[0], true) + ' and ' + @predicateToString(andAST[1], true) + closeGroup
+      else if orAST = predicate.or
+        openGroup + @predicateToString(orAST[0], true) + ' or ' + @predicateToString(orAST[1], true) + closeGroup
+      else if notAST = predicate.not
+        'not ' + @predicateToString notAST, true
+      else
+        result = []
+
+        if attributePath = predicate.attributePath
+          unless attributePath.length is 1 and attributePath[0] is 'text' #default
+            result.push('@' + attributePath.join(':'))
+
+        if relation = predicate.relation
+          if relation != 'contains' #default
+            result.push relation
+
+        if modifier = predicate.modifier
+          if modifier != 'i' #default
+            result.push('[' + modifier + ']')
+
+        if value = predicate.value
+          try
+            ItemPathParser.parse(value,  { startRule : 'Value' })
+          catch error
+            value = '"' + value + '"'
+          result.push value
+
+        result.join ' '
+
+  stepToString: (step, first) ->
+    predicate = @predicateToString step.predicate
+    switch step.axis
+      when 'child'
+        predicate
+      when 'descendant'
+        if first
+          predicate # default
+        else
+          '/' + predicate
+      when 'parent'
+        '..' + predicate
+      else
+        step.axis + '::' + predicate
+
+  pathToString: (pathAST) ->
+    stepStrings = []
+    firstStep = null
+    first = true
+    for step in pathAST.steps
+      unless firstStep
+        firstStep = step
+        stepStrings.push @stepToString step, true
+      else
+        stepStrings.push @stepToString step
+    if pathAST.absolute and !(firstStep.axis is 'descendant')
+      '/' + stepStrings.join('/')
+    else
+      stepStrings.join('/')
+
+  pathExpressionToString: (itemPath, group) ->
+    openGroup = if group then '(' else ''
+    closeGroup = if group then ')' else ''
+    if union = itemPath.union
+      openGroup + @pathExpressionToString(union[0], true) + ' union ' + @pathExpressionToString(union[1], true) + closeGroup
+    else if intersect = itemPath.intersect
+      openGroup + @pathExpressionToString(intersect[0], true) + ' intersect ' + @pathExpressionToString(intersect[1], true) + closeGroup
+    else if except = itemPath.except
+      openGroup + @pathExpressionToString(except[0], true) + ' except ' + @pathExpressionToString(except[1], true) + closeGroup
+    else
+      @pathToString itemPath
+
+  toString: ->
+    return @pathExpressionToString @pathAST
 
 keywordCompare = (a, b) ->
   aOffset = a.offset

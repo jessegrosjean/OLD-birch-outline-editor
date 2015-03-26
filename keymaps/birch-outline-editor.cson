@@ -2,6 +2,7 @@
   'alt-cmd-n': 'birch-outline-editor:new-outline'
 
 'birch-outline-editor':
+
   # Platform Bindings
   'home': 'editor:move-to-first-character-of-line'
   'end': 'editor:move-to-end-of-screen-line'

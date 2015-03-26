@@ -23,8 +23,8 @@ keymaps.add('core', coreKeymap)
 keymaps.add('birch', birchKeymap)
 
 document.addEventListener('keydown', (e) ->
-	keymaps.handleKeyboardEvent(e)
-	e.stopImmediatePropagation()
+  keymaps.handleKeyboardEvent(e)
+  e.stopImmediatePropagation()
 , true)
 
 window.atom =
@@ -36,7 +36,7 @@ window.atom =
       new Disposable()
 
   deserializers:
-  	add: ->
+    add: ->
   inBrowserMode: -> true
   config:
     get: ->

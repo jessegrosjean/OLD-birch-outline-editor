@@ -5,10 +5,10 @@ class SearchFieldElement extends HTMLElement
 
   initialize: ->
     this
+    @classList.add 'block'
 
   createdCallback: ->
     @textFieldElement = document.createElement 'atom-text-editor'
-    @textFieldElement.classList.add 'padding'
     @textFieldElement.setAttribute 'mini', true
     @textFieldElement.setAttribute 'placeholder-text', 'Search...'
     @textFieldEditor = @textFieldElement.getModel?()
@@ -24,10 +24,14 @@ class SearchFieldElement extends HTMLElement
     if attrName is 'data-query'
       unless @textFieldEditor?.getText() is newVal
         @textFieldEditor?.setText newVal
-      @editor?.setSearch "//*[text()[contains(.,'#{newVal}')]]"
+      @editor?.setSearch newVal
 
   destroyed: ->
+    @editor = null
     @filterPathSubscription?.dispose()
+
+  focus: ->
+    @textFieldElement.focus()
 
   getEditor: ->
     @editor
@@ -35,11 +39,16 @@ class SearchFieldElement extends HTMLElement
   setEditor: (editor) ->
     @filterPathSubscription?.dispose()
     @editor = editor
-    @filterPathSubscription = @editor?.onDidChangeFilterPath (filterPath) =>
-      filterPath = filterPath.match(/\.,'(.*)'/)?[1]
-      @setAttribute 'data-query', filterPath
+    @filterPathSubscription = @editor?.onDidChangeSearch (path, type) =>
+      @setAttribute 'data-query', path
+
+atom.commands.add 'outline-editor-search',
+  'core:cancel': ->
+    @setAttribute 'data-query', ''
+    @editor.outlineEditorElement.focus()
 
 module.exports = document.registerElement(
   'outline-editor-search',
   prototype: SearchFieldElement.prototype
 )
+

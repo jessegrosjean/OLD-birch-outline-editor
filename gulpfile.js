@@ -1,25 +1,23 @@
 var gulp = require("gulp");
+var gpeg = require("gulp-peg");
 var gutil = require("gulp-util");
 var webpack = require("webpack");
 var WebpackDevServer = require("webpack-dev-server");
 var webpackConfig = require("./webpack.config.js");
 
-// The development server (the recommended option for development)
-gulp.task("default", ["webpack-dev-server"]);
+gulp.task("default", ["peg:build", "webpack-dev-server"]);
+gulp.task("build", ["peg:build", "webpack:build"]);
 
-// Build and watch cycle (another option for development)
-// Advantage: No server required, can run app from filesystem
-// Disadvantage: Requests are not blocked until bundle is available,
-//               can serve an old app on refresh
-gulp.task("build-dev", ["webpack:build-dev"], function() {
-	gulp.watch(["app/**/*"], ["webpack:build-dev"]);
+gulp.task("peg:build", function() {
+  gulp
+    .src("./lib/**/*.pegjs")
+    .pipe(gpeg({
+    	cache: true,
+    	optimize: "size",
+    	allowedStartRules: ["ItemPathExpression", "Value"]
+    }).on("error", gutil.log))
+    .pipe(gulp.dest("./lib"));
 });
-
-gulp.task("demo", ["webpack-dev-server"]);
-gulp.task("specs", ["webpack-dev-server"]);
-
-// Production build
-gulp.task("build", ["webpack:build"]);
 
 gulp.task("webpack:build", function(callback) {
 	// modify some webpack config options
@@ -78,6 +76,6 @@ gulp.task("webpack-dev-server", function(callback) {
 		}
 	}).listen(8080, "localhost", function(err) {
 		if(err) throw new gutil.PluginError("webpack-dev-server", err);
-		gutil.log("[webpack-dev-server]", "http://localhost:8080/webpack-dev-server/src/pages/index.html");
+		gutil.log("[webpack-dev-server]", "http://localhost:8080/browser/demo/");
 	});
 });

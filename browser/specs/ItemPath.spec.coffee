@@ -103,16 +103,16 @@ describe 'ItemPath', ->
   describe 'Predicate', ->
     describe 'Structure', ->
       it 'should accept a complete attribute, relation, value, slice predicate', ->
-        outline.evaluateItemPath('//@bodytext = "one"[0]').should.eql [one]
+        outline.evaluateItemPath('//@text = "one"[0]').should.eql [one]
 
       it 'should accept a attribute, relation, value predicate', ->
-        outline.evaluateItemPath('//@bodytext = "one"').should.eql [one]
+        outline.evaluateItemPath('//@text = "one"').should.eql [one]
 
       it 'should default to case insensitive comparisons', ->
-        outline.evaluateItemPath('//@bodytext = "oNe"').should.eql [one]
+        outline.evaluateItemPath('//@text = "oNe"').should.eql [one]
 
       it 'should accept attribute value predicates', ->
-        outline.evaluateItemPath('//@bodytext one').should.eql [one]
+        outline.evaluateItemPath('//@text one').should.eql [one]
 
       it 'should accept value predicates', ->
         outline.evaluateItemPath('//one').should.eql [one]
@@ -143,7 +143,7 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('/one/not not not two').should.eql [five]
 
       it 'should handle and or not in the proper order', ->
-        outline.evaluateItemPath('//(@bodytext e and not @t) or @t = 23').should.eql [one, five, six]
+        outline.evaluateItemPath('//(@text e and not @t) or @t = 23').should.eql [one, five, six]
         outline.evaluateItemPath('//e and @t or not @t').should.eql [one, two, three, five]
         outline.evaluateItemPath('//(e and @t) or not @t').should.eql [one, two, three, five]
         outline.evaluateItemPath('//e and (@t or not v)').should.eql [one, three]
@@ -202,20 +202,20 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//matches ".*i.*"').should.eql [five, six]
 
       it 'should internally handle exception when matches is given a bad regex', ->
-        outline.evaluateItemPath('//@bodytext matches " @\\\\w("').should.eql []
+        outline.evaluateItemPath('//@text matches " @\\\\w("').should.eql []
 
     describe 'Optional Options', ->
       it 'should support options (AROV) formatted queries', ->
         one.bodyText = 'Being all INSENSITIVE'
-        outline.evaluateItemPath('@bodytext contains insensitive').should.eql [one]
-        outline.evaluateItemPath('@bodytext contains [s] insensitive').should.eql []
-        outline.evaluateItemPath('@bodytext contains [s] INSENSITIVE').should.eql [one]
+        outline.evaluateItemPath('@text contains insensitive').should.eql [one]
+        outline.evaluateItemPath('@text contains [s] insensitive').should.eql []
+        outline.evaluateItemPath('@text contains [s] INSENSITIVE').should.eql [one]
 
       it 'should support AOV formatted queries', ->
         one.bodyText = 'INSENSITIVE'
-        outline.evaluateItemPath('@bodytext insensitive').should.eql([one])
-        outline.evaluateItemPath('@bodytext [s] insensitive').should.eql([])
-        outline.evaluateItemPath('@bodytext [s] INSENSITIVE').should.eql([one])
+        outline.evaluateItemPath('@text insensitive').should.eql([one])
+        outline.evaluateItemPath('@text [s] insensitive').should.eql([])
+        outline.evaluateItemPath('@text [s] INSENSITIVE').should.eql([one])
 
       it 'should support OV formatted queries', ->
         one.bodyText = 'INSENSITIVE'
@@ -231,15 +231,15 @@ describe 'ItemPath', ->
 
       it 'should support convert to number before compare option', ->
         one.bodyText = '1.0'
-        outline.evaluateItemPath('@bodytext = 1.0').should.eql([one])
-        outline.evaluateItemPath('@bodytext = 1').should.eql([])
-        outline.evaluateItemPath('@bodytext = [n] 1').should.eql([one])
+        outline.evaluateItemPath('@text = 1.0').should.eql([one])
+        outline.evaluateItemPath('@text = 1').should.eql([])
+        outline.evaluateItemPath('@text = [n] 1').should.eql([one])
 
       it 'should support convert to date before compare option', ->
         one.bodyText = 'November 1, 2012'
-        outline.evaluateItemPath('@bodytext = November 1, 2012').should.eql([one])
-        outline.evaluateItemPath('@bodytext = November 01, 2012').should.eql([])
-        outline.evaluateItemPath('@bodytext = [d] November 01, 2012').should.eql([one])
+        outline.evaluateItemPath('@text = November 1, 2012').should.eql([one])
+        outline.evaluateItemPath('@text = November 01, 2012').should.eql([])
+        outline.evaluateItemPath('@text = [d] November 01, 2012').should.eql([one])
 
     describe 'Values', ->
       it 'should accept unquoted values', ->
@@ -346,3 +346,46 @@ describe 'ItemPath', ->
   describe 'Reported Error Cases', ->
     it 'should return empty array when evaluating bad node path', ->
       outline.evaluateItemPath('/////union').should.eql []
+
+  describe 'To String', ->
+    it 'should convert path object to path string', ->
+      new ItemPath('/*').toString().should.equal('/*')
+
+      new ItemPath('a union b').toString().should.equal('a union b')
+
+      new ItemPath('a intersect b').toString().should.equal('a intersect b')
+      new ItemPath('a except b').toString().should.equal('a except b')
+
+      new ItemPath('a union b union c').toString().should.equal('a union (b union c)')
+      new ItemPath('(a union b) union c').toString().should.equal('(a union b) union c')
+
+      new ItemPath('//a').toString().should.equal('a')
+      new ItemPath('a//b').toString().should.equal('a//b')
+      new ItemPath('a/..b').toString().should.equal('a/..b')
+      new ItemPath('..b').toString().should.equal('..b')
+      new ItemPath('/a/ancestor::b').toString().should.equal('/a/ancestor::b')
+
+      new ItemPath('@line = one').toString().should.equal('@line = one')
+      new ItemPath('= one').toString().should.equal('= one')
+      new ItemPath('= oNe').toString().should.equal('= oNe')
+      new ItemPath('oNe').toString().should.equal('oNe')
+
+      new ItemPath('a and b').toString().should.equal('a and b')
+      new ItemPath('a or b').toString().should.equal('a or b')
+      new ItemPath('not a').toString().should.equal('not a')
+
+      new ItemPath('a and b and c').toString().should.equal('a and (b and c)')
+      new ItemPath('not (a and b)').toString().should.equal('not (a and b)')
+
+      new ItemPath('@done').toString().should.equal('@done')
+      new ItemPath('@line:strong').toString().should.equal('@line:strong')
+
+      new ItemPath('> 10').toString().should.equal('> 10')
+      new ItemPath('@line matches 10').toString().should.equal('@line matches 10')
+
+      new ItemPath('= [s] insensitive').toString().should.equal('= [s] insensitive')
+
+      new ItemPath('/or').toString().should.equal('/or')
+      new ItemPath('/"not a"').toString().should.equal('/"not a"')
+      new ItemPath('/other things').toString().should.equal('/other things')
+      new ItemPath('/"quoted strings"').toString().should.equal('/quoted strings')

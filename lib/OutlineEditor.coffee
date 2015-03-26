@@ -52,8 +52,9 @@ class OutlineEditor extends Model
     @_textModeTypingFormattingTags = {}
     @_selectionVerticalAnchor = undefined
     @_disableSyncDOMSelectionToEditor = false
-    @_searchItems = []
-    @_search = null
+    @_searchQuery = null
+    @_searchType = null
+    @_searchQueryItems = []
 
     @_hoistStack = []
     @_dragState =
@@ -147,7 +148,7 @@ class OutlineEditor extends Model
       @_overrideIsFocused = false
 
   outlineDidChange: (e) ->
-    if @getSearch()
+    if @getSearchQuery()
       hoistedItem = @getHoistedItem()
       for eachMutation in e.mutations
         if eachMutation.type == Mutation.ChildrenChanged
@@ -292,7 +293,8 @@ class OutlineEditor extends Model
   # Public: Calls your `callback` when the editor's search changes.
   #
   # * `callback` {Function}
-  #   * `search` Editor's {Object} search.
+  #   * `query` Editor's {String} search query.
+  #   * `type` Editor's {String} search type.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeSearch: (callback) ->
@@ -502,44 +504,67 @@ class OutlineEditor extends Model
     @toggleFoldItems items, true
 
   ###
-  Section: Search
+  Section: Searching Items
   ###
 
-  getSearch: ->
-    @_search
+  # Public: Search type used for item path search syntax.
+  @ITEM_PATH_SEARCH: 'itempath'
 
-  setSearch: (search) ->
-    if @_search is search
+  # Public: Search type used for xpath search syntax.
+  @X_PATH_SEARCH: 'xpath'
+
+  # Public: Returns search query {String}.
+  getSearchQuery: ->
+    @_searchQuery
+
+  # Public: Returns a search type of either {OutlineEditor.ITEM_PATH_SEARCH}
+  # (default) or {OutlineEditor.X_PATH_SEARCH}.
+  getSearchType: ->
+    @_searchType
+
+  # Public: Sets search used to filter the contents of this outline. The
+  # search `type` parameter determines how the search is performed. It
+  # defaults to {OutlineEditor.ITEM_PATH_SEARCH} syntax, but you can also use
+  # {OutlineEditor.X_PATH_SEARCH} syntax.
+  #
+  # - `query` {String} Search query.
+  # - `type` (optional) {OutlineEditor.ITEM_PATH_SEARCH} (default) or {OutlineEditor.X_PATH_SEARCH}
+  setSearch: (query, type) ->
+    type ?= OutlineEditor.ITEM_PATH_SEARCH
+    query ?= ''
+
+    if @_searchQuery is query and @_searchType is type
       return
 
-    @_search = search
+    @_searchQuery = query
+    @_searchType = type
 
-    for each in @_searchItems
+    for each in @_searchQueryItems
       eachState = @editorState(each)
       eachState.expanded = false
       eachState.matched = false
       eachState.matchedAncestor = false
 
     hoisted = @getHoistedItem()
+    @_searchQueryItems = []
 
-    if search
-      @_searchItems = []
-      switch search.type
-        when 'itempath'
-          for each in hoisted.evaluateItemPath(search.query)
+    if query
+      switch type
+        when OutlineEditor.ITEM_PATH_SEARCH
+          for each in hoisted.evaluateItemPath(query)
             @_addSearchMatch(each)
-        when 'xpath'
-          for each in hoisted.getItemsForXPath(search.query)
+        when OutlineEditor.X_PATH_SEARCH
+          for each in hoisted.getItemsForXPath(query)
             @_addSearchMatch(each)
-    else
-      @_searchItems = []
+        else
+          console.log "Invalid search type #{type}"
 
     @outlineEditorElement.updateHoistedItem(null, hoisted)
-    @emitter.emit 'did-change-search', search
+    @emitter.emit 'did-change-search', query, type
     @_revalidateSelectionRange()
 
   _addSearchMatch: (item) ->
-    itemFilterPathItems = @_searchItems
+    itemFilterPathItems = @_searchQueryItems
     itemState = @editorState(item)
     itemState.matched = true
     itemFilterPathItems.push(item)
@@ -627,7 +652,7 @@ class OutlineEditor extends Model
       return false unless @isExpanded(parent)
       parent = parent.parent
 
-    return true unless @_search
+    return true unless @_searchQuery
     itemState = @editorState(item)
     itemState.matched or itemState.matchedAncestor
 

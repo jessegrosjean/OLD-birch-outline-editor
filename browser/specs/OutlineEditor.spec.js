@@ -91,7 +91,7 @@ describe('OutlineEditor', function() {
 
 	describe('Search', function() {
 		it('should set search', function() {
-			editor.setSearch({type: 'xpath', query: '//li/p[text()=\'two\']'});
+			editor.setSearch('//li/p[text()=\'two\']', 'xpath');
 			editor.isVisible(outlineSetup.one).should.be.ok;
 			editor.isVisible(outlineSetup.two).should.be.ok;
 			editor.isVisible(outlineSetup.three).should.not.be.ok;
