@@ -18,13 +18,21 @@ toggleStatus = (editor, status) ->
     undoManager.endUndoGrouping()
     outline.endUpdates()
 
+OutlineEditorService.eventRegistery.listen '.bstatus',
+  click: (e) ->
+    status = e.target.dataset.status
+    outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
+    outlineEditor.setSearch "@data-status = #{status}"
+    e.stopPropagation()
+    e.preventDefault()
+
 OutlineEditorService.observeOutlineEditors (editor) ->
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if status = item.getAttribute 'data-status'
-      span = document.createElement 'A'
-      span.className = 'bstatus'
-      span.setAttribute 'data-status', status
-      addBadgeElement span
+      a = document.createElement 'A'
+      a.className = 'bstatus'
+      a.setAttribute 'data-status', status
+      addBadgeElement a
 
 atom.commands.add 'birch-outline-editor',
   'birch-outline-editor:toggle-status-waiting': -> toggleStatus @editor, 'waiting'

@@ -25,6 +25,14 @@ OutlineEditorService.observeOutlineEditors (editor) ->
       span.setAttribute 'data-priority', value
       addBadgeElement span
 
+OutlineEditorService.eventRegistery.listen '.bpriority',
+  click: (e) ->
+    priority = e.target.dataset.priority
+    outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
+    outlineEditor.setSearch "@data-priority = #{priority}"
+    e.stopPropagation()
+    e.preventDefault()
+
 atom.commands.add 'birch-outline-editor',
   'birch-outline-editor:toggle-priority-1': -> togglePriority @editor, '1'
   'birch-outline-editor:toggle-priority-2': -> togglePriority @editor, '2'
