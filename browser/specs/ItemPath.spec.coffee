@@ -101,6 +101,7 @@ describe 'ItemPath', ->
       one.evaluateItemPath('//frog two', 'frog' : true).should.eql [two]
 
   describe 'Predicate', ->
+
     describe 'Structure', ->
       it 'should accept a complete attribute, relation, value, slice predicate', ->
         outline.evaluateItemPath('//@text = "one"[0]').should.eql [one]
@@ -161,6 +162,7 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//not (@t or e)').should.eql [two]
 
     describe 'Attributes', ->
+
       it 'should consider attributes with values', ->
         outline.evaluateItemPath('//@t = 23').should.eql [six]
 
@@ -205,6 +207,7 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//@text matches " @\\\\w("').should.eql []
 
     describe 'Optional Options', ->
+
       it 'should support options (AROV) formatted queries', ->
         one.bodyText = 'Being all INSENSITIVE'
         outline.evaluateItemPath('@text contains insensitive').should.eql [one]
@@ -242,6 +245,7 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('@text = [d] November 01, 2012').should.eql([one])
 
     describe 'Values', ->
+
       it 'should accept unquoted values', ->
         one.bodyText = 'find this string'
         outline.evaluateItemPath('find this string').should.eql([one])
@@ -315,6 +319,22 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//find in sanskrit पशुपतिरपि तान्यहानि कृच्छ्राद्').should.eql([sanskrit])
         outline.evaluateItemPath('//find in chinese 其為人也孝弟 而好犯上者 鮮矣').should.eql([chinese])
         outline.evaluateItemPath('//find in tamil ஸ்றீனிவாஸ ராமானுஜன் ஐயங்கார்').should.eql([tamil])
+
+    describe 'Tag Syntax', ->
+
+      beforeEach ->
+        one.setAttribute 'data-tags', ['one', 'two']
+        three.setAttribute 'data-tags', ['one', 'two', 'three']
+
+      it 'should find all tagged items with "#"', ->
+        outline.evaluateItemPath('#').should.eql [one, three]
+
+      it 'should find tagged items', ->
+        outline.evaluateItemPath('#one').should.eql [one, three]
+        outline.evaluateItemPath('#three').should.eql [three]
+
+      it 'should not match partial tags', ->
+        outline.evaluateItemPath('#on').should.eql []
 
   describe 'Slicing', ->
     it 'should slice from start', ->

@@ -1,5 +1,12 @@
 # ChangeLog
 
+## 1.5.0
+
+- Added click to search on badges.
+- Added shortcut for tags in search syntax.
+
+	- To find all tagged items: `#`. Symantically expands to `@data-tags`
+	- To find item with tagname: `#tagname`. Symantically expands to `@data-tags matches (^|,)tagname($|,)`
 
 - Fixed bug where search wasn't constrained to hoisted item.
 
