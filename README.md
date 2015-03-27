@@ -18,9 +18,9 @@ Birch is an outline editor built on the [Atom](http://atom.io) platform.
 
 ## Customizing Birch
 
-See [Customizing Atom](https://atom.io/docs/latest/customizing-atom). Birch is built on Atom so you use all the same techniques for custom themes, keymaps, and packages.
+See [Hacking Atom](https://atom.io/docs/latest/hacking-atom-tools-of-the-trade). Birch is built on Atom so you use all the same techniques for custom themes, keymaps, and packages.
 
-To create a package that works with Birch follow Atom's [creating a package](https://atom.io/docs/lastest/creating-a-package) instructions. Then you'll need to use the [services API](https://atom.io/docs/lastest/creating-a-package#interacting-with-other-packages-via-services) to consume the birch service.
+To create a package that works with Birch follow Atom's [creating a package](https://atom.io/docs/latest/hacking-atom-package-word-count) instructions. Then you'll need to use the [services API](https://atom.io/docs/latest/behind-atom-interacting-with-other-packages-via-services) to consume the `birch-outine-editor-service`.
 
 It's a two step process:
 
@@ -43,14 +43,14 @@ It's a two step process:
           new Disposable =>
             @birchOutlineEditorService = null
 
-Your package will then have access to Birch through the passed in {OutlineEditorService}. Please see these example package to get started:
+Your package will then have access to Birch through the passed in {OutlineEditorService}. Please see these example packages to get started:
 
 - [archive-done](https://github.com/FoldingText/archive-done)
 - [birch-markdown](https://github.com/FoldingText/birch-markdown)
 
 ## Birch Markup Language
 
-Birch Markup Language (BML) is subset of HTML for storing outline data. Birch uses this format to store outline data in an {HTMLDocument} at runtime, and as a default serialization format.
+Birch Markup Language (BML) is subset of HTML for storing outline data. Birch uses this format to internally store outline data in an {HTMLDocument} at runtime, and as a default serialization format. Note: the DOM that you *see* at runtime doesn't follow this format, it's the internal model layer that uses it.
 
 ### Example
 
