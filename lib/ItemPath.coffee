@@ -27,31 +27,31 @@ class ItemPath
       keywords: keywords
       error: exception
 
-  @evaluate: (itemPath, rootItem, types) ->
+  @evaluate: (itemPath, contextItem, types, rootItem) ->
     if typechecker.isString itemPath
       itemPath = new ItemPath itemPath, types or {}
     itemPath.rootItem = rootItem
-    results = itemPath.evaluate rootItem
+    results = itemPath.evaluate contextItem
     itemPath.rootItem = null
     results
 
   constructor: (@pathString, @types) ->
-    @pathAST = @constructor.parse(@pathString, undefined, @types).parsedPath
+    @pathExpressionAST = @constructor.parse(@pathString, undefined, @types).parsedPath
 
   ###
   Section: Evaluation
   ###
 
   evaluate: (item) ->
-    if @pathAST
-      @evaluateItemPath @pathAST, item
+    if @pathExpressionAST
+      @evaluatePathExpression @pathExpressionAST, item
     else
       []
 
-  evaluateItemPath: (pathAST, item) ->
-    union = pathAST.union
-    intersect = pathAST.intersect
-    except = pathAST.except
+  evaluatePathExpression: (pathExpressionAST, item) ->
+    union = pathExpressionAST.union
+    intersect = pathExpressionAST.intersect
+    except = pathExpressionAST.except
     results
 
     if union
@@ -61,9 +61,9 @@ class ItemPath
     else if except
       results = @evaluateExcept except, item
     else
-      results = @evaluatePath pathAST, item
+      results = @evaluatePath pathExpressionAST, item
 
-    @sliceResultsFrom pathAST.slice, results, 0
+    @sliceResultsFrom pathExpressionAST.slice, results, 0
 
     results
 
@@ -96,13 +96,13 @@ class ItemPath
           j++
 
   evaluateUnion: (pathsAST, item) ->
-    results1 = @evaluateItemPath pathsAST[0], item
-    results2 = @evaluateItemPath pathsAST[1], item
+    results1 = @evaluatePathExpression pathsAST[0], item
+    results2 = @evaluatePathExpression pathsAST[1], item
     @unionOutlineOrderedResults results1, results2, item.outline
 
   evaluateIntersect: (pathsAST, item) ->
-    results1 = @evaluateItemPath pathsAST[0], item
-    results2 = @evaluateItemPath pathsAST[1], item
+    results1 = @evaluatePathExpression pathsAST[0], item
+    results2 = @evaluatePathExpression pathsAST[1], item
     results = []
     i = 0
     j = 0
@@ -126,8 +126,8 @@ class ItemPath
           j++
 
   evaluateExcept: (pathsAST, item) ->
-    results1 = @evaluateItemPath pathsAST[0], item
-    results2 = @evaluateItemPath pathsAST[1], item
+    results1 = @evaluatePathExpression pathsAST[0], item
+    results2 = @evaluatePathExpression pathsAST[1], item
     results = []
     i = 0
     j = 0
@@ -481,7 +481,7 @@ class ItemPath
       @pathToString itemPath
 
   toString: ->
-    return @pathExpressionToString @pathAST
+    return @pathExpressionToString @pathExpressionAST
 
 keywordCompare = (a, b) ->
   aOffset = a.offset

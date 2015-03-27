@@ -451,10 +451,12 @@ class Outline
   # matching items.
   #
   # - `itemPath` {String} itempath expression
+  # - `contextItem` (optional)
   #
   # Returns an {Array} of matching {Item}s.
-  evaluateItemPath: (itemPath, types) ->
-    ItemPath.evaluate itemPath, @root, types
+  evaluateItemPath: (itemPath, contextItem, types) ->
+    contextItem ?= @root
+    ItemPath.evaluate itemPath, contextItem, types, @root
 
   # Public: XPath query internal HTML structure.
   #

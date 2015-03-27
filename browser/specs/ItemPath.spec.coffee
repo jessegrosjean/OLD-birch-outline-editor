@@ -149,7 +149,7 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//e and (@t or not v)').should.eql [one, three]
 
       it 'should handle boolean grouping without leading axis', ->
-        JSON.stringify(new ItemPath('(a and b) and c').pathAST).should.equal('{"absolute":false,"steps":[{"axis":"child","type":"*","predicate":{"and":[{"and":[{"attributePath":null,"relation":null,"modifier":null,"value":"a"},{"attributePath":null,"relation":null,"modifier":null,"value":"b"}]},{"attributePath":null,"relation":null,"modifier":null,"value":"c"}]},"slice":null}],"keywords":[{"label":"value","offset":1,"text":"a "},{"label":"keyword","offset":3,"text":"and"},{"label":"value","offset":7,"text":"b"},{"label":"keyword","offset":10,"text":"and"},{"label":"value","offset":14,"text":"c"}]}')
+        JSON.stringify(new ItemPath('(a and b) and c').pathExpressionAST).should.equal('{"absolute":false,"steps":[{"axis":"descendant","type":"*","predicate":{"and":[{"and":[{"attributePath":["text"],"relation":"contains","modifier":"i","value":"a"},{"attributePath":["text"],"relation":"contains","modifier":"i","value":"b"}]},{"attributePath":["text"],"relation":"contains","modifier":"i","value":"c"}]},"slice":null}],"keywords":[{"label":"value","offset":1,"text":"a "},{"label":"keyword","offset":3,"text":"and"},{"label":"value","offset":7,"text":"b"},{"label":"keyword","offset":10,"text":"and"},{"label":"value","offset":14,"text":"c"}]}')
 
     describe 'Nesting', ->
       it 'should accept parenthesis around predicates', ->
