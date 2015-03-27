@@ -1,7 +1,14 @@
 @priority-color-3: #f4ce33; // yellow
 @priority-color-4: #6ccb49; // green
+@priority-color-5: #40b8f3; // blue
 
 .bbadge.bstatus {
+  &[data-status="todo"] {
+    background: @priority-color-5;
+    &:before {
+      content: "todo";
+    }
+  }
   &[data-status="waiting"] {
     background: @priority-color-3;
     &:before {

@@ -35,12 +35,14 @@ OutlineEditorService.observeOutlineEditors (editor) ->
       addBadgeElement a
 
 atom.commands.add 'birch-outline-editor',
+  'birch-outline-editor:toggle-status-todo': -> toggleStatus @editor, 'todo'
   'birch-outline-editor:toggle-status-waiting': -> toggleStatus @editor, 'waiting'
   'birch-outline-editor:toggle-status-active': -> toggleStatus @editor, 'active'
   'birch-outline-editor:toggle-status-complete': -> toggleStatus @editor, 'complete'
 
 atom.keymaps.add 'status-bindings',
   'birch-outline-editor.outlineMode':
+    's t' : 'birch-outline-editor:toggle-status-todo'
     's w' : 'birch-outline-editor:toggle-status-waiting'
     's a' : 'birch-outline-editor:toggle-status-active'
     's c' : 'birch-outline-editor:toggle-status-complete'
