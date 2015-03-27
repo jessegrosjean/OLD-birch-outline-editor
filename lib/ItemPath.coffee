@@ -30,9 +30,9 @@ class ItemPath
   @evaluate: (itemPath, rootItem, types) ->
     if typechecker.isString itemPath
       itemPath = new ItemPath itemPath, types or {}
-    @rootItem = rootItem
+    itemPath.rootItem = rootItem
     results = itemPath.evaluate rootItem
-    @rootItem = null
+    itemPath.rootItem = null
     results
 
   constructor: (@pathString, @types) ->

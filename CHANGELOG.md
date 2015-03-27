@@ -1,5 +1,8 @@
 # ChangeLog
 
+
+- Fixed bug where search wasn't constrained to hoisted item.
+
 ## 1.4.0
 
 - Added search bar (similar syntax to FoldingText)
