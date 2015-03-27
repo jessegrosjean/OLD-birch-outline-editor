@@ -1,6 +1,7 @@
 {Disposable, CompositeDisposable} = require 'atom'
 OutlineLiveQuery = require './liveQueries/OutlineLiveQuery'
 WorkspaceLiveQuery = require './liveQueries/WorkspaceLiveQuery'
+eventRegistery = require './EventRegistery'
 OutlineEditor = require './OutlineEditor'
 Outline = require './Outline'
 Item = require './Item'
@@ -61,6 +62,9 @@ class OutlineEditorService
   ###
   Section: Event Subscription
   ###
+
+  # Public: {EventRegistery} instance.
+  @eventRegistery: eventRegistery
 
   # Public: Invoke the given callback when an outline editor is added to the
   # workspace.
