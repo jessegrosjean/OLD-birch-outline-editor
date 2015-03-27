@@ -67,7 +67,7 @@ class OutlineEditor extends Model
     @outline = outline or Outline.buildOutlineSync()
     @subscribeToOutline()
 
-    outlineEditorElement = new OutlineEditorElement().initialize(this)
+    outlineEditorElement = document.createElement('birch-outline-editor').initialize(this)
     outlineEditorElement.id = id
     outlineEditorElement.classList.add('beditor')
     @outlineEditorElement = outlineEditorElement
@@ -513,6 +513,12 @@ class OutlineEditor extends Model
   # Public: Search type used for xpath search syntax.
   @X_PATH_SEARCH: 'xpath'
 
+  ###
+  # Private: Add an attribute name shortcut that will be used in the
+  # {OutlineEditor.ITEM_PATH_SEARCH} search syntax. For example when searching for
+  addItemPathSearchAttributeShortcut: (shortcut) ->
+  ###
+
   # Public: Returns search query {String}.
   getSearchQuery: ->
     @_searchQuery
@@ -530,7 +536,7 @@ class OutlineEditor extends Model
   # - `query` {String} Search query.
   # - `type` (optional) {OutlineEditor.ITEM_PATH_SEARCH} (default) or {OutlineEditor.X_PATH_SEARCH}
   setSearch: (query, type) ->
-    type ?= OutlineEditor.ITEM_PATH_SEARCH
+    type ?= (@_searchType or OutlineEditor.ITEM_PATH_SEARCH)
     query ?= ''
 
     if @_searchQuery is query and @_searchType is type
@@ -1834,6 +1840,17 @@ class OutlineEditor extends Model
   ###
   Section: Util
   ###
+
+  # Public: Given a view DOM element find and return the {OutlineEditor} that
+  # contains it. For example this is useful when doing event handling. If you
+  # detect a click on some element you use this method to find the associated
+  # editor.
+  #
+  # - `element` DOM element.
+  #
+  # Returns {OutlineEditor}.
+  @findOutlineEditor: (element) ->
+    OutlineEditorElement.findOutlineEditor element
 
   editorState: (item) ->
     item?.editorState @id

@@ -21,6 +21,7 @@ Util = require './Util'
 require './elements/ToolbarElement'
 require './elements/SearchFieldElement'
 
+module.exports =
 class OutlineEditorElement extends HTMLElement
 
   ###
@@ -713,6 +714,14 @@ class OutlineEditorElement extends HTMLElement
   Section: Util
   ###
 
+  @findOutlineEditor: (element) ->
+    @findOutlineEditorElement(element)?.editor
+
+  @findOutlineEditorElement: (element) ->
+    while element and element.tagName != 'BIRCH-OUTLINE-EDITOR'
+      element = element.parentNode
+    element
+
   itemForViewNode: (viewNode) ->
     @itemRenderer.itemForRenderedNode viewNode
 
@@ -734,12 +743,6 @@ class OutlineEditorElement extends HTMLElement
 ###
 Util Functions
 ###
-
-findOutlineEditorElement = (e) ->
-  element = e.target
-  while element and element.tagName != 'BIRCH-OUTLINE-EDITOR'
-    element = element.parentNode
-  element
 
 stopEventPropagation = (commandListeners) ->
   newCommandListeners = {}
@@ -769,14 +772,14 @@ Event and Command registration
 
 EventRegistery.listen 'birch-outline-editor > ul',
   'mousedown': (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editorElement.editor.focus()
     setTimeout ->
       editorElement.beginExtendSelectionInteraction e
 
 EventRegistery.listen '.bbodytext',
   'mousedown': (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editorElement.editor.focus()
     editorElement.beginExtendSelectionInteraction e
     e.stopPropagation()
@@ -790,7 +793,7 @@ EventRegistery.listen '.bitemcontent',
   compositionupdate: (e) ->
   compositionend: (e) ->
   input: (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editor = editorElement.editor
     typingFormattingTags = editor.typingFormattingTags()
     item = editorElement.itemForViewNode e.target
@@ -846,7 +849,7 @@ EventRegistery.listen '.bitemcontent',
 
 EventRegistery.listen '.bhandle',
   mousedown: (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editor = editorElement.editor
     editorElement._maintainSelection = editor.selection
     e.stopPropagation()
@@ -856,7 +859,7 @@ EventRegistery.listen '.bhandle',
       e.target.blur()
 
   focusout: (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     maintainSelection = editorElement._maintainSelection
     editor = editorElement.editor
 
@@ -871,7 +874,7 @@ EventRegistery.listen '.bhandle',
           editor.focus()
 
   click: (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     item = editorElement.itemForViewNode e.target
     editor = editorElement.editor
     if item
@@ -891,7 +894,7 @@ EventRegistery.listen '.bhandle',
 
 EventRegistery.listen '.bhoistedItem > .bbranch > .bitemcontent',
   click: (e) ->
-    editorElement = findOutlineEditorElement e
+    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editor = editorElement.editor
     editor.unhoist()
 
@@ -1036,4 +1039,4 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:copy-path': -> @editor.copyPathToClipboard()
 )
 
-module.exports = document.registerElement 'birch-outline-editor', prototype: OutlineEditorElement.prototype
+document.registerElement 'birch-outline-editor', prototype: OutlineEditorElement.prototype
