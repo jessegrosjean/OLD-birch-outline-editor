@@ -63,9 +63,13 @@ outline-editor-toolbar {
 }
 
 outline-editor-search {
-//  padding: @component-padding;
-//  background: -webkit-linear-gradient(@tab-background-color-active , mix(@tab-background-color-active, @pane-item-border-color, 50%));
-//  border-bottom: 1px solid  @pane-item-border-color;
+  > atom-text-editor::shadow {
+    .itempath {
+      > .string {
+        //color: @syntax-text-color;
+      }
+    }
+  }
 }
 
 birch-outline-editor {
