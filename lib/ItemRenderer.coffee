@@ -414,11 +414,11 @@ class ItemRenderer
   outlineDidChange: (e) ->
     for each in e.mutations
       switch each.type
-        when Mutation.AttributeChanged
+        when Mutation.ATTRIBUTE_CHANGED
           @updateItemAttribute each.target, each.attributeName
-        when Mutation.BodyTextChanged
+        when Mutation.BODT_TEXT_CHANGED
           @updateItemBodyContent each.target
-        when Mutation.ChildrenChanged
+        when Mutation.CHILDREN_CHANGED
           @updateItemChildren(
             each.target,
             each.removedItems,

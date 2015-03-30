@@ -152,7 +152,7 @@ class OutlineEditor extends Model
     if @getSearch()?.query
       hoistedItem = @getHoistedItem()
       for eachMutation in e.mutations
-        if eachMutation.type == Mutation.ChildrenChanged
+        if eachMutation.type == Mutation.CHILDREN_CHANGED
           for eachItem in eachMutation.addedItems
             if hoistedItem.contains(eachItem)
               @_addSearchResult(eachItem)
@@ -164,7 +164,7 @@ class OutlineEditor extends Model
     @_overrideIsFocused = false
 
     for eachMutation in e.mutations
-      if eachMutation.type == Mutation.ChildrenChanged
+      if eachMutation.type == Mutation.CHILDREN_CHANGED
         targetItem = eachMutation.target
         if not targetItem.hasChildren
           @setCollapsed targetItem

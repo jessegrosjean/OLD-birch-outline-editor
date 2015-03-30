@@ -152,7 +152,7 @@ class Item
 
       outline.emitter.emit 'will-change',
         target: this
-        type: Mutation.AttributeChanged
+        type: Mutation.ATTRIBUTE_CHANGED
         attributeName: name
         attributeNewValue: value
         attributeOldValue: oldValue
@@ -383,7 +383,7 @@ class Item
 
       outline.emitter.emit 'will-change',
         target: this
-        type: Mutation.BodyTextChanged
+        type: Mutation.BODT_TEXT_CHANGED
         insertedText: insertedText
         replacedText: replacedText
         location: location
@@ -690,7 +690,7 @@ class Item
 
       outline.emitter.emit 'will-change',
         target: this
-        type: Mutation.ChildrenChanged
+        type: Mutation.CHILDREN_CHANGED
         addedItems: children
         previousSibling: previousSibling
         nextSibling: referenceSibling
@@ -745,7 +745,7 @@ class Item
 
       outline.emitter.emit 'will-change',
         target: this
-        type: Mutation.ChildrenChanged
+        type: Mutation.CHILDREN_CHANGED
         removedItems: children
         previousSibling: children[0].previousSibling
         nextSibling: nextSibling

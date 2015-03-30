@@ -10,9 +10,18 @@ assert = require 'assert'
 module.exports =
 class Mutation
 
-  @AttributeChanged = 'attribute'
-  @BodyTextChanged = 'bodyText'
-  @ChildrenChanged = 'children'
+  ###
+  Section: Constants
+  ###
+
+  # Public: ATTRIBUTE_CHANGED Mutation type constant.
+  @ATTRIBUTE_CHANGED: 'attribute'
+
+  # Public: BODT_TEXT_CHANGED Mutation type constant.
+  @BODT_TEXT_CHANGED: 'bodyText'
+
+  # Public: CHILDREN_CHANGED Mutation type constant.
+  @CHILDREN_CHANGED: 'children'
 
   ###
   Section: Attributes
@@ -21,7 +30,8 @@ class Mutation
   # Public: Read-only {Item} target of the change delta.
   target: null
 
-  # Public: Read-only type of change. `attributes`, `bodyText`, or `children`.
+  # Public: Read-only type of change. {Mutation.ATTRIBUTE_CHANGED},
+  # {Mutation.BODT_TEXT_CHANGED}, or {Mutation.CHILDREN_CHANGED}.
   type: null
 
   # Public: Read-only {Array} of child {Item}s added to the target.
@@ -71,13 +81,13 @@ class Mutation
 
     if targetTag is 'LI'
       if type is 'attributes'
-        mutation.type = Mutation.AttributeChanged
+        mutation.type = Mutation.ATTRIBUTE_CHANGED
         mutation.attributeName = mutationRecord.attributeName
         mutation.attributeOldValue = mutationRecord.attributeOldValue
       else if type is 'childList'
         if mutationRecord.removedNodes.length is 1 && mutationRecord.addedNodes.length is 1 && mutationRecord.addedNodes[0].tagName is 'P'
           # updating bodyP through replacement
-          mutation.type = Mutation.BodyTextChanged
+          mutation.type = Mutation.BODT_TEXT_CHANGED
         else
           return null # adding 'UL' ... ignore, li children will be added separate
       else
@@ -95,7 +105,7 @@ class Mutation
 
       mutation.previousSibling = _item(mutationRecord.previousSibling)
       mutation.nextSibling = _item(mutationRecord.nextSibling)
-      mutation.type = Mutation.ChildrenChanged
+      mutation.type = Mutation.CHILDREN_CHANGED
     else
       throw new Error 'Unexpected Mutation: ' + mutationRecord
 

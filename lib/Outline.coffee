@@ -50,11 +50,11 @@ else
 # disposable = outline.onDidChange (e) ->
 #   for mutation in e.mutations
 #     switch mutation.type
-#       when 'attributes'
+#       when Mutation.ATTRIBUTE_CHANGED
 #         console.log mutation.attributeName
-#       when 'bodyText'
+#       when Mutation.BODT_TEXT_CHANGED
 #         console.log mutation.target.bodyText
-#       when 'children'
+#       when Mutation.CHILDREN_CHANGED
 #         console.log mutation.addedItems
 #         console.log mutation.removedItems
 # ```

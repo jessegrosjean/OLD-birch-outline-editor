@@ -3,6 +3,7 @@ OutlineLiveQuery = require './liveQueries/OutlineLiveQuery'
 WorkspaceLiveQuery = require './liveQueries/WorkspaceLiveQuery'
 eventRegistery = require './EventRegistery'
 OutlineEditor = require './OutlineEditor'
+Mutation = require './Mutation'
 Outline = require './Outline'
 Item = require './Item'
 
@@ -22,6 +23,9 @@ class OutlineEditorService
 
   # Public: {Outline} Class
   @Outline: Outline
+
+  # Public: {Mutation} Class
+  @Mutation: Mutation
 
   # Public: {OutlineEditor} Class
   @OutlineEditor: OutlineEditor
