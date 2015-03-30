@@ -6,6 +6,7 @@ ItemBodyEncoder = require './ItemBodyEncoder'
 ItemEditorState = require './ItemEditorState'
 typechecker = require 'typechecker'
 Constants = require './Constants'
+Mutation = require './Mutation'
 ItemPath = require './ItemPath'
 assert = require 'assert'
 Util = require './Util'
@@ -148,8 +149,17 @@ class Item
 
     if isInOutline
       oldValue = @getAttribute name
+
+      outline.emitter.emit 'will-change',
+        target: this
+        type: Mutation.AttributeChanged
+        attributeName: name
+        attributeNewValue: value
+        attributeOldValue: oldValue
+
       outline.undoManager.registerUndoOperation =>
         @setAttribute name, oldValue
+
       outline.beginUpdates()
 
     if value == undefined
@@ -371,12 +381,20 @@ class Item
       else
         replacedText = new AttributedString
 
-      undoManager.registerUndoOperation(new ItemBodyUndoOperation(
+      outline.emitter.emit 'will-change',
+        target: this
+        type: Mutation.BodyTextChanged
+        insertedText: insertedText
+        replacedText: replacedText
+        location: location
+        length: length
+
+      undoManager.registerUndoOperation new ItemBodyUndoOperation(
         this,
         replacedText,
         location,
         insertedString.length
-      ))
+      )
 
       outline.beginUpdates()
 
@@ -664,8 +682,22 @@ class Item
     outline.removeItemsFromParents(children)
 
     if isInOutline
+      previousSibling = null
+      if referenceSibling
+        previousSibling = referenceSibling.previousSibling
+      else
+        previousSibling = @lastChild
+
+      outline.emitter.emit 'will-change',
+        target: this
+        type: Mutation.ChildrenChanged
+        addedItems: children
+        previousSibling: previousSibling
+        nextSibling: referenceSibling
+
       outline.undoManager.registerUndoOperation =>
         @removeChildren(children)
+
       outline.beginUpdates()
 
     ownerDocument = @_liOrRootUL.ownerDocument
@@ -710,8 +742,17 @@ class Item
     if isInOutline
       lastChild = children[children.length - 1]
       nextSibling = lastChild.nextSibling
+
+      outline.emitter.emit 'will-change',
+        target: this
+        type: Mutation.ChildrenChanged
+        removedItems: children
+        previousSibling: children[0].previousSibling
+        nextSibling: nextSibling
+
       outline.undoManager.registerUndoOperation =>
         @insertChildrenBefore(children, nextSibling)
+
       outline.beginUpdates()
 
     siblingChildren = []
