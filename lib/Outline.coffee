@@ -16,7 +16,9 @@ File = null
 if atom.inBrowserMode
   File = {}
 else
-  {File} = require atom.config.resourcePath + '/node_modules/pathwatcher'
+  # construct path on separate line for endokken
+  pathwatcherPath = atom.config.resourcePath + '/node_modules/pathwatcher'
+  {File} = require pathwatcherPath
 
 # Essential: A mutable outline of {Item}s.
 #

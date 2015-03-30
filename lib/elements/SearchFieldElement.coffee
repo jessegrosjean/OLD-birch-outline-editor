@@ -5,7 +5,9 @@ Grammar = null
 if atom.inBrowserMode
   Grammar = {}
 else
-  Grammar = require atom.config.resourcePath + '/node_modules/first-mate/lib/grammar'
+  # construct path on separate line for endokken
+  grammarPath = atom.config.resourcePath + '/node_modules/first-mate/lib/grammar'
+  Grammar = require grammarPath
 
 class ItemPathGrammar extends Grammar
   constructor: (registry) ->
