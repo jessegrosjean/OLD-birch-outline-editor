@@ -6,12 +6,17 @@ UndoManager = require './UndoManager'
 Constants = require './Constants'
 ItemPath = require './ItemPath'
 Mutation = require './Mutation'
-{File} = require 'pathwatcher'
 emissary = require 'emissary'
 shortid = require './shortid'
 assert = require 'assert'
 Item = require './Item'
 Q = require 'q'
+
+File = null
+if atom.inBrowserMode
+  File = {}
+else
+  {File} = require atom.config.resourcePath + '/node_modules/pathwatcher'
 
 # Essential: A mutable outline of {Item}s.
 #
