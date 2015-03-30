@@ -14,6 +14,7 @@ typechecker = require 'typechecker'
 Constants = require './Constants'
 Selection = require './Selection'
 Mutation = require './Mutation'
+ItemPath = require './ItemPath'
 Outline = require './Outline'
 shortid = require './shortid'
 {Model} = require 'theorist'
@@ -52,9 +53,9 @@ class OutlineEditor extends Model
     @_textModeTypingFormattingTags = {}
     @_selectionVerticalAnchor = undefined
     @_disableSyncDOMSelectionToEditor = false
-    @_searchQuery = null
-    @_searchType = null
-    @_searchQueryItems = []
+    @_search = {}
+    @_searchAttributeShortcuts = {}
+    @_searchResults = []
 
     @_hoistStack = []
     @_dragState =
@@ -148,13 +149,13 @@ class OutlineEditor extends Model
       @_overrideIsFocused = false
 
   outlineDidChange: (e) ->
-    if @getSearchQuery()
+    if @getSearch()?.query
       hoistedItem = @getHoistedItem()
       for eachMutation in e.mutations
         if eachMutation.type == Mutation.ChildrenChanged
           for eachItem in eachMutation.addedItems
             if hoistedItem.contains(eachItem)
-              @_addSearchMatch(eachItem)
+              @_addSearchResult(eachItem)
 
     selectionRange = @selection
     @_overrideIsFocused = @isFocused()
@@ -293,8 +294,11 @@ class OutlineEditor extends Model
   # Public: Calls your `callback` when the editor's search changes.
   #
   # * `callback` {Function}
-  #   * `query` Editor's {String} search query.
-  #   * `type` Editor's {String} search type.
+  #   * `searchInfo`
+  #     - `query` Editor's {String} search query.
+  #     - `type` Editor's {String} search type.
+  #     - `keywords`
+  #     - `error`
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeSearch: (callback) ->
@@ -513,20 +517,27 @@ class OutlineEditor extends Model
   # Public: Search type used for xpath search syntax.
   @X_PATH_SEARCH: 'xpath'
 
-  ###
-  # Private: Add an attribute name shortcut that will be used in the
-  # {OutlineEditor.ITEM_PATH_SEARCH} search syntax. For example when searching for
-  addItemPathSearchAttributeShortcut: (shortcut) ->
-  ###
+  # Public: Add a shortcut for an attribute name in the
+  # {OutlineEditor.ITEM_PATH_SEARCH} search syntax. For example if you want
+  # the user to be able to type `@status` instead of having to type `@data-
+  # status` then you can add `status` as a shortcut for `data-status`.
+  #
+  # - `shortcutName` {String} Shortcut name, `status` for example.
+  # - `attributeName` {String} Attribute name, 'data-status' for example.
+  #
+  addSearchAttributeShortcut: (shortcutName, attributeName) ->
+    @_searchAttributeShortcuts[shortcutName] = attributeName
+    if @search
+      setSearch @search
 
-  # Public: Returns search query {String}.
-  getSearchQuery: ->
-    @_searchQuery
-
-  # Public: Returns a search type of either {OutlineEditor.ITEM_PATH_SEARCH}
-  # (default) or {OutlineEditor.X_PATH_SEARCH}.
-  getSearchType: ->
-    @_searchType
+  # Public: Returns search {Object} with keys:
+  #
+  # - `query` Search {String}
+  # - `type` either {OutlineEditor.ITEM_PATH_SEARCH} or {OutlineEditor.X_PATH_SEARCH}
+  # - `keywords` {Array} of recognized keyword ranges.
+  # - `error` Any error encountered while parsing search query.
+  getSearch: ->
+    @_search
 
   # Public: Sets search used to filter the contents of this outline. The
   # search `type` parameter determines how the search is performed. It
@@ -545,32 +556,45 @@ class OutlineEditor extends Model
     @_searchQuery = query
     @_searchType = type
 
-    for each in @_searchQueryItems
+    for each in @_searchResults
       eachState = @editorState(each)
       eachState.expanded = false
       eachState.matched = false
       eachState.matchedAncestor = false
 
     hoisted = @getHoistedItem()
-    @_searchQueryItems = []
+    keywords = null
+    error = null
 
+    @_searchResults = []
     if query
       switch type
         when OutlineEditor.ITEM_PATH_SEARCH
-          for each in hoisted.evaluateItemPath(query)
-            @_addSearchMatch(each)
+          itemPath = new ItemPath query
+          keywords = itemPath.pathExpressionKeywords
+          error = itemPath.pathExpressionError
+          results = ItemPath.evaluate itemPath, hoisted,
+            root: hoisted
+            attributeShortcuts: @_searchAttributeShortcuts
+          for each in results
+            @_addSearchResult(each)
+
         when OutlineEditor.X_PATH_SEARCH
           for each in hoisted.getItemsForXPath(query)
-            @_addSearchMatch(each)
+            @_addSearchResult(each)
         else
           console.log "Invalid search type #{type}"
 
     @outlineEditorElement.updateHoistedItem(null, hoisted)
-    @emitter.emit 'did-change-search', query, type
+    @emitter.emit 'did-change-search',
+      query: query
+      type: type
+      keywords: keywords
+      error: error
     @_revalidateSelectionRange()
 
-  _addSearchMatch: (item) ->
-    itemFilterPathItems = @_searchQueryItems
+  _addSearchResult: (item) ->
+    itemFilterPathItems = @_searchResults
     itemState = @editorState(item)
     itemState.matched = true
     itemFilterPathItems.push(item)

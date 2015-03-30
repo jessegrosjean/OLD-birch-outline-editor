@@ -37,13 +37,14 @@ window.atom =
 
   deserializers:
     add: ->
-  inBrowserMode: -> true
+  inBrowserMode: true
   config:
     get: ->
     set: ->
     observe: -> new Disposable
 
 module.exports =
+  atom: atom
   Emitter: Emitter
   Disposable: Disposable
   CompositeDisposable: CompositeDisposable

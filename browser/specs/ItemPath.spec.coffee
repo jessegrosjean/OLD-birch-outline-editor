@@ -27,6 +27,9 @@ describe 'ItemPath', ->
     it 'should minus paths separated by "except" when expect results proceed orignal results', ->
       outline.evaluateItemPath('(//three except //two)').should.eql [three]
 
+    it 'should minus paths separated by "except" when initial results are empty', ->
+      outline.evaluateItemPath('(//cantfindme except //two)').should.eql []
+
   describe 'Set Grouping', ->
     it 'should group path set operations with parentheses', ->
       outline.evaluateItemPath('(//one union //two union //three except //two)').should.eql [one, two, three]
@@ -97,8 +100,11 @@ describe 'ItemPath', ->
     it 'should support taxonomy declared type shortcut', ->
       two.setAttribute 'data-type', 'frog'
       one.evaluateItemPath('//frog').should.eql []
-      one.evaluateItemPath('//frog', 'frog' : true).should.eql [two]
-      one.evaluateItemPath('//frog two', 'frog' : true).should.eql [two]
+      options =
+        types:
+          'frog' : true
+      one.evaluateItemPath('//frog', options).should.eql [two]
+      one.evaluateItemPath('//frog two', options).should.eql [two]
 
   describe 'Predicate', ->
 
@@ -150,7 +156,7 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//e and (@t or not v)').should.eql [one, three]
 
       it 'should handle boolean grouping without leading axis', ->
-        JSON.stringify(new ItemPath('(a and b) and c').pathExpressionAST).should.equal('{"absolute":false,"steps":[{"axis":"descendant","type":"*","predicate":{"and":[{"and":[{"attributePath":["text"],"relation":"contains","modifier":"i","value":"a"},{"attributePath":["text"],"relation":"contains","modifier":"i","value":"b"}]},{"attributePath":["text"],"relation":"contains","modifier":"i","value":"c"}]},"slice":null}],"keywords":[{"label":"value","offset":1,"text":"a "},{"label":"keyword","offset":3,"text":"and"},{"label":"value","offset":7,"text":"b"},{"label":"keyword","offset":10,"text":"and"},{"label":"value","offset":14,"text":"c"}]}')
+        new ItemPath('(a and b) and c')
 
     describe 'Nesting', ->
       it 'should accept parenthesis around predicates', ->
@@ -321,7 +327,6 @@ describe 'ItemPath', ->
         outline.evaluateItemPath('//find in tamil ஸ்றீனிவாஸ ராமானுஜன் ஐயங்கார்').should.eql([tamil])
 
     describe 'Tag Syntax', ->
-
       beforeEach ->
         one.setAttribute 'data-tags', ['one', 'two']
         three.setAttribute 'data-tags', ['one', 'two', 'three']
@@ -405,7 +410,6 @@ describe 'ItemPath', ->
 
       new ItemPath('= [s] insensitive').toString().should.equal('= [s] insensitive')
 
-      new ItemPath('/or').toString().should.equal('/or')
       new ItemPath('/"not a"').toString().should.equal('/"not a"')
       new ItemPath('/other things').toString().should.equal('/other things')
       new ItemPath('/"quoted strings"').toString().should.equal('/quoted strings')

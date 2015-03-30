@@ -761,8 +761,8 @@ class Item
   Section: Querying Outline Structure
   ###
 
-  evaluateItemPath: (itemPath, types) ->
-    ItemPath.evaluate itemPath, this, types
+  evaluateItemPath: (itemPath, options) ->
+    ItemPath.evaluate itemPath, this, options
 
   evaluateXPath: (xpathExpression, namespaceResolver, resultType, result) ->
     @outline.evaluateXPath(xpathExpression, this, namespaceResolver, resultType, result)

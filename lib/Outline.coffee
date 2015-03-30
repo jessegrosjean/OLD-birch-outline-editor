@@ -454,9 +454,11 @@ class Outline
   # - `contextItem` (optional)
   #
   # Returns an {Array} of matching {Item}s.
-  evaluateItemPath: (itemPath, contextItem, types) ->
+  evaluateItemPath: (itemPath, contextItem, options) ->
+    options ?= {}
+    options.root ?= @root
     contextItem ?= @root
-    ItemPath.evaluate itemPath, contextItem, types, @root
+    ItemPath.evaluate itemPath, contextItem, options
 
   # Public: XPath query internal HTML structure.
   #

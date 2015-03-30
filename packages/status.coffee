@@ -22,11 +22,12 @@ OutlineEditorService.eventRegistery.listen '.bstatus',
   click: (e) ->
     status = e.target.dataset.status
     outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
-    outlineEditor.setSearch "@data-status = #{status}"
+    outlineEditor.setSearch "@status = #{status}"
     e.stopPropagation()
     e.preventDefault()
 
 OutlineEditorService.observeOutlineEditors (editor) ->
+  editor.addSearchAttributeShortcut 'status', 'data-status'
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if status = item.getAttribute 'data-status'
       a = document.createElement 'A'

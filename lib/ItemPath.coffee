@@ -19,24 +19,27 @@ class ItemPath
 
     if parsedPath
       keywords = parsedPath.keywords
-      keywords.sort(keywordCompare)
-      keywords.sortedUniquify(keywordCompare)
 
     {} =
       parsedPath: parsedPath
       keywords: keywords
       error: exception
 
-  @evaluate: (itemPath, contextItem, types, rootItem) ->
+  @evaluate: (itemPath, contextItem, options) ->
+    options ?= {}
     if typechecker.isString itemPath
-      itemPath = new ItemPath itemPath, types or {}
-    itemPath.rootItem = rootItem
+      itemPath = new ItemPath itemPath, options
+    itemPath.options = options
     results = itemPath.evaluate contextItem
-    itemPath.rootItem = null
+    itemPath.options = options
     results
 
-  constructor: (@pathString, @types) ->
-    @pathExpressionAST = @constructor.parse(@pathString, undefined, @types).parsedPath
+  constructor: (@pathExpressionString, @options) ->
+    @options ?= {}
+    parsed = @constructor.parse(@pathExpressionString, undefined, @options.types)
+    @pathExpressionAST = parsed.parsedPath
+    @pathExpressionKeywords = parsed.keywords
+    @pathExpressionError = parsed.error
 
   ###
   Section: Evaluation
@@ -136,7 +139,7 @@ class ItemPath
       r1 = results1[i]
       r2 = results2[j]
 
-      while r2 and (r1.comparePosition(r2) & Node.DOCUMENT_POSITION_PRECEDING)
+      while r1 and r2 and (r1.comparePosition(r2) & Node.DOCUMENT_POSITION_PRECEDING)
         j++
         r2 = results2[j]
 
@@ -161,7 +164,7 @@ class ItemPath
     results
 
     if pathAST.absolute
-      item = @rootItem or item.root
+      item = @options.root or item.root
 
     contexts.push item
 
@@ -294,6 +297,8 @@ class ItemPath
 
   valueForAttributePath: (attributePath, item) ->
     attributeName = attributePath[0]
+    attributeName = @options.attributeShortcuts?[attributeName] or attributeName
+
     switch attributeName
       when 'text'
         item.bodyText
@@ -482,19 +487,3 @@ class ItemPath
 
   toString: ->
     return @pathExpressionToString @pathExpressionAST
-
-keywordCompare = (a, b) ->
-  aOffset = a.offset
-  bOffset = b.offset
-
-  if aOffset != bOffset
-    aOffset - bOffset
-  else if a.text.length != b.text.length
-    a.text.length - b.text.length
-  else if a.label != b.label
-    if a < b
-      -1
-    else
-      1
-  else
-    0

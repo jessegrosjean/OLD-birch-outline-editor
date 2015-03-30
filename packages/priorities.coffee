@@ -18,6 +18,7 @@ togglePriority = (editor, priority) ->
     outline.endUpdates()
 
 OutlineEditorService.observeOutlineEditors (editor) ->
+  editor.addSearchAttributeShortcut 'priority', 'data-priority'
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if value = item.getAttribute 'data-priority'
       span = document.createElement 'A'
@@ -29,7 +30,7 @@ OutlineEditorService.eventRegistery.listen '.bpriority',
   click: (e) ->
     priority = e.target.dataset.priority
     outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
-    outlineEditor.setSearch "@data-priority = #{priority}"
+    outlineEditor.setSearch "@priority = #{priority}"
     e.stopPropagation()
     e.preventDefault()
 
