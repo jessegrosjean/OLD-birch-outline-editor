@@ -1,44 +1,18 @@
 @import "prefixer";
+@import "fonts.less";
 @import "default-ui-variables";
 @import "default-syntax-variables";
 
 @syntax-selection-color: #a7caff;
 @syntax-secondary-selection-color: #EDF4FF;
 @syntax-cursor-color: #007aff;
+@base-accent-color: @syntax-cursor-color;
 
 @ui-site-color-1: @background-color-success; // green
 @ui-site-color-2: @background-color-info; // blue
 @ui-site-color-3: @background-color-warning; // orange
 @ui-site-color-4: #db2ff4; // purple
 @ui-site-color-5: #f5e11d; // yellow
-
-@font-face {
-  font-family: 'Open Sans';
-  font-weight: 400;
-  font-style: normal;
-  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-Regular.ttf');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-weight: 400;
-  font-style: italic;
-  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-Italic.ttf');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-weight: bold;
-  font-style: normal;
-  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-Bold.ttf');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-weight: bold;
-  font-style: italic;
-  src: url('atom://birch-outline-editor/styles/fonts/OpenSans-BoldItalic.ttf');
-}
 
 @import "ui-variables";
 @import "syntax-variables";
@@ -60,14 +34,81 @@ outline-editor-toolbar {
   background: @tab-background-color-active;
   background: -webkit-linear-gradient(@tab-background-color-active , mix(@tab-background-color-active, @pane-item-border-color, 50%));
   border-bottom: 1px solid  @pane-item-border-color;
+  display: flex;
 }
 
+@hoist-animation-duration: 0.4s;
+@search-button-width: @component-line-height + (@component-padding / 2.0);
+
 outline-editor-search {
-  > atom-text-editor::shadow {
-    .itempath {
-      > .string {
-        //color: @syntax-text-color;
+  flex-grow: 1;
+  display: flex;
+  position: relative;
+
+  > button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1em;
+    cursor: pointer;
+    position: absolute;
+    top: 1px;
+    width: @search-button-width;
+    height: @component-line-height;
+    line-height: @component-line-height;
+    color: mix(@syntax-text-color, @syntax-background-color, 65%);
+
+    &.unhoist {
+      left: 0;
+      width: 0;
+      color: @syntax-background-color;
+      background: @base-accent-color;
+      border-top-right-radius: @component-border-radius;
+      border-bottom-right-radius: @component-border-radius;
+      transform: scaleX(-1);
+      transition:width @hoist-animation-duration;
+    }
+
+    &.find {
+      left: 0;
+      transition:left @hoist-animation-duration;
+    }
+
+    &.cancel {
+      right: 0;
+    }
+  }
+
+  > atom-text-editor[mini] {
+    flex-grow: 1;
+    padding-left: @search-button-width;
+    padding-right: @search-button-width;
+    transition:padding-left @hoist-animation-duration;
+
+    &,
+    &::shadow {
+      .source.itempath .string {
+        color: @syntax-text-color;
       }
+    }
+  }
+
+  &.hoisted {
+    > button {
+      &.unhoist {
+        width: @search-button-width;
+        transition:width @hoist-animation-duration;
+      }
+      &.find {
+        left: @search-button-width;
+        transition:left @hoist-animation-duration;
+      }
+    }
+    > atom-text-editor[mini] {
+      padding-left: @search-button-width * 2;
+      transition:padding-left @hoist-animation-duration;
     }
   }
 }
@@ -125,26 +166,8 @@ birch-outline-editor > ul {
   > .bbranchcontrols {
     display: none;
   }
-  > .bbranchcontrols {
-    display: none;
-  }
   > .bbranch > .bitemcontent {
-    color: @syntax-cursor-color;
-    cursor: pointer;
-    padding:0;
-    &:before {
-      display: inline-block;
-      text-align: center;
-      width: @item-indent-spacing;
-      font-weight: normal;
-      content: '↖︎';
-    }
-    > .bbodytext {
-      display: none;
-    }
-    > .bbadges {
-      display: none;
-    }
+    display: none;
   }
 }
 

@@ -892,12 +892,6 @@ EventRegistery.listen '.bhandle',
 # Handle clicking on file links
 #
 
-EventRegistery.listen '.bhoistedItem > .bbranch > .bitemcontent',
-  click: (e) ->
-    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
-    editor = editorElement.editor
-    editor.unhoist()
-
 EventRegistery.listen '.bbodytext a',
   click: (e) ->
     if href = e.target.href

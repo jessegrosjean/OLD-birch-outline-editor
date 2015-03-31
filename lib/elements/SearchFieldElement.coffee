@@ -1,4 +1,5 @@
 {Disposable, CompositeDisposable} = require 'atom'
+EventRegistery = require '../EventRegistery'
 ItemPath = require '../ItemPath'
 
 Grammar = null
@@ -44,15 +45,38 @@ class SearchFieldElement extends HTMLElement
 
   initialize: ->
     this
-    @classList.add 'block'
 
   createdCallback: ->
+    @classList.add 'block'
+
+    @backButton = document.createElement 'button'
+    @backButton.classList.add 'unhoist'
+    @backButton.classList.add 'fa'
+    @backButton.classList.add 'fa-level-up'
+    @backButton.classList.add 'fa-lg'
+    @appendChild @backButton
+
+    @findButton = document.createElement 'button'
+    @findButton.classList.add 'find'
+    @findButton.classList.add 'fa'
+    @findButton.classList.add 'fa-search'
+    @findButton.classList.add 'fa-lg'
+    @appendChild @findButton
+
     @textFieldElement = document.createElement 'atom-text-editor'
     @textFieldElement.setAttribute 'mini', true
     @textFieldElement.setAttribute 'placeholder-text', 'Search...'
+
     @textFieldEditor = @textFieldElement.getModel?()
     @textFieldEditor?.setGrammar new ItemPathGrammar(atom.grammars)
     @appendChild @textFieldElement
+
+    @clearButton = document.createElement 'button'
+    @clearButton.classList.add 'cancel'
+    @clearButton.classList.add 'fa'
+    @clearButton.classList.add 'fa-times'
+    @clearButton.classList.add 'fa-lg'
+    @appendChild @clearButton
 
   attachedCallback: ->
 
@@ -80,6 +104,16 @@ class SearchFieldElement extends HTMLElement
         @editor.onDidChangeSearch (searchInfo) =>
           @updateSearchInfo searchInfo
 
+        @editor.onDidChangeHoistedItem (item) =>
+          if item.isRoot == @classList.contains('hoisted')
+            @classList.toggle('hoisted')
+
+        textFieldEditor?.onDidChange =>
+          if @textFieldEditor.getText()
+            @clearButton.style.display = null
+          else
+            @clearButton.style.display = 'none'
+
         textFieldEditor?.onDidStopChanging ->
           newQuery = textFieldEditor.getText()
           oldQuery = editor.getSearch().query
@@ -92,6 +126,32 @@ class SearchFieldElement extends HTMLElement
     if @textFieldEditor
       unless @textFieldEditor.getText() is query
         @textFieldEditor?.setText query
+
+EventRegistery.listen 'outline-editor-search button.unhoist',
+  mousedown: (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+
+  click: (e) ->
+    @parentElement.editor.unhoist()
+
+EventRegistery.listen 'outline-editor-search button.find',
+  mousedown: (e) ->
+    @parentElement.focus()
+    e.preventDefault()
+    e.stopPropagation()
+
+  click: (e) ->
+    # refresh search
+
+EventRegistery.listen 'outline-editor-search button.cancel',
+  mousedown: (e) ->
+    @parentElement.focus()
+    e.preventDefault()
+    e.stopPropagation()
+
+  click: (e) ->
+    @parentElement.editor.setSearch ''
 
 atom.commands.add 'outline-editor-search',
   'core:cancel': ->
