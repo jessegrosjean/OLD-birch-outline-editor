@@ -58,12 +58,12 @@ outline-editor-search {
     width: @search-button-width;
     height: @component-line-height;
     line-height: @component-line-height;
-    color: mix(@syntax-text-color, @syntax-background-color, 65%);
+    color: @text-color-subtle;
 
     &.unhoist {
       left: 0;
       width: 0;
-      color: @syntax-background-color;
+      color: @input-background-color;
       background: @base-accent-color;
       border-top-right-radius: @component-border-radius;
       border-bottom-right-radius: @component-border-radius;
@@ -90,7 +90,7 @@ outline-editor-search {
     &,
     &::shadow {
       .source.itempath .string {
-        color: @syntax-text-color;
+        color: @text-color;
       }
     }
   }
