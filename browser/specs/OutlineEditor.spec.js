@@ -102,6 +102,23 @@ describe('OutlineEditor', function() {
 			editor.isVisible(outlineSetup.three).should.not.be.ok;
 			editor.isVisible(outlineSetup.five).should.not.be.ok;
 		});
+
+		it('should restore expanded/collapse state after search', function() {
+			editor.setExpanded(outlineSetup.one);
+			editor.setSearch('three');
+			editor.isVisible(outlineSetup.one).should.be.ok;
+			editor.isVisible(outlineSetup.two).should.be.ok;
+			editor.isVisible(outlineSetup.three).should.be.ok;
+			editor.isVisible(outlineSetup.four).should.not.be.ok;
+			editor.isVisible(outlineSetup.five).should.not.be.ok;
+			editor.setSearch('');
+			editor.isVisible(outlineSetup.one).should.be.ok;
+			editor.isVisible(outlineSetup.two).should.be.ok;
+			editor.isVisible(outlineSetup.three).should.not.be.ok;
+			editor.isVisible(outlineSetup.four).should.not.be.ok;
+			editor.isVisible(outlineSetup.five).should.be.ok;
+			editor.isVisible(outlineSetup.six).should.not.be.ok;
+		});
 	});
 
 	describe('Selection', function() {

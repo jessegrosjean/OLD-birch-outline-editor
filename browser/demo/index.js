@@ -25,7 +25,6 @@ function createBranch(outline, depth, breadth) {
 	return item;
 }
 
-//require('birch/extensions/LocalStorage');
 
 //require('birch/eventhandlers/ItemHandleDragHandler');
 //require('birch/eventhandlers/EditorDropHandler');

@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 1.6.0
+
+- Added clear button to search bar.
+- Added hoist indicator to search bar.
+- Restore previous expanded state after search.
+
 ## 1.5.0
 
 - Added click to search on badges.

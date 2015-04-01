@@ -54,6 +54,7 @@ class OutlineEditor extends Model
     @_selectionVerticalAnchor = undefined
     @_disableSyncDOMSelectionToEditor = false
     @_search = {}
+    @_searchCollapsed = {}
     @_searchAttributeShortcuts = {}
     @_searchResults = []
 
@@ -547,18 +548,17 @@ class OutlineEditor extends Model
   # - `query` {String} Search query.
   # - `type` (optional) {OutlineEditor.ITEM_PATH_SEARCH} (default) or {OutlineEditor.X_PATH_SEARCH}
   setSearch: (query, type) ->
-    type ?= (@_searchType or OutlineEditor.ITEM_PATH_SEARCH)
     query ?= ''
+    type ?= (@_search.type or OutlineEditor.ITEM_PATH_SEARCH)
+    return if @_search.query is query and @_search.type is type
 
-    if @_searchQuery is query and @_searchType is type
-      return
-
-    @_searchQuery = query
-    @_searchType = type
+    @_search.query = query
+    @_search.type = type
 
     for each in @_searchResults
       eachState = @editorState(each)
-      eachState.expanded = false
+      if @_searchExpanded[each.id]
+        eachState.expanded = false
       eachState.matched = false
       eachState.matchedAncestor = false
 
@@ -567,12 +567,14 @@ class OutlineEditor extends Model
     error = null
 
     @_searchResults = []
+    @_searchExpanded = {}
+
     if query
       switch type
         when OutlineEditor.ITEM_PATH_SEARCH
           itemPath = new ItemPath query
-          keywords = itemPath.pathExpressionKeywords
-          error = itemPath.pathExpressionError
+          @_search.keywords = itemPath.pathExpressionKeywords
+          @_search.error = itemPath.pathExpressionError
           results = ItemPath.evaluate itemPath, hoisted,
             root: hoisted
             attributeShortcuts: @_searchAttributeShortcuts
@@ -586,11 +588,7 @@ class OutlineEditor extends Model
           console.log "Invalid search type #{type}"
 
     @outlineEditorElement.updateHoistedItem(null, hoisted)
-    @emitter.emit 'did-change-search',
-      query: query
-      type: type
-      keywords: keywords
-      error: error
+    @emitter.emit 'did-change-search', @_search
     @_revalidateSelectionRange()
 
   _addSearchResult: (item) ->
@@ -605,7 +603,9 @@ class OutlineEditor extends Model
       if eachState.matchedAncestor
         return
       else
-        eachState.expanded = true
+        unless eachState.expanded
+          eachState.expanded = true
+          @_searchExpanded[each.id] = true
         eachState.matchedAncestor = true
         itemFilterPathItems.push(each)
       each = each.parent
@@ -682,7 +682,7 @@ class OutlineEditor extends Model
       return false unless @isExpanded(parent)
       parent = parent.parent
 
-    return true unless @_searchQuery
+    return true unless @_search.query
     itemState = @editorState(item)
     itemState.matched or itemState.matchedAncestor
 
