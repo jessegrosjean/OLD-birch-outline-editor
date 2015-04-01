@@ -404,7 +404,10 @@ class OutlineEditor extends Model
     if @getFirstVisibleItem()
       @outlineEditorElement.setBackgroundMessage ''
     else
-      @outlineEditorElement.setBackgroundMessage 'Press <b>Return</b> to create a new item.'
+      if @getSearch().query and @getHoistedItem().firstChild
+        @outlineEditorElement.setBackgroundMessage 'Clear the search to see filtered items.'
+      else
+        @outlineEditorElement.setBackgroundMessage 'Press <kbd>Return</kbd> to create a new item.'
 
   ###
   Section: Expanding Items
@@ -590,6 +593,7 @@ class OutlineEditor extends Model
     @outlineEditorElement.updateHoistedItem(null, hoisted)
     @emitter.emit 'did-change-search', @_search
     @_revalidateSelectionRange()
+    @_updateBackgroundMessage()
 
   _addSearchResult: (item) ->
     itemFilterPathItems = @_searchResults

@@ -81,6 +81,7 @@ class OutlineEditorElement extends HTMLElement
     @toolbarElement.appendChild @searchElement
 
     topListElement = document.createElement('UL')
+    topListElement.classList.add 'top-item-list'
     @appendChild(topListElement)
     @topListElement = topListElement
 
