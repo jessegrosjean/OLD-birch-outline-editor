@@ -5,6 +5,7 @@
 - Added clear button to search bar.
 - Added hoist indicator to search bar.
 - Restore previous expanded state after search.
+- Changed selection drawing to display secondary selection on branch when in item mode.
 
 ## 1.5.0
 

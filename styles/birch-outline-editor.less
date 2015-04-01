@@ -1,5 +1,4 @@
 @import "prefixer";
-@import "fonts.less";
 @import "default-ui-variables";
 @import "default-syntax-variables";
 
@@ -14,6 +13,7 @@
 @ui-site-color-4: #db2ff4; // purple
 @ui-site-color-5: #f5e11d; // yellow
 
+@import "fonts.less";
 @import "ui-variables";
 @import "syntax-variables";
 
@@ -30,9 +30,8 @@
 @item-badge-spacing: round(@line-height / 4);
 
 outline-editor-toolbar {
-  padding: @component-padding;
+  padding: @component-padding / 2;
   background: @tab-background-color-active;
-  background: -webkit-linear-gradient(@tab-background-color-active , mix(@tab-background-color-active, @pane-item-border-color, 50%));
   border-bottom: 1px solid  @pane-item-border-color;
   display: flex;
 }
@@ -89,6 +88,8 @@ outline-editor-search {
 
     &,
     &::shadow {
+      font-size: @input-font-size;
+      font-family: @font-family;
       .source.itempath .string {
         color: @text-color;
       }
@@ -323,10 +324,8 @@ birch-outline-editor > ul {
 }
 
 .bitemselected {
-  > .bbranchcontrols > .bhandle {
-    background: @syntax-selection-color;
-  }
   > .bbranch {
+    background: mix(@syntax-selection-color, @syntax-background-color, 35%);
     > .bitemcontent {
       background-color: @syntax-selection-color;
       *::selection {
