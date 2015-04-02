@@ -108,12 +108,13 @@ class OutlineEditorElement extends HTMLElement
     @subscriptions.add atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
       @disableAnimationOverride = newValue
 
-    process.nextTick =>
-      @onStylesheetsChanged()
-      onStylesheetsChanged = Util.debounce(@onStylesheetsChanged, 100)
-      @subscriptions.add atom.styles.onDidAddStyleElement(onStylesheetsChanged)
-      @subscriptions.add atom.styles.onDidRemoveStyleElement(onStylesheetsChanged)
-      @subscriptions.add atom.styles.onDidUpdateStyleElement(onStylesheetsChanged)
+    if atom.styles
+      process.nextTick =>
+        @onStylesheetsChanged()
+        onStylesheetsChanged = Util.debounce(@onStylesheetsChanged, 100)
+        @subscriptions.add atom.styles.onDidAddStyleElement(onStylesheetsChanged)
+        @subscriptions.add atom.styles.onDidRemoveStyleElement(onStylesheetsChanged)
+        @subscriptions.add atom.styles.onDidUpdateStyleElement(onStylesheetsChanged)
 
     this
 
