@@ -156,19 +156,19 @@ describe('OutlineEditor', function() {
 		describe('Formatting', function() {
 			it('should toggle formatting', function() {
 				editor.moveSelectionRange(outlineSetup.one, 0, outlineSetup.one, 2);
-				editor.toggleBold();
+				editor.toggleFormattingTag('B');
 				outlineSetup.one.bodyHTML.should.equal('<b>on</b>e');
-				editor.toggleBold();
+				editor.toggleFormattingTag('B');
 				outlineSetup.one.bodyHTML.should.equal('one');
 			});
 
 			it('should toggle typing formatting tags if collapsed selection', function() {
 				outlineSetup.one.bodyText = '';
 				editor.moveSelectionRange(outlineSetup.one, 0);
-				editor.toggleBold();
+				editor.toggleFormattingTag('B');
 				editor.insertText('hello');
 				outlineSetup.one.bodyHTML.should.equal('<b>hello</b>');
-				editor.toggleBold();
+				editor.toggleFormattingTag('B');
 				editor.insertText('world');
 				outlineSetup.one.bodyHTML.should.equal('<b>hello</b>world');
 			});

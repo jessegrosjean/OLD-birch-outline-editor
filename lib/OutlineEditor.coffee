@@ -1272,7 +1272,7 @@ class OutlineEditor extends Model
         insertBefore = @getFirstVisibleChild parent
       else
         parent = selectedItem.parent
-        insertBefore = getNextVisibleSibling selectedItem
+        insertBefore = @getNextVisibleSibling selectedItem
 
     outline = parent.outline
     outlineEditorElement = @outlineEditorElement
@@ -1563,21 +1563,6 @@ class OutlineEditor extends Model
   Section: Formatting
   ###
 
-  toggleBold: ->
-    @_toggleFormattingTag('B')
-
-  toggleItalic: ->
-    @_toggleFormattingTag('I')
-
-  toggleUnderline: ->
-    @_toggleFormattingTag('U')
-
-  toggleCode: ->
-    @_toggleFormattingTag('CODE')
-
-  toggleStrikethrough: ->
-    @_toggleFormattingTag 'S'
-
   editLink: ->
     # Ugly mess... move lots of this logic into LinkEditorElement
     selection = @selection
@@ -1639,7 +1624,7 @@ class OutlineEditor extends Model
       @focus()
       @moveSelectionRange selection
 
-  _toggleFormattingTag: (tagName, attributes={}) ->
+  toggleFormattingTag: (tagName, attributes={}) ->
     startItem = @selection.startItem
 
     if @selection.isCollapsed

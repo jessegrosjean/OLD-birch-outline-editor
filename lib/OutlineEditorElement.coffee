@@ -984,11 +984,23 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'birch-outline-editor:group-items': -> @editor.groupItems()
   'deleteItemsBackward': -> @editor.deleteItemsBackward()
   'deleteItemsForward': -> @editor.deleteItemsForward()
-  'birch-outline-editor:toggle-bold': -> @editor.toggleBold()
-  'birch-outline-editor:toggle-italic': -> @editor.toggleItalic()
-  'birch-outline-editor:toggle-underline': -> @editor.toggleUnderline()
-  'birch-outline-editor:toggle-strikethrough': -> @editor.toggleStrikethrough()
-  'birch-outline-editor:toggle-code': -> @editor.toggleCode()
+  'birch-outline-editor:toggle-abbreviation': -> @editor.toggleFormattingTag 'ABBR'
+  'birch-outline-editor:toggle-bold': -> @editor.toggleFormattingTag 'B'
+  'birch-outline-editor:toggle-citation': -> @editor.toggleFormattingTag 'CITE'
+  'birch-outline-editor:toggle-code': -> @editor.toggleFormattingTag 'CODE'
+  'birch-outline-editor:toggle-definition': -> @editor.toggleFormattingTag 'DFN'
+  'birch-outline-editor:toggle-emphasis': -> @editor.toggleFormattingTag 'EM'
+  'birch-outline-editor:toggle-italic': -> @editor.toggleFormattingTag 'I'
+  'birch-outline-editor:toggle-keyboard-input': -> @editor.toggleFormattingTag 'KBD'
+  'birch-outline-editor:toggle-inline-quote': -> @editor.toggleFormattingTag 'Q'
+  'birch-outline-editor:toggle-strikethrough': -> @editor.toggleFormattingTag 'S'
+  'birch-outline-editor:toggle-sample-output': -> @editor.toggleFormattingTag 'SAMP'
+  'birch-outline-editor:toggle-small': -> @editor.toggleFormattingTag 'SMALL'
+  'birch-outline-editor:toggle-strong': -> @editor.toggleFormattingTag 'STRONG'
+  'birch-outline-editor:toggle-subscript': -> @editor.toggleFormattingTag 'SUB'
+  'birch-outline-editor:toggle-superscript': -> @editor.toggleFormattingTag 'SUP'
+  'birch-outline-editor:toggle-underline': -> @editor.toggleFormattingTag 'U'
+  'birch-outline-editor:toggle-variable': -> @editor.toggleFormattingTag 'VAR'
   'birch-outline-editor:edit-link': -> @editor.editLink()
   'birch-outline-editor:clear-formatting': -> @editor.clearFormatting()
   'editor:upper-case': -> @editor.upperCase()

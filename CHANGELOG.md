@@ -2,6 +2,8 @@
 
 ## 1.7.0
 
+- Added toggle commands for most HTML inline formatting elements: abbreviation, bold, citation, code, definition, emphasis, italic, keyboard-input, inline-quote, strikethrough, sample-output, small, strong, subscript, superscript, underline, and variable.
+
 - Fixed bug where scrollbar wouldn't be themed properly on startup.
 - Fixed bug where could get stuck in state extending selection with mouse.
 - Fixed some editing problems in filtered view where items would display out of order.
