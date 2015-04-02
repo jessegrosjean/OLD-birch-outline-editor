@@ -50,6 +50,7 @@ class SearchFieldElement extends HTMLElement
     @classList.add 'block'
 
     @backButton = document.createElement 'button'
+    @backButton.tabIndex = -1
     @backButton.classList.add 'unhoist'
     @backButton.classList.add 'fa'
     @backButton.classList.add 'fa-level-up'
@@ -57,6 +58,7 @@ class SearchFieldElement extends HTMLElement
     @appendChild @backButton
 
     @findButton = document.createElement 'button'
+    @findButton.tabIndex = -1
     @findButton.classList.add 'find'
     @findButton.classList.add 'fa'
     @findButton.classList.add 'fa-search'
@@ -72,6 +74,7 @@ class SearchFieldElement extends HTMLElement
     @appendChild @textFieldElement
 
     @clearButton = document.createElement 'button'
+    @clearButton.tabIndex = -1
     @clearButton.classList.add 'cancel'
     @clearButton.classList.add 'fa'
     @clearButton.classList.add 'fa-times'
