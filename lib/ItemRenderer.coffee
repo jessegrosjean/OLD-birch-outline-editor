@@ -355,7 +355,11 @@ class ItemRenderer
             renderedChildrenUL.removeChild eachChildRenderedLI
 
       if addedChildren.length
-        nextSiblingRenderedLI = @renderedLIForItem nextSibling
+        nextVisibleSibling = nextSibling
+        unless editor.isVisible nextSibling
+          nextVisibleSibling = editor.getNextVisibleSibling nextSibling
+
+        nextSiblingRenderedLI = @renderedLIForItem nextVisibleSibling
         documentFragment = document.createDocumentFragment()
         addedChildrenLIs = []
 

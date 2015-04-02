@@ -72,6 +72,27 @@ describe('OutlineEditorElement', function() {
 				editor.setCollapsed(outlineSetup.one);
 				outlineSetup.four.appendChild(outline.createItem('Boo!'));
 			});
+
+			it('should update correctly when child is inserted into filtered view', function() {
+				editor.hoistItem(outlineSetup.one);
+				editor.setSearch('five');
+
+				var item = editor.insertItem('Boo!');
+				item.nextSibling.should.equal(outlineSetup.five);
+				var renderedItemLI = outlineEditorElement.itemViewLIForItem(item);
+				renderedItemLI.nextSibling.should.equal(outlineEditorElement.itemViewLIForItem(item.nextSibling));
+			});
+
+			it('should update correctly when child is inserted before filtered sibling', function() {
+				editor.hoistItem(outlineSetup.one);
+				editor.setSearch('five');
+
+				var item = editor.outline.createItem('Boo!');
+				outlineSetup.one.insertChildBefore(item, outlineSetup.one.firstChild);
+				var renderedItemLI = outlineEditorElement.itemViewLIForItem(item);
+				var nextRenderedItemLI = outlineEditorElement.itemViewLIForItem(editor.getNextVisibleSibling(item));
+				renderedItemLI.nextSibling.should.equal(nextRenderedItemLI);
+			});
 		});
 
 		describe('Editor State', function() {

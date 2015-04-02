@@ -1258,7 +1258,7 @@ class OutlineEditor extends Model
       selectedItem = selectedItems[0]
       if not selectedItem
         parent = @getHoistedItem()
-        insertBefore = parent.firstChild
+        insertBefore = @getFirstVisibleChild parent
       else
         parent = selectedItem.parent
         insertBefore = selectedItem
@@ -1266,13 +1266,13 @@ class OutlineEditor extends Model
       selectedItem = selectedItems[selectedItems.length - 1]
       if not selectedItem
         parent = @getHoistedItem()
-        insertBefore = parent.firstChild
+        insertBefore = @getFirstVisibleChild parent
       else if @isExpanded(selectedItem)
         parent = selectedItem
-        insertBefore = selectedItem.firstChild
+        insertBefore = @getFirstVisibleChild parent
       else
         parent = selectedItem.parent
-        insertBefore = selectedItem.nextSibling
+        insertBefore = getNextVisibleSibling selectedItem
 
     outline = parent.outline
     outlineEditorElement = @outlineEditorElement

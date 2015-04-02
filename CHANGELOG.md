@@ -2,6 +2,8 @@
 
 ## 1.7.0
 
+- Fixed some editing problems in filtered view where items would display out of order.
+
 ## 1.6.0
 
 - Added clear button to search bar.
