@@ -2,7 +2,14 @@
   "name": "birch-outline-editor",
   "main": "./lib/AtomEntry",
   "version": "1.7.0",
-  "description": "Simple and clean outline editor",
+  "description": "Clean and simple outline editor",
+  "keywords": [
+    "outline",
+    "notes",
+    "tasks",
+    "todos",
+    "GTD"
+  ],
   "repository": "https://github.com/jessegrosjean/birch-outline-editor",
   "license": "Commercial",
   "engines": {
@@ -50,6 +57,6 @@
     "mocha-loader": "^0.7.1",
     "should": "^5.0.0",
     "webpack": "~1.7.3",
-    "webpack-dev-server": "~1.7.0"
+    "webpack-dev-server": "~1.8.0"
   }
 }
