@@ -1,5 +1,31 @@
-// Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
+_GlobalMouseDown = 0
+_GlobalMouseButton = 0
+
+isGlobalMouseDown = ->
+  _GlobalMouseDown > 0
+
+isGlobalLeftMouseDown = ->
+  isGlobalMouseDown() and _GlobalMouseButton is 0
+
+isGlobalWheelMouseDown = ->
+  isGlobalMouseDown() and _GlobalMouseButton is 1
+
+isGlobalRightMouseDown = ->
+  isGlobalMouseDown() and _GlobalMouseButton is 2
+
+handleGlobalMouseDown = (e) ->
+  ++_GlobalMouseDown
+  _GlobalMouseButton = e.button
+
+handleGlobalMouseUp = (e) ->
+  --_GlobalMouseDown
+
+document.addEventListener 'mousedown', handleGlobalMouseDown, true
+document.addEventListener 'mouseup', handleGlobalMouseUp, true
+
+`
 var Constants = require('./Constants'),
 	raf = require('raf');
 
@@ -320,7 +346,7 @@ function childIndeOf(node) {
 //
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for N
-// milliseconds. If `immediate` is passed, trigger the function on the leading
+// milliseconds. If immediate is passed, trigger the function on the leading
 // edge, instead of the trailing.
 function debounce(func, wait, immediate) {
 	var timeout;
@@ -386,6 +412,10 @@ function getClipboarData(e) {
 }
 
 module.exports = {
+	isGlobalMouseDown: isGlobalMouseDown,
+	isGlobalLeftMouseDown: isGlobalLeftMouseDown,
+	isGlobalWheelMouseDown: isGlobalWheelMouseDown,
+	isGlobalRightMouseDown: isGlobalRightMouseDown,
 	getClipboarData: getClipboarData,
 	removeBranchIDs: removeBranchIDs,
 	removeFromDOM: removeFromDOM,
@@ -401,3 +431,4 @@ module.exports = {
 	//nodeOffsetToAncestorEncodedOffset: nodeOffsetToAncestorEncodedOffset,
 	//ancestorEncodedOffsetToNodeOffset: ancestorEncodedOffsetToNodeOffset
 };
+`

@@ -47,6 +47,7 @@ class OutlineEditorElement extends HTMLElement
     @_animationDisabled = 0
     @_maintainSelection = null
     @_disableScrolling = 0
+
     @_extendingSelectionInteraction = false
     @_extendingSelectionInteractionLastScrollTop = undefined
     @_extendSelectionDisposables = new CompositeDisposable()
@@ -447,7 +448,12 @@ class OutlineEditorElement extends HTMLElement
     # autoscroll, double-click select word and triple-click select paragraph.
     # e.preventDefault()
 
-    if e.button == 0
+    # Only start the drag interaction if "current" mouse down button is 0.
+    # Mouse down events can get queued at startup, so that if we test e.button
+    # it will say mouse is down when it really isn't, that that cause problem
+    # in the selection interaction logic, since we never get mouseup event to
+    # end it.
+    if Util.isGlobalLeftMouseDown()
       @disableScrolling()
       editor._disableSyncDOMSelectionToEditor = true
       @_extendingSelectionInteraction = true
