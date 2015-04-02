@@ -108,6 +108,13 @@ class OutlineEditorElement extends HTMLElement
     @subscriptions.add atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
       @disableAnimationOverride = newValue
 
+    process.nextTick =>
+      @onStylesheetsChanged()
+      onStylesheetsChanged = Util.debounce(@onStylesheetsChanged, 100)
+      @subscriptions.add atom.styles.onDidAddStyleElement(onStylesheetsChanged)
+      @subscriptions.add atom.styles.onDidRemoveStyleElement(onStylesheetsChanged)
+      @subscriptions.add atom.styles.onDidUpdateStyleElement(onStylesheetsChanged)
+
     this
 
   destroyed: ->
@@ -137,6 +144,14 @@ class OutlineEditorElement extends HTMLElement
 
   outlineDidChange: (e) ->
     @itemRenderer.outlineDidChange e
+
+  onStylesheetsChanged: =>
+    return unless @parentElement
+
+    # Force a redraw so the scrollbars are styled correctly based on the theme
+    @style.display = 'none'
+    @offsetWidth
+    @style.display = 'block'
 
   ###
   Section: Background Message

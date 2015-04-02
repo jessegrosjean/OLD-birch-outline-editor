@@ -2,6 +2,7 @@
 
 ## 1.7.0
 
+- Fixed bug where scrollbar wouldn't be themed properly on startup.
 - Fixed bug where could get stuck in state extending selection with mouse.
 - Fixed some editing problems in filtered view where items would display out of order.
 
