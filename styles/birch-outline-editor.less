@@ -3,7 +3,6 @@
 @import "default-syntax-variables";
 
 @syntax-selection-color: #a7caff;
-@syntax-secondary-selection-color: #EDF4FF;
 @syntax-cursor-color: #007aff;
 @base-accent-color: @syntax-cursor-color;
 
@@ -13,6 +12,15 @@
 @ui-site-color-4: #db2ff4; // purple
 @ui-site-color-5: #f5e11d; // yellow
 
+@birch-font-size: 16px;
+@birch-font-family: 'Open Sans', Helvetica;
+@line-height-mult: 1.5;
+@line-height-pixels: round(@birch-font-size * 1.5);
+@item-indent-spacing: round(@birch-font-size * 1.5);
+@item-vertical-spacing: round(@birch-font-size / 4.0);
+@item-badge-spacing: round(@line-height-pixels / 4);
+@syntax-secondary-selection-color: mix(@syntax-selection-color, @syntax-background-color, 35%);
+
 @import "fonts.less";
 @import "ui-variables";
 @import "syntax-variables";
@@ -21,13 +29,6 @@
 @import "../packages/tags.less";
 @import "../packages/mentions.less";
 @import "../packages/priorities.less";
-
-@font-size: 16px;
-@font-family: 'Open Sans', Helvetica;
-@line-height: round(@font-size * 1.5);
-@item-indent-spacing: round(@font-size * 1.5);
-@item-vertical-spacing: round(@font-size / 4.0);
-@item-badge-spacing: round(@line-height / 4);
 
 outline-editor-toolbar {
   padding: @component-padding / 2;
@@ -89,7 +90,7 @@ outline-editor-search {
     &,
     &::shadow {
       font-size: @input-font-size;
-      font-family: @font-family;
+      font-family: @birch-font-family;
       .source.itempath .string {
         color: @text-color;
       }
@@ -118,9 +119,9 @@ birch-outline-editor {
   display: block;
   color: @syntax-text-color;
   background-color: @syntax-background-color;
-  font-family: @font-family;
-  font-size: @font-size;
-  line-height: @line-height;
+  font-family: @birch-font-family;
+  font-size: @birch-font-size;
+  line-height: @line-height-mult;
   overflow-y: auto;
   overflow-x: hidden;
   .user-select(none);
@@ -168,7 +169,7 @@ birch-outline-editor > ul.top-item-list {
 }
 
 .bhoistedItem {
-  margin: round(@line-height / 2);
+  margin: round(@line-height-pixels / 2);
   > .bbranchcontrols {
     display: none;
   }
@@ -203,8 +204,8 @@ birch-outline-editor > ul.top-item-list {
 .bhandle {
   cursor: pointer;
   pointer-events: all;
-  line-height: @line-height;
-  font-size: @font-size;
+  line-height: @line-height-mult;
+  font-size: @birch-font-size;
   text-decoration:none;
   flex-grow: 0;
   padding: @item-vertical-spacing 0;
@@ -231,7 +232,7 @@ birch-outline-editor > ul.top-item-list {
 .bhasChildren:not(.bexpanded) > .bbranchcontrols > .bhandle:before {
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: @line-height;
+  background-size: @line-height-pixels;
   background-image: @expandableHandleBackgroundImage;
 }
 
@@ -248,7 +249,7 @@ birch-outline-editor > ul.top-item-list {
 }
 
 .bitemcontent {
-  line-height: @line-height;
+  line-height: @line-height-mult;
   margin: 0;
   padding: @item-vertical-spacing 0;
   //display: inline-block;
@@ -268,6 +269,22 @@ birch-outline-editor > ul.top-item-list {
     outline-color: transparent;
     outline-style: none;
   }
+
+  cite {
+    font-style: italic;
+  }
+
+  code {
+    white-space: pre-wrap;
+  }
+
+  kbd {
+    border: 1px solid mix(transparent, @syntax-invisible-character-color, 50%);
+    background-color: mix(transparent, @syntax-invisible-character-color, 90%);
+    padding: 0 4px;
+    border-radius: 4px;
+    font-family: @birch-font-family;
+  }
 }
 
 .bchildren {
@@ -283,8 +300,7 @@ birch-outline-editor > ul.top-item-list {
 .bbadges {
   display: inline-block;
   vertical-align: baseline;
-  font-size: round(@font-size * 0.7);
-  line-height: round(@line-height * 0.7);
+  font-size: round(@birch-font-size * 0.7);
 }
 
 .bbadge {
@@ -330,7 +346,7 @@ birch-outline-editor > ul.top-item-list {
 
 .bitemselected {
   > .bbranch {
-    background: mix(@syntax-selection-color, @syntax-background-color, 35%);
+    background: @syntax-secondary-selection-color;
     > .bitemcontent {
       background-color: @syntax-selection-color;
       *::selection {
@@ -361,7 +377,7 @@ birch-outline-editor > ul.top-item-list {
   position: relative;
 }
 
-@drop-ball-radius: round(@font-size / 4);
+@drop-ball-radius: round(@birch-font-size / 4);
 @drop-ball-diameter: round(@drop-ball-radius * 2.0);
 
 .bdropbefore > .bbranch > .bitemcontent::before,
