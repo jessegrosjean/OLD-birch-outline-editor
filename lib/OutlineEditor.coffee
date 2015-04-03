@@ -405,9 +405,9 @@ class OutlineEditor extends Model
       @outlineEditorElement.setBackgroundMessage ''
     else
       if @getSearch().query and @getHoistedItem().firstChild
-        @outlineEditorElement.setBackgroundMessage 'Clear the search to see filtered items.'
+        @outlineEditorElement.setBackgroundMessage 'Clear the search to see items.'
       else
-        @outlineEditorElement.setBackgroundMessage 'Press <kbd>Return</kbd> to create a new item.'
+        @outlineEditorElement.setBackgroundMessage 'Press <span class="keystroke">Return</span> to create new item.'
 
   ###
   Section: Expanding Items
