@@ -2,11 +2,31 @@
 
 ## 1.7.0
 
-- Added toggle commands for most HTML inline formatting elements: abbreviation, bold, citation, code, definition, emphasis, italic, keyboard-input, inline-quote, strikethrough, sample-output, small, strong, subscript, superscript, underline, and variable.
+- Added commands for more HTML formatting elements:
 
-- Fixed bug where scrollbar wouldn't be themed properly on startup.
-- Fixed bug where could get stuck in state extending selection with mouse.
-- Fixed some editing problems in filtered view where items would display out of order.
+	- abbreviation
+	- bold
+	- citation
+	- code
+	- definition
+	- emphasis
+	- italic
+	- keyboard-input
+	- inline-quote
+	- strikethrough
+	- sample-output
+	- small
+	- strong
+	- subscript
+	- superscript
+	- underline
+	- variable
+
+- Changed `onDidChange` callback to take array of Mutations.
+- Fixed bug where could get stuck extending selection state.
+- Fixed bug where scrollbar wouldn't theme properly on startup.
+- Fixed editing problems in filtered view where items would display out of order.
+- Fixed bug where deleting consecutive characters wouldn't coalecse into a single undo operation.
 
 ## 1.6.0
 

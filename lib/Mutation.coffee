@@ -34,6 +34,29 @@ class Mutation
   # {Mutation.BODT_TEXT_CHANGED}, or {Mutation.CHILDREN_CHANGED}.
   type: null
 
+  # Public: Read-only name of changed attribute in the target {Item}, or null.
+  attributeName: null
+
+  # Public: Read-only new value of changed attribute in the target
+  # {Item}, or null.
+  attributeNewValue: null
+
+  # Public: Read-only previous value of changed attribute in the target
+  # {Item}, or null.
+  attributeOldValue: null
+
+  # Public: Read-only value of the body text location where the insert started
+  # in the target {Item}, or null.
+  insertedTextLocation: null
+
+  # Public: Read-only value of length of the inserted body text in the target
+  # {Item}, or null.
+  insertedTextLength: null
+
+  # Public: Read-only value of replaced body text in the target {Item}, or
+  # null.
+  replacedText: null
+
   # Public: Read-only {Array} of child {Item}s added to the target.
   addedItems: null
 
@@ -48,76 +71,87 @@ class Mutation
   # null.
   nextSibling: null
 
-  # Public: Read-only name of changed attribute in the target {Item}, or null.
-  attributeName: null
-
-  # Public: Read-only previous value of changed attribute in the target
-  # {Item}, or null.
-  attributeOldValue: null
-
-  @createFromDOMMutations: (mutationRecords) ->
-    results = []
-    for mutationRecord in mutationRecords
-      if mutation = Mutation.createFromDOMMutation(mutationRecord)
-        results.push mutation
-    results
-
-  @createFromDOMMutation: (mutationRecord) ->
-    type = mutationRecord.type
-    target = mutationRecord.target
-    targetTag = target.tagName
-    mutation = new Mutation mutationRecord
-    mutation.target = _item(target)
-
-    unless mutation.target
-      # Must be a body child node that is later removed, so at this point
-      # it's no longer connected to a parent. Ignore here by returning null,
-      # body change will be generated later when it's removed.
-      return null
-
-    # Map raw XML model changes to Items. Also validate those changes, only
-    # expect a few types of changes, XML model should never get arbitrarily
-    # changed.
-
-    if targetTag is 'LI'
-      if type is 'attributes'
-        mutation.type = Mutation.ATTRIBUTE_CHANGED
-        mutation.attributeName = mutationRecord.attributeName
-        mutation.attributeOldValue = mutationRecord.attributeOldValue
-      else if type is 'childList'
-        if mutationRecord.removedNodes.length is 1 && mutationRecord.addedNodes.length is 1 && mutationRecord.addedNodes[0].tagName is 'P'
-          # updating bodyP through replacement
-          mutation.type = Mutation.BODT_TEXT_CHANGED
-        else
-          return null # adding 'UL' ... ignore, li children will be added separate
-      else
-        throw new Error 'Unexpected Mutation: ' + mutationRecord
-
-    else if targetTag is 'UL'
-      if type != 'childList'
-        throw new Error 'Unexpected Mutation: ' + mutationRecord
-
-      for each in mutationRecord.removedNodes
-        mutation.removedItems.push _item(each)
-
-      for each in mutationRecord.addedNodes
-        mutation.addedItems.push _item(each)
-
-      mutation.previousSibling = _item(mutationRecord.previousSibling)
-      mutation.nextSibling = _item(mutationRecord.nextSibling)
-      mutation.type = Mutation.CHILDREN_CHANGED
-    else
-      throw new Error 'Unexpected Mutation: ' + mutationRecord
-
+  @createAttributeMutation: (target, attributeName, attributeNewValue, attributeOldValue) ->
+    mutation = new Mutation target, Mutation.ATTRIBUTE_CHANGED
+    mutation.attributeName = attributeName
+    mutation.attributeNewValue = attributeNewValue
+    mutation.attributeOldValue = attributeOldValue
     mutation
 
-  constructor: (mutationRecord) ->
-    @_mutation = mutationRecord
-    @addedItems = []
-    @removedItems = []
+  @createBodyTextMutation: (target, insertedTextLocation, insertedTextLength, replacedText) ->
+    mutation = new Mutation target, Mutation.BODT_TEXT_CHANGED
+    mutation.insertedTextLocation = insertedTextLocation
+    mutation.insertedTextLength = insertedTextLength
+    mutation.replacedText = replacedText
+    mutation
 
-_item = (domNode) ->
-  while domNode
-    if domNode._item
-      return domNode._item
-    domNode = domNode.parentNode
+  @createChildrenMutation: (target, addedItems, removedItems, previousSibling, nextSibling) ->
+    mutation = new Mutation target, Mutation.CHILDREN_CHANGED
+    mutation.addedItems = addedItems or []
+    mutation.removedItems = removedItems or []
+    mutation.previousSibling = previousSibling
+    mutation.nextSibling = nextSibling
+    mutation
+
+  constructor: (@target, @type) ->
+
+  copy: ->
+    mutation = new Mutation @target, @type
+    mutation.attributeName = @attributeName
+    mutation.attributeNewValue = @attributeNewValue
+    mutation.attributeOldValue = @attributeOldValue
+    mutation.insertedTextLocation = @insertedTextLocation
+    mutation.insertedTextLength = @insertedTextLength
+    mutation.replacedText = @replacedText?.copy()
+    mutation.addedItems = @addedItems
+    mutation.removedItems = @removedItems
+    mutation.previousSibling = @previousSibling
+    mutation.nextSibling = @nextSibling
+    mutation
+
+  performUndoOperation: ->
+    switch @type
+      when Mutation.ATTRIBUTE_CHANGED
+        @target.setAttribute @attributeName, @attributeOldValue
+
+      when Mutation.BODT_TEXT_CHANGED
+        @target.replaceBodyTextInRange @replacedText, @insertedTextLocation, @insertedTextLength
+
+      when Mutation.CHILDREN_CHANGED
+        if @addedItems.length
+          @target.removeChildren @addedItems
+
+        if @removedItems.length
+          @target.insertChildrenBefore @removedItems, @nextSibling
+
+  coalesce: (operation) ->
+    return false unless operation instanceof Mutation
+    return false unless @target is operation.target
+    return false unless @type is operation.type
+    return false unless @type is Mutation.BODT_TEXT_CHANGED
+
+    thisInsertedTextLocation = @insertedTextLocation
+    thisInsertLength = @insertedTextLength
+    thisInsertEnd = thisInsertedTextLocation + thisInsertLength
+    thisInsertEnd = thisInsertedTextLocation + thisInsertLength
+
+    newInsertedTextLocation = operation.insertedTextLocation
+    newInsertedTextLength = operation.insertedTextLength
+    newReplaceLength = operation.replacedText.length
+    newReplaceEnd = newInsertedTextLocation + newReplaceLength
+
+    singleInsertAtEnd = newInsertedTextLocation is thisInsertEnd and newInsertedTextLength is 1 and newReplaceLength is 0
+    singleDeleteFromEnd = newReplaceEnd is thisInsertEnd and newInsertedTextLength is 0 and newReplaceLength is 1
+
+    if singleInsertAtEnd
+      @insertedTextLength++
+      true
+    else if singleDeleteFromEnd
+      if newInsertedTextLocation < thisInsertedTextLocation
+        @replacedText.insertStringAtLocation operation.replacedText, 0
+        @insertedTextLocation--
+      else
+        @insertedTextLength--
+      true
+    else
+      false

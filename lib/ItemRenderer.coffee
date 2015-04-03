@@ -415,8 +415,8 @@ class ItemRenderer
         if animate
           @animateExpandRenderedChildrenUL item, renderedChildrenUL
 
-  outlineDidChange: (e) ->
-    for each in e.mutations
+  outlineDidChange: (mutations) ->
+    for each in mutations
       switch each.type
         when Mutation.ATTRIBUTE_CHANGED
           @updateItemAttribute each.target, each.attributeName

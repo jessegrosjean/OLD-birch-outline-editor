@@ -55,13 +55,6 @@ class UndoManager
       @currentGroup.metadata = metadata or {}
       @emitter.emit 'did-open-undo-group'
 
-  reopenLastUndoGrouping: ->
-    if @undoStack.length
-      @groupingLevel++
-      if @groupingLevel == 1
-        @currentGroup = @undoStack.pop()
-        @emitter.emit 'did-reopen-undo-group'
-
   endUndoGrouping: ->
     if @groupingLevel > 0
       @groupingLevel--
@@ -90,22 +83,6 @@ class UndoManager
 
   registerUndoOperation: (operation) ->
     return unless @isUndoRegistrationEnabled()
-
-    if not @isUndoing and not @isRedoing
-      currentGroup = @currentGroup
-
-      if not currentGroup
-        @reopenLastUndoGrouping()
-        currentGroup = @currentGroup
-        if currentGroup
-          coalesceOperation = currentGroup[currentGroup.length - 1]
-          currentGroup = null
-        @endUndoGrouping()
-      else
-        coalesceOperation = currentGroup[currentGroup.length - 1]
-
-      if coalesceOperation && coalesceOperation.coalesce && coalesceOperation.coalesce(operation)
-        return
 
     @beginUndoGrouping()
     @currentGroup.unshift(operation)
@@ -139,17 +116,17 @@ class UndoManager
 
     @emitter.emit 'will-undo'
     @isUndoing = true
-    @beginUndoGrouping(@undoGroupMetadata())
+    @beginUndoGrouping(@getUndoGroupMetadata())
 
     @undoStack.pop().forEach (each) ->
-      if each.performOperation
-        each.performOperation(context)
+      if each.performUndoOperation
+        each.performUndoOperation(context)
       else
         each(context)
 
     @endUndoGrouping()
     @isUndoing = false
-    @emitter.emit 'did-undo', @redoGroupMetadata()
+    @emitter.emit 'did-undo', @getRedoGroupMetadata()
 
   redo: (context) ->
     assert.ok(@groupingLevel == 0, 'Unclosed grouping')
@@ -159,22 +136,22 @@ class UndoManager
 
     @emitter.emit 'will-redo'
     @isRedoing = true
-    @beginUndoGrouping(@redoGroupMetadata())
+    @beginUndoGrouping(@getRedoGroupMetadata())
 
     @redoStack.pop().forEach (each) ->
-      if each.performOperation
-        each.performOperation(context)
+      if each.performUndoOperation
+        each.performUndoOperation(context)
       else
         each(context)
 
     @endUndoGrouping()
     @isRedoing = false
-    @emitter.emit 'did-redo', @undoGroupMetadata()
+    @emitter.emit 'did-redo', @getUndoGroupMetadata()
 
-  undoGroupMetadata: ->
+  getUndoGroupMetadata: ->
     @undoStack[@undoStack.length - 1]?.metadata
 
-  redoGroupMetadata: ->
+  getRedoGroupMetadata: ->
     @redoStack[@redoStack.length - 1]?.metadata
 
   removeAllActions: ->

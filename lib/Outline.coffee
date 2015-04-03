@@ -47,8 +47,8 @@ else
 # Watch for outline changes:
 #
 # ```coffeescript
-# disposable = outline.onDidChange (e) ->
-#   for mutation in e.mutations
+# disposable = outline.onDidChange (mutations) ->
+#   for mutation in mutations
 #     switch mutation.type
 #       when Mutation.ATTRIBUTE_CHANGED
 #         console.log mutation.attributeName
@@ -73,7 +73,7 @@ class Outline
   undoSubscriptions: null
   updateCount: 0
   updateMutations: null
-  updateMutationObserver: null
+  coalescingMutation: null
   cachedText: null
   stoppedChangingDelay: 300
   stoppedChangingTimeout: null
@@ -101,27 +101,22 @@ class Outline
     @loaded = false
     @serializedState = {}
 
-    @updateMutationObserver = new MutationObserver (mutations) =>
-      @updateMutations = @updateMutations.concat mutations
-
-    @updateMutationObserver.observe rootElement,
-      attributes: true
-      childList: true
-      characterData: true
-      subtree: true
-      attributeOldValue: true
-      characterDataOldValue: true
-
     @undoSubscriptions = new CompositeDisposable
     @undoSubscriptions.add undoManager.onDidCloseUndoGroup =>
       unless undoManager.isUndoing or undoManager.isRedoing
         @changeCount++
         @scheduleModifiedEvents()
+    @undoSubscriptions.add undoManager.onWillUndo =>
+      @breakUndoCoalescing()
     @undoSubscriptions.add undoManager.onDidUndo =>
       @changeCount--
+      @breakUndoCoalescing()
       @scheduleModifiedEvents()
+    @undoSubscriptions.add undoManager.onWillRedo =>
+      @breakUndoCoalescing()
     @undoSubscriptions.add undoManager.onDidRedo =>
       @changeCount++
+      @breakUndoCoalescing()
       @scheduleModifiedEvents()
 
     @setPath(params.filePath) if params?.filePath
@@ -242,12 +237,8 @@ class Outline
   # Because observers are invoked synchronously, it's important not to perform
   # any expensive operations via this method.
   #
-  # * `callback` {Function} to be called when the buffer changes.
-  #   * `event` {Object} with the following keys:
-  #     * `oldRange` {Range} of the old text.
-  #     * `newRange` {Range} of the new text.
-  #     * `oldText` {String} containing the text that was replaced.
-  #     * `newText` {String} containing the text that was inserted.
+  # * `callback` {Function} to be called when the outline will change.
+  #   * `mutation` {Mutation} describing the change.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onWillChange: (callback) ->
@@ -258,8 +249,7 @@ class Outline
   # See {Outline} Examples for an example of subscribing to this event.
   #
   # - `callback` {Function} to be called when the outline changes.
-  #   - `event` {Object} with following keys:
-  #     - `mutations` {Array} of {Mutation}s.
+  #   - `mutations` {Array} of {Mutation}s describing the changes.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChange: (callback) ->
@@ -560,18 +550,38 @@ class Outline
   beginUpdates: ->
     if ++@updateCount == 1 then @updateMutations = []
 
+  breakUndoCoalescing: ->
+    @coalescingMutation = null
+
+  recoredUpdateMutation: (mutation) ->
+    @updateMutations.push mutation.copy()
+
+    if @undoManager.isUndoing or @undoManager.isUndoing
+      @breakUndoCoalescing()
+
+    if @coalescingMutation and @coalescingMutation.coalesce(mutation)
+      metadata = @undoManager.getUndoGroupMetadata()
+      undoSelection = metadata.undoSelection
+      if undoSelection and @coalescingMutation.type is Mutation.BODT_TEXT_CHANGED
+        # Update the undo selection to match coalescingMutation
+        undoSelection.anchorOffset = @coalescingMutation.insertedTextLocation
+        undoSelection.startOffset = @coalescingMutation.insertedTextLocation
+        undoSelection.focusOffset = @coalescingMutation.insertedTextLocation + @coalescingMutation.replacedText.length
+        undoSelection.endOffset = @coalescingMutation.insertedTextLocation + @coalescingMutation.replacedText.length
+    else
+      @undoManager.registerUndoOperation mutation
+      @coalescingMutation = mutation
+
   # Public: End grouping changes. Must call to balance a previous
   # {::beginUpdates} call.
   endUpdates: ->
     if --@updateCount == 0
       updateMutations = @updateMutations
       @updateMutations = null
-      updateMutations = updateMutations.concat(@updateMutationObserver.takeRecords())
       if updateMutations.length > 0
         @cachedText = null
         @conflict = false if @conflict and !@isModified()
-        event = { mutations: Mutation.createFromDOMMutations updateMutations }
-        @emitter.emit('did-change', event)
+        @emitter.emit('did-change', updateMutations)
         @scheduleModifiedEvents()
 
   ###
@@ -737,7 +747,6 @@ class Outline
   destroy: ->
     unless @destroyed
       Outline.removeOutline this
-      @updateMutationObserver.disconnect()
       @cancelStoppedChangingTimeout()
       @undoSubscriptions?.dispose()
       @fileSubscriptions?.dispose()

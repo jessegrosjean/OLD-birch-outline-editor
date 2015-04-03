@@ -83,12 +83,6 @@ describe('Outline', function() {
 	});
 
 	describe('Undo', function() {
-		it('should undo body change', function() {
-			outlineSetup.one.bodyText = 'hello word';
-			outline.undoManager.undo();
-			outlineSetup.one.bodyText.should.equal('one');
-		});
-
 		it('should undo append child', function() {
 			var child = outline.createItem('hello');
 			outlineSetup.one.appendChild(child);
@@ -108,6 +102,50 @@ describe('Outline', function() {
 			outline.undoManager.endUndoGrouping();
 			outline.undoManager.undo();
 			outlineSetup.six.parent.should.equal(outlineSetup.five);
+		});
+
+		it('should undo set attribute', function() {
+			outlineSetup.one.setAttribute('myattr', 'test');
+			outlineSetup.one.getAttribute('myattr').should.equal('test');
+			outline.undoManager.undo();
+			should(outlineSetup.one.getAttribute('myattr') === null);
+		});
+
+		describe('Body Text', function() {
+			it('should undo set body text', function() {
+				outlineSetup.one.bodyText = 'hello word';
+				outline.undoManager.undo();
+				outlineSetup.one.bodyText.should.equal('one');
+			});
+
+			it('should undo replace body text', function() {
+				outlineSetup.one.replaceBodyTextInRange('hello', 1, 1);
+				outlineSetup.one.bodyText.should.equal('ohelloe');
+				outline.undoManager.undo();
+				outlineSetup.one.bodyText.should.equal('one');
+			});
+
+			it('should coalesce consecutive body text inserts', function() {
+				outlineSetup.one.replaceBodyTextInRange('a', 1, 0);
+				outlineSetup.one.replaceBodyTextInRange('b', 2, 0);
+				outlineSetup.one.replaceBodyTextInRange('c', 3, 0);
+				outlineSetup.one.bodyText.should.equal('oabcne');
+				outline.undoManager.undo();
+				outlineSetup.one.bodyText.should.equal('one');
+				outline.undoManager.redo();
+				outlineSetup.one.bodyText.should.equal('oabcne');
+			});
+
+			it('should coalesce consecutive body text deletes', function() {
+				outlineSetup.one.replaceBodyTextInRange('', 2, 1);
+				outlineSetup.one.replaceBodyTextInRange('', 1, 1);
+				outlineSetup.one.replaceBodyTextInRange('', 0, 1);
+				outlineSetup.one.bodyText.should.equal('');
+				outline.undoManager.undo();
+				outlineSetup.one.bodyText.should.equal('one');
+				outline.undoManager.redo();
+				outlineSetup.one.bodyText.should.equal('');
+			});
 		});
 	});
 

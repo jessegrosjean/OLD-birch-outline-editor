@@ -149,10 +149,10 @@ class OutlineEditor extends Model
         @moveSelectionRange(selectionRange)
       @_overrideIsFocused = false
 
-  outlineDidChange: (e) ->
+  outlineDidChange: (mutations) ->
     if @getSearch()?.query
       hoistedItem = @getHoistedItem()
-      for eachMutation in e.mutations
+      for eachMutation in mutations
         if eachMutation.type == Mutation.CHILDREN_CHANGED
           for eachItem in eachMutation.addedItems
             if hoistedItem.contains(eachItem)
@@ -160,11 +160,11 @@ class OutlineEditor extends Model
 
     selectionRange = @selection
     @_overrideIsFocused = @isFocused()
-    @outlineEditorElement.outlineDidChange(e)
+    @outlineEditorElement.outlineDidChange(mutations)
     @moveSelectionRange(selectionRange)
     @_overrideIsFocused = false
 
-    for eachMutation in e.mutations
+    for eachMutation in mutations
       if eachMutation.type == Mutation.CHILDREN_CHANGED
         targetItem = eachMutation.target
         if not targetItem.hasChildren
@@ -218,8 +218,7 @@ class OutlineEditor extends Model
   # See {Outline} Examples for an example of subscribing to these events.
   #
   # - `callback` {Function} to be called when the outline changes.
-  #   - `event` {Object} with following keys:
-  #     - `mutations` {Array} of {Mutation}s.
+  #   - `mutations` {Array} of {Mutation}s describing the changes.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChange: (callback) ->

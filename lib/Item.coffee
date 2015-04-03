@@ -1,6 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-ItemBodyUndoOperation = require './ItemBodyUndoOperation'
 AttributedString = require './AttributedString'
 ItemBodyEncoder = require './ItemBodyEncoder'
 ItemEditorState = require './ItemEditorState'
@@ -149,18 +148,10 @@ class Item
 
     if isInOutline
       oldValue = @getAttribute name
-
-      outline.emitter.emit 'will-change',
-        target: this
-        type: Mutation.ATTRIBUTE_CHANGED
-        attributeName: name
-        attributeNewValue: value
-        attributeOldValue: oldValue
-
-      outline.undoManager.registerUndoOperation =>
-        @setAttribute name, oldValue
-
+      mutation = Mutation.createAttributeMutation this, name, value, oldValue
+      outline.emitter.emit 'will-change', mutation
       outline.beginUpdates()
+      outline.recoredUpdateMutation mutation
 
     if value == undefined
       @_liOrRootUL.removeAttribute name
@@ -381,22 +372,10 @@ class Item
       else
         replacedText = new AttributedString
 
-      outline.emitter.emit 'will-change',
-        target: this
-        type: Mutation.BODT_TEXT_CHANGED
-        insertedText: insertedText
-        replacedText: replacedText
-        location: location
-        length: length
-
-      undoManager.registerUndoOperation new ItemBodyUndoOperation(
-        this,
-        replacedText,
-        location,
-        insertedString.length
-      )
-
+      mutation = Mutation.createBodyTextMutation this, location, insertedString.length, replacedText
+      outline.emitter.emit 'will-change', mutation
       outline.beginUpdates()
+      outline.recoredUpdateMutation mutation
 
     li = @_liOrRootUL
     bodyP = _bodyP(li)
@@ -688,17 +667,10 @@ class Item
       else
         previousSibling = @lastChild
 
-      outline.emitter.emit 'will-change',
-        target: this
-        type: Mutation.CHILDREN_CHANGED
-        addedItems: children
-        previousSibling: previousSibling
-        nextSibling: referenceSibling
-
-      outline.undoManager.registerUndoOperation =>
-        @removeChildren(children)
-
+      mutation = Mutation.createChildrenMutation this, children, [], previousSibling, referenceSibling
+      outline.emitter.emit 'will-change', mutation
       outline.beginUpdates()
+      outline.recoredUpdateMutation mutation
 
     ownerDocument = @_liOrRootUL.ownerDocument
     documentFragment = ownerDocument.createDocumentFragment()
@@ -742,18 +714,10 @@ class Item
     if isInOutline
       lastChild = children[children.length - 1]
       nextSibling = lastChild.nextSibling
-
-      outline.emitter.emit 'will-change',
-        target: this
-        type: Mutation.CHILDREN_CHANGED
-        removedItems: children
-        previousSibling: children[0].previousSibling
-        nextSibling: nextSibling
-
-      outline.undoManager.registerUndoOperation =>
-        @insertChildrenBefore(children, nextSibling)
-
+      mutation = Mutation.createChildrenMutation this, [], children, children[0].previousSibling, nextSibling
+      outline.emitter.emit 'will-change', mutation
       outline.beginUpdates()
+      outline.recoredUpdateMutation mutation
 
     siblingChildren = []
     outerThis = this
