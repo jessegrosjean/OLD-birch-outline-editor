@@ -670,7 +670,10 @@ class ItemRenderer
       else
         pick.selectionAffinity = Constants.SelectionAffinityUpstream
     else
-      pick?.selectionAffinity = Constants.SelectionAffinityUpstream
+      if range?.startOffset is 0
+        pick?.selectionAffinity = Constants.SelectionAffinityDownstream
+      else
+        pick?.selectionAffinity = Constants.SelectionAffinityUpstream
 
     pick
 

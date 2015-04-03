@@ -26,6 +26,7 @@
 - Fixed bug where could get stuck extending selection state.
 - Fixed bug where scrollbar wouldn't theme properly on startup.
 - Fixed editing problems in filtered view where items would display out of order.
+- Fixed case where cursor could end up in wrong position when moving line up/down.
 - Fixed bug where deleting consecutive characters wouldn't coalecse into a single undo operation.
 
 ## 1.6.0

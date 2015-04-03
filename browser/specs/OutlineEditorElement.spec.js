@@ -147,6 +147,42 @@ describe('OutlineEditorElement', function() {
 			var pick = outlineEditorElement.pick(0, 0);
 		});
 
+		it('should pick at line wrap boundaries', function() {
+			var LI = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
+			var P = outlineEditorElement._itemViewBodyP(LI);
+			var bounds = P.getBoundingClientRect();
+			var appendText = ' makethislinewrap';
+			var newBounds;
+
+			// First grow text in one so that it wraps to next line. So tests
+			// will pass no matter what browser window width/font/etc is.
+			do {
+				outlineSetup.one.appendBodyText(appendText);
+				P = outlineEditorElement._itemViewBodyP(LI);
+				newBounds = P.getBoundingClientRect();
+			} while (bounds.height === newBounds.height);
+
+			var pickRightTop = outlineEditorElement.pick(newBounds.right - 1, newBounds.top + 1).itemCaretPosition;
+			var pickLeftBottom = outlineEditorElement.pick(newBounds.left + 1, newBounds.bottom - 1).itemCaretPosition;
+
+			pickRightTop.selectionAffinity.should.equal('SelectionAffinityUpstream');
+			pickLeftBottom.selectionAffinity.should.equal('SelectionAffinityDownstream');
+
+			// Setup problematic special case... when first text to wrap also
+			// starts an attribute run.
+
+			var length = appendText.length - 1;
+			var start = outlineSetup.one.bodyText.length - length;
+			outlineSetup.one.addElementInBodyTextRange('I', null, start, length);
+			P = outlineEditorElement._itemViewBodyP(LI);
+
+			newBounds = P.getBoundingClientRect();
+			pickRightTop = outlineEditorElement.pick(newBounds.right - 1, newBounds.top + 1).itemCaretPosition;
+			pickLeftBottom = outlineEditorElement.pick(newBounds.left + 1, newBounds.bottom - 1).itemCaretPosition;
+
+			pickRightTop.selectionAffinity.should.equal('SelectionAffinityUpstream');
+			pickLeftBottom.selectionAffinity.should.equal('SelectionAffinityDownstream');
+		});
 	});
 
 	describe('Offset Encoding', function() {
