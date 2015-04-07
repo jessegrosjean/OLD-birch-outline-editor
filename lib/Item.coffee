@@ -120,7 +120,7 @@ class Item
   # - `array` (optional) {Boolean} true if should split comma separated value to create an array.
   # - `clazz` (optional) {Class} ({Number} or {Date}) to convert string values into.
   #
-  # Returns attribute value or `undefined`.
+  # Returns attribute value.
   getAttribute: (name, array, clazz) ->
     value
     if value = @_liOrRootUL.getAttribute name
@@ -136,6 +136,7 @@ class Item
   # attribute. `id` is reserved and an exception is thrown if you try to set
   # it. Non string values (such as {Date}s) will be converted to appropriate
   # string format so that they can be read back using {::getAttribute()}.
+  # Setting an attribute to `null` or `undefined` will remove the attribute.
   #
   # - `name` The {String} attribute name.
   # - `value` The new attribute value.
@@ -147,16 +148,16 @@ class Item
     value = Item.objectToAttributeValueString value
 
     if isInOutline
-      oldValue = @getAttribute name
-      mutation = Mutation.createAttributeMutation this, name, value, oldValue
+      oldValue = @getAttribute name or undefined
+      mutation = Mutation.createAttributeMutation this, name, oldValue
       outline.emitter.emit 'will-change', mutation
       outline.beginUpdates()
       outline.recoredUpdateMutation mutation
 
-    if value == undefined
-      @_liOrRootUL.removeAttribute name
-    else
+    if value?
       @_liOrRootUL.setAttribute name, value
+    else
+      @_liOrRootUL.removeAttribute name
 
     if isInOutline
       outline.endUpdates()

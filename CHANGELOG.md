@@ -2,6 +2,10 @@
 
 ## 1.8.0
 
+- Added some context menu items.
+- Select word under cursor on right click.
+- Remove item attribute when set to `undefined` or `null`.
+
 ## 1.7.0
 
 - Added commands for more HTML formatting elements:

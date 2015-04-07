@@ -70,6 +70,35 @@ class Selection
   @isDownstreamDirection: (direction) ->
     direction is 'forward' or direction is 'right' or direction is 'down'
 
+  @nextSelectionIndexFrom: (item, index, direction, granularity) ->
+    text = item.bodyText
+
+    assert(index >= 0 and index <= text.length, 'Invalid Index')
+
+    if text.length is 0
+      return 0
+
+    iframe = document.getElementById('birchTextCalculationIFrame')
+    unless iframe
+      iframe = document.createElement("iframe")
+      iframe.id = 'birchTextCalculationIFrame'
+      document.body.appendChild(iframe)
+      iframe.contentWindow.document.body.appendChild(iframe.contentWindow.document.createElement('P'))
+
+    iframeWindow = iframe.contentWindow
+    iframeDocument = iframeWindow.document
+    selection = iframeDocument.getSelection()
+    range = iframeDocument.createRange()
+    iframeBody = iframeDocument.body
+    p = iframeBody.firstChild
+
+    p.textContent = text
+    range.setStart(p.firstChild, index)
+    selection.removeAllRanges()
+    selection.addRange(range)
+    selection.modify('move', direction, granularity)
+    selection.focusOffset
+
   constructor: (editor, focusItem, focusOffset, anchorItem, anchorOffset, selectionAffinity) ->
     if focusItem instanceof Selection
       selection = focusItem
@@ -320,8 +349,8 @@ class Selection
 
     switch granularity
       when 'sentenceboundary'
-        next.offset = _nextSelectionIndexFrom(
-          focusItem.bodyText,
+        next.offset = Selection.nextSelectionIndexFrom(
+          focusItem,
           focusOffset,
           if upstream then 'backward' else 'forward',
           granularity
@@ -369,8 +398,8 @@ class Selection
                 next.offset = 0
 
       when 'word', 'sentence'
-        next.offset = _nextSelectionIndexFrom(
-          focusItem.bodyText,
+        next.offset = Selection.nextSelectionIndexFrom(
+          focusItem,
           focusOffset,
           if upstream then 'backward' else 'forward',
           granularity
@@ -536,32 +565,5 @@ _isValidSelectionOffset = (editor, item, itemOffset) ->
       itemOffset <= item.bodyText.length
   else
     false
-
-_nextSelectionIndexFrom = (text, index, direction, granularity) ->
-  assert(index >= 0 and index <= text.length, 'Invalid Index')
-
-  if text.length is 0
-    return 0
-
-  iframe = document.getElementById('birchTextCalculationIFrame')
-  unless iframe
-    iframe = document.createElement("iframe")
-    iframe.id = 'birchTextCalculationIFrame'
-    document.body.appendChild(iframe)
-    iframe.contentWindow.document.body.appendChild(iframe.contentWindow.document.createElement('P'))
-
-  iframeWindow = iframe.contentWindow
-  iframeDocument = iframeWindow.document
-  selection = iframeDocument.getSelection()
-  range = iframeDocument.createRange()
-  iframeBody = iframeDocument.body
-  p = iframeBody.firstChild
-
-  p.textContent = text
-  range.setStart(p.firstChild, index)
-  selection.removeAllRanges()
-  selection.addRange(range)
-  selection.modify('move', direction, granularity)
-  selection.focusOffset
 
 module.exports = Selection

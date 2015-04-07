@@ -14,3 +14,31 @@
     ]
   }
 ]
+
+'context-menu':
+  'birch-outline-editor': [
+    { label: 'Undo', command: 'core:undo' },
+    { label: 'Redo', command: 'core:redo' },
+    { type: 'separator' },
+    { label: 'Cut', command: 'core:cut' },
+    { label: 'Copy', command: 'core:copy' },
+    { label: 'Paste', command: 'core:paste' },
+    { type: 'separator' },
+    {
+      label: 'Formatting',
+      submenu: [
+        { label: 'Bold', command: 'birch-outline-editor:toggle-bold' },
+        { label: 'Italic', command: 'birch-outline-editor:toggle-italic' },
+        { label: 'Edit Link', command: 'birch-outline-editor:edit-link' },
+        { type: 'separator' },
+        { label: 'Clear Formatting', command: 'birch-outline-editor:clear-formatting' }
+      ]
+    },
+    {
+      label: 'Transformations',
+      submenu: [
+        { label: 'Make Upper Case', command: 'editor:upper-case' },
+        { label: 'Make Lower Case', command: 'editor:lower-case' }
+      ]
+    }
+  ]

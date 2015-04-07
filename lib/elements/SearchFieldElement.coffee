@@ -161,8 +161,4 @@ atom.commands.add 'outline-editor-search',
     @editor.setSearch ''
     @editor.outlineEditorElement.focus()
 
-module.exports = document.registerElement(
-  'outline-editor-search',
-  prototype: SearchFieldElement.prototype
-)
-
+module.exports = document.registerElement 'outline-editor-search', prototype: SearchFieldElement.prototype

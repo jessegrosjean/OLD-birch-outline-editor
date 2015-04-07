@@ -66,7 +66,7 @@ else
 #   console.log each
 # ```
 class Outline
-  atom.deserializers.add(this)
+  atom.deserializers.add(Outline)
 
   refcount: 0
   changeCount: 0
@@ -666,8 +666,9 @@ class Outline
 
     @emitter.emit 'will-save', {path: filePath}
     @setPath(filePath)
-    @file.writeSync(@getText(editor))
-    @cachedDiskContents = @getText(editor)
+    text = @getText(editor)
+    @file.writeSync text
+    @cachedDiskContents = text
     @conflict = false
     @changeCount = 0
     @emitModifiedStatusChanged(false)
@@ -782,7 +783,7 @@ class Outline
       # cached them. If the contents updated asynchrounously multiple
       # `conlict` events could trigger for the same disk contents.
       @updateCachedDiskContentsSync()
-      return if previousContents == @cachedDiskContents
+      return if previousContents is @cachedDiskContents
 
       if @conflict
         @emitter.emit 'did-conflict'

@@ -1031,13 +1031,45 @@ class OutlineEditor extends Model
   moveToEndOfDocumentAndModifySelection: ->
     @modifySelectionRange('extend', 'forward', 'documentboundary')
 
-  selectLine: ->
+  extendSelectionRangeToItemBoundaries: ->
     @moveSelectionRange(
       @selection.focusItem,
       undefined,
       @selection.anchorItem,
       undefined
     )
+
+  extendSelectionRangeToSentanceBoundaries: ->
+    @extendSelectionRangeToBoundary 'sentenceboundary'
+
+  extendSelectionRangeToLineBoundaries: ->
+    @extendSelectionRangeToBoundary 'lineboundary'
+
+  extendSelectionRangeToWordBoundaries: ->
+    @extendSelectionRangeToBoundary 'word'
+
+  extendSelectionRangeToBoundary: (boundary) ->
+    selection = @selection
+    startItem = selection.startItem
+    endItem = selection.endItem
+
+    originalStart = selection.startOffset
+    startOffset = Selection.nextSelectionIndexFrom startItem, selection.startOffset, 'backward', boundary
+    probeForward = Selection.nextSelectionIndexFrom startItem, startOffset, 'forward', boundary
+    if probeForward < originalStart
+      startOffset = originalStart
+
+    originalEnd = selection.endOffset
+    endOffset = Selection.nextSelectionIndexFrom endItem, selection.endOffset, 'forward', boundary
+    probeBackward = Selection.nextSelectionIndexFrom startItem, endOffset, 'backward', boundary
+    if probeBackward > originalEnd
+      endOffset = originalEnd
+
+    if originalStart is startOffset and originalEnd is endOffset
+      endOffset++
+
+    @moveSelectionRange endItem, endOffset, startItem, startOffset
+
 
   # Public: Set a new {Selection}.
   #

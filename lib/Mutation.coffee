@@ -37,10 +37,6 @@ class Mutation
   # Public: Read-only name of changed attribute in the target {Item}, or null.
   attributeName: null
 
-  # Public: Read-only new value of changed attribute in the target
-  # {Item}, or null.
-  attributeNewValue: null
-
   # Public: Read-only previous value of changed attribute in the target
   # {Item}, or null.
   attributeOldValue: null
@@ -71,10 +67,9 @@ class Mutation
   # null.
   nextSibling: null
 
-  @createAttributeMutation: (target, attributeName, attributeNewValue, attributeOldValue) ->
+  @createAttributeMutation: (target, attributeName, attributeOldValue) ->
     mutation = new Mutation target, Mutation.ATTRIBUTE_CHANGED
     mutation.attributeName = attributeName
-    mutation.attributeNewValue = attributeNewValue
     mutation.attributeOldValue = attributeOldValue
     mutation
 

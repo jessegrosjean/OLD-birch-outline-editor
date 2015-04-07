@@ -67,6 +67,12 @@ class OutlineEditorElement extends HTMLElement
     @appendChild animationLayerElement
     @animationLayerElement = animationLayerElement
 
+    popoverLayerElement = document.createElement 'DIV'
+    popoverLayerElement.className = 'popoverLayer'
+    popoverLayerElement.style.position = 'absolute'
+    @appendChild popoverLayerElement
+    @popoverLayerElement = popoverLayerElement
+
     @styledTextCaretElement = document.createElement 'DIV'
     @styledTextCaretElement.className = 'styledTextCaret'
     @styledTextCaretElement.style.position = 'absolute'
@@ -449,27 +455,27 @@ class OutlineEditorElement extends HTMLElement
     @_extendingSelectionInteraction
 
   beginExtendSelectionInteraction: (e) ->
-    editor = @editor
-    pick = @pick(e.clientX, e.clientY)
-    caretPosition = pick.itemCaretPosition
-
-    if caretPosition
-      if e.shiftKey
-        editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
-      else
-        editor.moveSelectionRange(caretPosition.offsetItem, caretPosition.offset)
-
-    e.stopPropagation()
-    # Calling prevent default fixes picking inbetween items. But it breaks
-    # autoscroll, double-click select word and triple-click select paragraph.
-    # e.preventDefault()
-
     # Only start the drag interaction if "current" mouse down button is 0.
     # Mouse down events can get queued at startup, so that if we test e.button
     # it will say mouse is down when it really isn't, that that cause problem
     # in the selection interaction logic, since we never get mouseup event to
     # end it.
     if Util.isGlobalLeftMouseDown()
+      editor = @editor
+      pick = @pick(e.clientX, e.clientY)
+      caretPosition = pick.itemCaretPosition
+
+      if caretPosition
+        if e.shiftKey
+          editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
+        else
+          editor.moveSelectionRange(caretPosition.offsetItem, caretPosition.offset)
+
+      # Calling prevent default fixes picking inbetween items. But it breaks
+      # autoscroll, double-click select word and triple-click select paragraph.
+      # e.preventDefault()
+      e.stopPropagation()
+
       @disableScrolling()
       editor._disableSyncDOMSelectionToEditor = true
       @_extendingSelectionInteraction = true
@@ -481,7 +487,20 @@ class OutlineEditorElement extends HTMLElement
       )
 
   onContextMenu: (e) ->
-    picked = @pick e.clientX, e.clientY
+    e.preventDefault()
+    e.stopPropagation()
+
+    pick = @pick(e.clientX, e.clientY)
+    caretPosition = pick.itemCaretPosition
+    selection = @editor.selection
+
+    if selection.isTextMode
+      @editor.moveSelectionRange caretPosition.offsetItem, caretPosition.offset
+      @editor.extendSelectionRangeToWordBoundaries()
+    else
+      @editor.moveSelectionRange caretPosition.offsetItem, undefined
+
+    setTimeout (-> atom.contextMenu.showForEvent(e)), 100
 
   onMouseMove: (e) ->
     pick = @pick(e.clientX, e.clientY)
@@ -1008,7 +1027,12 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
 )
 
 atom.commands.add 'birch-outline-editor', stopEventPropagation(
-  'core:cancel': -> @editor.selectLine()
+  'core:cancel': ->
+    if @editor.isTextMode()
+      @editor.extendSelectionRangeToItemBoundaries()
+    else
+      @editor.outlineEditorElement.showFindAndReplace()
+
   'core:move-backward': -> @editor.moveBackward()
   'core:select-backward': -> @editor.moveBackwardAndModifySelection()
   'core:move-up': -> @editor.moveUp()
@@ -1048,7 +1072,7 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:move-paragraph-forward': -> @editor.moveParagraphForward()
   'editor:select-paragraph-forward': -> @editor.moveParagraphForwardAndModifySelection()
   'core:select-all': -> @editor.selectAll()
-  'editor:select-line': -> @editor.selectLine()
+  'editor:select-line': -> @editor.extendSelectionRangeToItemBoundaries()
   'birch-outline-editor:hoist': -> @editor.hoistItem()
   'birch-outline-editor:unhoist': -> @editor.unhoist()
   'editor:scroll-to-top': -> @editor.scrollToBeginningOfDocument()

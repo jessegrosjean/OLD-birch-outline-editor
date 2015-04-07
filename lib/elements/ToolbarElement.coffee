@@ -38,5 +38,12 @@ class ToolbarElement extends HTMLElement
   destroyed: ->
     @setEditor null
 
-module.exports = document.registerElement 'outline-editor-toolbar',
-  prototype: ToolbarElement.prototype
+atom.commands.add 'outline-editor-toolbar',
+  'find-and-replace:show': (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+  'find-and-replace:show-replace': (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+
+module.exports = document.registerElement 'outline-editor-toolbar', prototype: ToolbarElement.prototype

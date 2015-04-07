@@ -1,26 +1,27 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
 _GlobalMouseDown = 0
-_GlobalMouseButton = 0
+_GlobalMouseButton = {}
 
 isGlobalMouseDown = ->
   _GlobalMouseDown > 0
 
 isGlobalLeftMouseDown = ->
-  isGlobalMouseDown() and _GlobalMouseButton is 0
+  _GlobalMouseButton[0]
 
 isGlobalWheelMouseDown = ->
-  isGlobalMouseDown() and _GlobalMouseButton is 1
+  _GlobalMouseButton[1]
 
 isGlobalRightMouseDown = ->
-  isGlobalMouseDown() and _GlobalMouseButton is 2
+  _GlobalMouseButton[2]
 
 handleGlobalMouseDown = (e) ->
-  ++_GlobalMouseDown
-  _GlobalMouseButton = e.button
+  _GlobalMouseDown++
+  _GlobalMouseButton[e.button] = true
 
 handleGlobalMouseUp = (e) ->
-  --_GlobalMouseDown
+  _GlobalMouseDown--
+  _GlobalMouseButton[e.button] = false
 
 document.addEventListener 'mousedown', handleGlobalMouseDown, true
 document.addEventListener 'mouseup', handleGlobalMouseUp, true
