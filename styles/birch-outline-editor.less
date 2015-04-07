@@ -222,9 +222,9 @@ birch-outline-editor > ul.top-item-list {
   color: @syntax-text-color;
 }
 
-@handleImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{syntax-text-color}" cx="12px" cy="12px" r="2.5px" /></g></svg>');
-@expandableHandleBackgroundColor: fade(@syntax-text-color, 15%);
-@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{expandableHandleBackgroundColor}" cx="12px" cy="12px" r="8px" /></g></svg>');
+//@handleImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{syntax-text-color}" cx="12px" cy="12px" r="2.5px" /></g></svg>');
+//@expandableHandleBackgroundColor: fade(@syntax-text-color, 15%);
+//@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{expandableHandleBackgroundColor}" cx="12px" cy="12px" r="8px" /></g></svg>');
 //@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><polygon fill="red" points="14,20 20,20 20,14 14,20"/></g></svg>');
 
 
@@ -232,14 +232,16 @@ birch-outline-editor > ul.top-item-list {
   display: inline-block;
   width: @item-indent-spacing;
   font-weight: normal;
-  content: '•';
+  color: @syntax-invisible-character-color;
+  content: '▸︎';
 }
 
 .bhasChildren:not(.bexpanded) > .bbranchcontrols > .bhandle:before {
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: @line-height-pixels;
-  background-image: @expandableHandleBackgroundImage;
+  color: @syntax-text-color;
+  //background-repeat: no-repeat;
+  //background-position: center center;
+  //background-size: @line-height-pixels;
+  //background-image: @expandableHandleBackgroundImage;
 }
 
 .bborder {
