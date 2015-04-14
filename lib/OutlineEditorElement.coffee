@@ -940,7 +940,7 @@ EventRegistery.listen '.bbodytext a',
       if href.indexOf('file://') is 0
         e.preventDefault()
         e.stopPropagation()
-        atom.workspace.open href.substring(7),
+        atom.workspace.open unescape(href.substring(7)),
           searchAllPanes: true
 
 #
