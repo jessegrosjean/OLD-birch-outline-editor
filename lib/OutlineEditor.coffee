@@ -1212,15 +1212,11 @@ class OutlineEditor extends Model
 
     classList = outlineEditorElement.classList
     if currentSelection.isTextMode
-      if classList.contains('outlineMode')
-        classList.remove('outlineMode')
-      if not classList.contains('textMode')
-        classList.add('textMode')
+      classList.remove('outlineMode')
+      classList.add('textMode')
     else
-      if classList.contains('textMode')
-        classList.remove('textMode')
-      if not classList.contains('outlineMode')
-        classList.add('outlineMode')
+      classList.remove('textMode')
+      classList.add('outlineMode')
 
     outlineEditorElement.updateSimulatedCursor()
 
