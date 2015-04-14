@@ -10,7 +10,6 @@ class TextInputElement extends HTMLElement
   delegate: null
 
   createdCallback: ->
-
     @textEditorElement = document.createElement 'atom-text-editor'
     @textEditorElement.setAttribute 'mini', true
     @textEditor = @textEditorElement.getModel()
@@ -35,7 +34,7 @@ class TextInputElement extends HTMLElement
       @delegate?.didChangeText?(e)
 
     @textEditorElement.addEventListener 'blur', (e) =>
-      #@cancel() unless @cancelling
+      @cancel() unless @cancelling
 
   attachedCallback: ->
 
@@ -44,27 +43,22 @@ class TextInputElement extends HTMLElement
   attributeChangedCallback: (attrName, oldVal, newVal) ->
 
   ###
-  Section: Text
+  Section: Messages to the user
   ###
 
-  getText: ->
-    @textEditor.getText()
+  getPlaceholderText: ->
+    @textEditor.getPlaceholderText()
 
-  setText: (text) ->
-    @textEditor.setText text
+  setPlaceholderText: (placeholderText) ->
+    @textEditor.setPlaceholderText placeholderText
 
-  isCursorAtStart: ->
-    range = @textEditor.getSelectedBufferRange()
-    range.isEmpty() and range.containsPoint([0, 0])
-
-  ###
-  Section: Delegate
-  ###
-
-  getDelegate: ->
-    @delegate
-
-  setDelegate: (@delegate) ->
+  setMessage: (message='') ->
+    if message.length is 0
+      @message.textContent = ''
+      @message.style.display = 'none'
+    else
+      @message.textContent = message
+      @message.style.display = null
 
   ###
   Section: Accessory Elements
@@ -79,16 +73,27 @@ class TextInputElement extends HTMLElement
     @removeChild element.parentElement
 
   ###
-  Section: Messages to the user
+  Section: Text
   ###
 
-  setMessage: (message='') ->
-    if message.length is 0
-      @message.textContent = ''
-      @message.style.display = 'none'
-    else
-      @message.textContent = message
-      @message.style.display = null
+  getText: ->
+    @textEditor.getText()
+
+  setText: (text) ->
+    @textEditor.setText text or ''
+
+  isCursorAtStart: ->
+    range = @textEditor.getSelectedBufferRange()
+    range.isEmpty() and range.containsPoint([0, 0])
+
+  ###
+  Section: Delegate
+  ###
+
+  getDelegate: ->
+    @delegate
+
+  setDelegate: (@delegate) ->
 
   ###
   Section: Element Actions

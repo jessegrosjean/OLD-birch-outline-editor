@@ -27,6 +27,29 @@ class TokenInputElement extends HTMLElement
   attributeChangedCallback: (attrName, oldVal, newVal) ->
 
   ###
+  Section: Messages to the user
+  ###
+
+  getPlaceholderText: ->
+    @textInputElement.getPlaceholderText()
+
+  setPlaceholderText: (placeholderText) ->
+    @textInputElement.setPlaceholderText placeholderText
+
+  setMessage: (message='') ->
+    @textInputElement.setMessage message
+
+  ###
+  Section: Accessory Elements
+  ###
+
+  addAccessoryElement: (element) ->
+    @textInputElement.addAccessoryElement element
+
+  removeAccesoryElement: (element) ->
+    @textInputElement.removeAccesoryElement element
+
+  ###
   Section: Text
   ###
 

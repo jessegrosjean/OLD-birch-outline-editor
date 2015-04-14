@@ -1,6 +1,6 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-LinkEditorElement = require './elements/LinkEditorElement'
+TextInputElement = require './birch-ui/TextInputElement'
 OutlineEditorElement = require './OutlineEditorElement'
 AttributedString = require './AttributedString'
 {Emitter, CompositeDisposable} = require 'atom'
@@ -22,6 +22,8 @@ assert = require 'assert'
 Item = require './Item'
 Util = require './Util'
 path = require 'path'
+
+validUrl = null # defer until used
 
 # Public: Editor for {Outline}s.
 #
@@ -1595,65 +1597,61 @@ class OutlineEditor extends Model
   ###
 
   editLink: ->
-    # Ugly mess... move lots of this logic into LinkEditorElement
-    selection = @selection
-    focusItem = selection.focusItem
+    editor = this
+    savedSelection = editor.selection
+    item = savedSelection.focusItem
+    offset = savedSelection.focusOffset
+    return unless item
+
     linkAttributes
-
-    unless focusItem
-      return
-
-    if selection.isCollapsed
+    if savedSelection.isCollapsed
       longestRange = {}
-      linkAttributes = focusItem.getElementAtBodyTextIndex('A', selection.focusOffset, null, longestRange)
+      linkAttributes = item.getElementAtBodyTextIndex('A', offset, null, longestRange)
       if linkAttributes?.href != undefined
-        @moveSelectionRange(focusItem, longestRange.location, focusItem, longestRange.end)
-        selection = @selection
+        @moveSelectionRange(item, longestRange.location, item, longestRange.end)
+        savedSelection = editor.selection
+        offset = longestRange.location
     else
-      linkAttributes = focusItem.getElementAtBodyTextIndex('A', selection.focusOffset or 0)
+      linkAttributes = item.getElementAtBodyTextIndex('A', offset or 0)
 
-    birchLinkEditor = document.createElement 'birch-link-editor'
-    birchLinkEditor.setAttribute 'label', 'Link destination:'
-    birchLinkEditor.setAttribute 'text', linkAttributes?.href or 'http://'
-    birchLinkEditor.setValidator (text) ->
-      validUrl = require 'valid-url'
-      unless validUrl.isUri text
-        if text
-          'This does not look like a valid link.'
+    textInput = document.createElement 'birch-text-input'
+    textInput.setText linkAttributes?.href or 'http://'
+    textInput.setDelegate
+      didChangeText: ->
+        validUrl ?= require 'valid-url'
+        linkText = textInput.getText()
+        if not linkText or validUrl.isUri linkText
+          textInput.setMessage ''
         else
-          'This link will be removed.'
+          textInput.setMessage 'This does not look like a valid link.'
 
-    editLinkPanel = atom.workspace.addModalPanel
-      item: birchLinkEditor
+      restoreFocus: ->
+        editor.focus()
+        editor.moveSelectionRange savedSelection
+
+      cancelled: ->
+        textInputPanel.destroy()
+
+      confirm: ->
+        linkText = textInput.getText()
+        if savedSelection.isCollapsed
+          insertText = new AttributedString linkText
+          insertText.addAttributeInRange 'A', href: linkText, 0, linkText.length
+          item.replaceBodyTextInRange insertText, offset, 0
+          savedSelection = editor.createSelection item, offset, item, offset + linkText.length
+        else
+          editor._transformSelectedText (eachItem, start, end) ->
+            if linkText
+              eachItem.addElementInBodyTextRange('A', href: linkText, start, end - start)
+            else
+              eachItem.removeElementInBodyTextRange('A', start, end - start)
+        textInputPanel.destroy()
+        @restoreFocus()
+
+    textInputPanel = atom.workspace.addModalPanel
+      item: textInput
       visible: true
-    birchLinkEditor.focus()
-
-    subscriptions = new CompositeDisposable
-    subscriptions.add birchLinkEditor.onConfirm =>
-      subscriptions.dispose()
-      editLinkPanel.destroy()
-      linkText = birchLinkEditor.getAttribute 'text'
-
-      if selection.isCollapsed
-        insertText = new AttributedString linkText
-        insertText.addAttributeInRange 'A', href: linkText, 0, linkText.length
-        focusItem.replaceBodyTextInRange insertText, selection.focusOffset, 0
-        selection = @createSelection focusItem, selection.focusOffset, focusItem, selection.focusOffset + linkText.length
-      else
-        @_transformSelectedText (eachItem, start, end) ->
-          if linkText
-            eachItem.addElementInBodyTextRange('A', href: linkText, start, end - start)
-          else
-            eachItem.removeElementInBodyTextRange('A', start, end - start)
-
-      @focus()
-      @moveSelectionRange selection
-
-    subscriptions.add birchLinkEditor.onCancel =>
-      subscriptions.dispose()
-      editLinkPanel.destroy()
-      @focus()
-      @moveSelectionRange selection
+    textInput.focusTextEditor()
 
   toggleFormattingTag: (tagName, attributes={}) ->
     startItem = @selection.startItem
