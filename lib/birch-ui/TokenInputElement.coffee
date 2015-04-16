@@ -8,12 +8,14 @@ class TokenInputElement extends HTMLElement
 
   createdCallback: ->
     @tokenzieRegex = /\s|,|#/
+
+    @list = document.createElement 'ol'
+    @appendChild @list
+
     @textInputElement = document.createElement 'birch-text-input'
     @textEditorElement = @textInputElement.textEditorElement
     @textEditor = @textInputElement.textEditor
     @appendChild @textInputElement
-    @list = document.createElement 'ol'
-    @appendChild @list
 
     @updateLayout()
 
@@ -38,6 +40,12 @@ class TokenInputElement extends HTMLElement
 
   setMessage: (message='') ->
     @textInputElement.setMessage message
+
+  setHTMLMessage: (htmlMessage='') ->
+    @textInputElement.setHTMLMessage htmlMessage
+
+  showDefaultMessage: ->
+    @textInputElement.showDefaultMessage()
 
   ###
   Section: Accessory Elements

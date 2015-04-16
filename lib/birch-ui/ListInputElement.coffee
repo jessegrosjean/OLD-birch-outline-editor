@@ -15,26 +15,8 @@ class ListInputElement extends HTMLElement
 
   createdCallback: ->
     @classList.add 'select-list'
-
-    @error = document.createElement 'div'
-    @error.classList.add 'error-message'
-    @appendChild @error
-
-    @loadingArea = document.createElement 'div'
-    @loadingArea.classList.add 'loading'
-    @appendChild @loadingArea
-
-    @loading = document.createElement 'span'
-    @loading.classList.add 'loading-message'
-    @loadingArea.appendChild @loading
-
-    @loadingBadge = document.createElement 'span'
-    @loadingBadge.classList.add 'badge'
-    @loadingArea.appendChild @loadingBadge
-
     @list = document.createElement 'ol'
     @list.classList.add 'list-group'
-    @appendChild @list
 
     @setTextInputElement document.createElement 'birch-text-input'
 
@@ -56,7 +38,8 @@ class ListInputElement extends HTMLElement
       @textInputElement.parentElement.removeChild @textInputElement
     @textInputElement = textInputElement
     if @textInputElement
-      this.insertBefore @textInputElement, this.firstChild
+      @insertBefore @textInputElement, this.firstChild
+      @textInputElement.addAccessoryElement @list
 
   ###
   Section: Delegate
@@ -79,7 +62,6 @@ class ListInputElement extends HTMLElement
 
     @textInputElement.setDelegate(delegate)
     @populateList()
-    @setLoading()
 
   ###
   Section: Text
@@ -105,7 +87,6 @@ class ListInputElement extends HTMLElement
 
   setItems: (@items=[]) ->
     @populateList()
-    @setLoading()
 
   setMaxItems: (@maxItems) ->
 
@@ -128,8 +109,7 @@ class ListInputElement extends HTMLElement
 
     @list.innerHTML = ''
     if filteredItems.length
-      @setError(null)
-
+      @list.style.display = null
       for i in [0...Math.min(filteredItems.length, @maxItems)]
         item = filteredItems[i]
         itemElement = @getDelegate().elementForListItem(item)
@@ -141,7 +121,7 @@ class ListInputElement extends HTMLElement
       else if not @allowEmptySelection
         @selectItemElement(@list.firstChild)
     else
-      @setError(@getEmptyMessage(@items.length, filteredItems.length))
+      @list.style.display = 'none'
 
   ###
   Section: Allow Mark Active
@@ -161,26 +141,6 @@ class ListInputElement extends HTMLElement
   ###
   Section: Messages to the user
   ###
-
-  setError: (message='') ->
-    if message.length is 0
-      @error.textContent = ''
-      @error.style.display = 'none'
-    else
-      @setLoading()
-      @error.textContent = message
-      @error.style.display = null
-
-  setLoading: (message='') ->
-    if message.length is 0
-      @loading.textContent = ''
-      @loading.style.display = 'none'
-      @loadingBadge.textContent = ''
-      @loadingBadge.style.display = 'none'
-    else
-      @setError()
-      @loading.textContent = message
-      @loadingArea.style.display = null
 
   getEmptyMessage: (itemCount, filteredItemCount) ->
     emptyMessage = @getDelegate().getEmptyMessage?(itemCount, filteredItemCount)
@@ -240,6 +200,9 @@ class ListInputElement extends HTMLElement
   clearListSelection: ->
     @selectItemElement(null)
 
+  clearListSelectionOnTextMovement: ->
+    @clearListSelection()
+
   scrollToItemElement: (element) ->
     scrollTop = @list.scrollTop
     listRect = @list.getBoundingClientRect()
@@ -270,16 +233,21 @@ liForNode = (node) ->
     node = node.parentElement
   node
 
-OutlineEditorService.eventRegistery.listen 'birch-list-input > .list-group',
+birchListInputForNode = (node) ->
+  while node and node.tagName != 'BIRCH-LIST-INPUT'
+    node = node.parentElement
+  node
+
+OutlineEditorService.eventRegistery.listen 'birch-list-input birch-text-input > atom-panel > .list-group',
   # This prevents the focusout event from firing on the filter editor element
   # when the list is scrolled by clicking the scrollbar and dragging.
   mousedown: (e) ->
-    @parentElement.selectItemElement(liForNode(e.target))
+    birchListInputForNode(this).selectItemElement(liForNode(e.target))
     e.preventDefault()
     e.stopPropagation()
 
   click: (e) ->
-    listInput = @parentElement
+    listInput = birchListInputForNode(this)
     li = liForNode(e.target)
     if li?.classList.contains('selected')
       if listInput.getDelegate().mouseClickListItem
@@ -287,16 +255,23 @@ OutlineEditorService.eventRegistery.listen 'birch-list-input > .list-group',
     e.preventDefault()
     e.stopPropagation()
 
-atom.commands.add 'birch-list-input',
-  'core:move-up': (e) -> @selectPreviousItemElement(e)
-  'core:move-down': (e) -> @selectNextItemElement(e)
-  'core:move-to-top': (e) -> @selectFirstElement(e)
-  'core:move-to-bottom': (e) -> @selectLastElement(e)
+atom.commands.add 'birch-list-input birch-text-input > atom-text-editor[mini]',
+  'core:move-up': (e) -> birchListInputForNode(this).selectPreviousItemElement(e)
+  'core:move-down': (e) -> birchListInputForNode(this).selectNextItemElement(e)
+  'core:move-to-top': (e) -> birchListInputForNode(this).selectFirstElement(e)
+  'core:move-to-bottom': (e) -> birchListInputForNode(this).selectLastElement(e)
 
-atom.commands.add 'birch-list-input > birch-token-input > birch-text-input > atom-text-editor[mini]',
-  'core:move-up': (e) -> @parentElement.parentElement.parentElement.selectPreviousItemElement(e)
-  'core:move-down': (e) -> @parentElement.parentElement.parentElement.selectNextItemElement(e)
-  'core:move-to-top': (e) -> @parentElement.parentElement.parentElement.selectFirstElement(e)
-  'core:move-to-bottom': (e) -> @parentElement.parentElement.parentElement.selectLastElement(e)
+  'editor:move-to-first-character-of-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-beginning-of-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-beginning-of-paragraph': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-beginning-of-word': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-backward': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-left': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-word': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-forward': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-right': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-screen-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-paragraph': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
 
 module.exports = document.registerElement 'birch-list-input', prototype: ListInputElement.prototype

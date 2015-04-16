@@ -34,7 +34,7 @@ class TextInputElement extends HTMLElement
       @delegate?.didChangeText?(e)
 
     @textEditorElement.addEventListener 'blur', (e) =>
-      @cancel() unless @cancelling
+      @cancel(e) unless @cancelling
 
   attachedCallback: ->
 
@@ -53,12 +53,23 @@ class TextInputElement extends HTMLElement
     @textEditor.setPlaceholderText placeholderText
 
   setMessage: (message='') ->
+    @message.innerHTML = ''
     if message.length is 0
-      @message.textContent = ''
       @message.style.display = 'none'
     else
       @message.textContent = message
       @message.style.display = null
+
+  setHTMLMessage: (htmlMessage='') ->
+    @message.innerHTML = ''
+    if htmlMessage.length is 0
+      @message.style.display = 'none'
+    else
+      @message.innerHTML = htmlMessage
+      @message.style.display = null
+
+  showDefaultMessage: ->
+    @setHTMLMessage 'Press <kbd>Enter</kbd> to accept or <kbd>Escape</kbd> to cancel.'
 
   ###
   Section: Accessory Elements
@@ -67,7 +78,7 @@ class TextInputElement extends HTMLElement
   addAccessoryElement: (element) ->
     accessoryPanel = document.createElement 'atom-panel'
     accessoryPanel.appendChild element
-    @insertBefore accessoryPanel, @textEditorElement
+    @insertBefore accessoryPanel, @textEditorElement.nextSibling
 
   removeAccesoryElement: (element) ->
     @removeChild element.parentElement
@@ -102,7 +113,13 @@ class TextInputElement extends HTMLElement
   focusTextEditor: ->
     @textEditorElement.focus()
 
-  cancel: ->
+  cancel: (e) ->
+    unless @cancelling
+      if @delegate?.shouldCancel?
+        unless @delegate.shouldCancel()
+          e?.stopPropagation()
+          return
+
     @cancelling = true
     textEditorElementFocused = @textEditorElement.hasFocus()
     @delegate?.cancelled?() unless @confirming
