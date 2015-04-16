@@ -24,12 +24,14 @@
     { label: 'Copy', command: 'core:copy' },
     { label: 'Paste', command: 'core:paste' },
     { type: 'separator' },
+    { label: 'Edit Link...', command: 'birch-outline-editor:edit-link' },
+    { label: 'Edit Tags...', command: 'birch-outline-editor:edit-tags' },
     {
       label: 'Formatting',
       submenu: [
         { label: 'Bold', command: 'birch-outline-editor:toggle-bold' },
         { label: 'Italic', command: 'birch-outline-editor:toggle-italic' },
-        { label: 'Edit Link', command: 'birch-outline-editor:edit-link' },
+        { label: 'Underline', command: 'birch-outline-editor:toggle-underline' },
         { type: 'separator' },
         { label: 'Clear Formatting', command: 'birch-outline-editor:clear-formatting' }
       ]
