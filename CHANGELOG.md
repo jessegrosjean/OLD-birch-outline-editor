@@ -2,10 +2,11 @@
 
 ## 1.8.0
 
-- Added tagging UI
+- Added tagging UI.
 - Added some context menu items.
 - Select word under cursor on right click.
 - Remove item attribute when set to `undefined` or `null`.
+- Fixed opening of file path links that contain spaces.
 
 ## 1.7.0
 
@@ -57,7 +58,7 @@
 
 ## 1.4.0
 
-- Added search bar (similar syntax to FoldingText)
+- Added search bar (similar syntax to FoldingText).
 - Fixed focus is set correctly when opening an outline.
 - Fixed loading process to only display outline when fully loaded.
 - Fixed some flashing that happened when clicking to set selection.
@@ -113,13 +114,13 @@
 
 ## 0.1.0
 
-- Updated docs
-- Added 'Edit Link' command
-- Added 'Clear Formatting' command
-- Shift-Cmd-C for 'code' formatting
-- Added "Press Return to create a new item" message
-- Drop indicator color matches theme cursor color
-- Documented more {OutlineEditor} selection API
+- Updated docs.
+- Added 'Edit Link' command.
+- Added 'Clear Formatting' command.
+- Shift-Cmd-C for 'code' formatting.
+- Added "Press Return to create a new item" message.
+- Drop indicator color matches theme cursor color.
+- Documented more {OutlineEditor} selection API.
 
 ## 0.0.1 - First Release
 

@@ -1612,12 +1612,14 @@ class OutlineEditor extends Model
 
     textInput = document.createElement 'birch-text-input'
     textInput.setText linkAttributes?.href or 'http://'
+    textInput.showDefaultMessage()
+
     textInput.setDelegate
       didChangeText: ->
         validUrl ?= require 'valid-url'
         linkText = textInput.getText()
         if not linkText or validUrl.isUri linkText
-          textInput.setMessage ''
+          textInput.showDefaultMessage()
         else
           textInput.setMessage 'This does not look like a valid link.'
 

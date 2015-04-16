@@ -20,15 +20,20 @@
 @item-vertical-spacing: round(@birch-font-size / 4.0);
 @item-badge-spacing: round(@line-height-pixels / 4);
 @syntax-secondary-selection-color: mix(@syntax-selection-color, @syntax-background-color, 35%);
+@hoist-animation-duration: 0.4s;
 
 @import "fonts.less";
 @import "ui-variables";
 @import "syntax-variables";
 
 @import "../packages/status.less";
-@import "../packages/tags.less";
+@import "../packages/tags/tags.less";
 @import "../packages/mentions.less";
 @import "../packages/priorities.less";
+
+//
+// Toolbar
+//
 
 outline-editor-toolbar {
   padding: @component-padding / 2;
@@ -37,7 +42,10 @@ outline-editor-toolbar {
   display: flex;
 }
 
-@hoist-animation-duration: 0.4s;
+//
+// Search
+//
+
 @search-button-width: @component-line-height + (@component-padding / 2.0);
 
 outline-editor-search {
@@ -114,6 +122,56 @@ outline-editor-search {
     }
   }
 }
+
+//
+// Token Input Element
+//
+
+birch-text-input > atom-panel {
+  margin: @component-padding 0
+}
+
+birch-token-input {
+  cursor: text;
+  position: relative;
+
+  > ol {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    pointer-events: none;
+    list-style-type: none;
+    z-index: 1;
+
+    > li {
+      display: inline;
+      cursor: default;
+      padding: 0px 2px;
+      border-radius: 2px;
+      margin-right: @item-badge-spacing;
+      color: @syntax-background-color;
+      background: @syntax-invisible-character-color;
+      pointer-events: all;
+      &:before {
+        content: "#";
+      }
+      &.selected {
+        color: @syntax-background-color;
+        background: @syntax-cursor-color;
+      }
+    }
+  }
+
+  &.has-token-selected > birch-text-input > atom-text-editor[mini]::shadow {
+    .cursors {
+      visibility: hidden;
+    }
+  }
+}
+
+//
+// Outline Editor
+//
 
 birch-outline-editor {
   display: block;

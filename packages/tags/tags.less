@@ -1,0 +1,13 @@
+@import "syntax-variables";
+
+.bbadge.btag {
+  &:before {
+    content: "#";
+  }
+  &.selected-tag {
+    background: @base-accent-color;
+  }
+  &[data-tag="done"] {
+    background: black;
+  }
+}
