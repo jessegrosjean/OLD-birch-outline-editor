@@ -148,9 +148,17 @@ editTags = (editor) ->
       editor.moveSelectionRange savedSelection
 
   listInput.setItems Object.keys(outlineTagsMap).sort()
-  listInputPanel = atom.workspace.addModalPanel
+
+  listInputPanel = atom.workspace.addPopoverPanel
     item: listInput
-    visible: true
+    position:
+      xAnchor: 0.5 # center
+      yAnchor: 0.0 # top
+      targetXAnchor: 0.5 # center
+      targetYAnchor: 1.0 # bottom
+      target: ->
+        editor.getClientRectForItemOffset item, item.bodyText.length
+
   listInput.focusTextEditor()
 
 clearTags = (editor) ->
