@@ -79,8 +79,8 @@ describe('OutlineEditorElement', function() {
 
 				var item = editor.insertItem('Boo!');
 				item.nextSibling.should.equal(outlineSetup.five);
-				var renderedItemLI = outlineEditorElement.itemViewLIForItem(item);
-				renderedItemLI.nextSibling.should.equal(outlineEditorElement.itemViewLIForItem(item.nextSibling));
+				var renderedItemLI = outlineEditorElement.renderedLIForItem(item);
+				renderedItemLI.nextSibling.should.equal(outlineEditorElement.renderedLIForItem(item.nextSibling));
 			});
 
 			it('should update correctly when child is inserted before filtered sibling', function() {
@@ -89,15 +89,15 @@ describe('OutlineEditorElement', function() {
 
 				var item = editor.outline.createItem('Boo!');
 				outlineSetup.one.insertChildBefore(item, outlineSetup.one.firstChild);
-				var renderedItemLI = outlineEditorElement.itemViewLIForItem(item);
-				var nextRenderedItemLI = outlineEditorElement.itemViewLIForItem(editor.getNextVisibleSibling(item));
+				var renderedItemLI = outlineEditorElement.renderedLIForItem(item);
+				var nextRenderedItemLI = outlineEditorElement.renderedLIForItem(editor.getNextVisibleSibling(item));
 				renderedItemLI.nextSibling.should.equal(nextRenderedItemLI);
 			});
 		});
 
 		describe('Editor State', function() {
 			it('should render selection state', function() {
-				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
+				var li = outlineEditorElement.renderedLIForItem(outlineSetup.one);
 				editor.moveSelectionRange(outlineSetup.one);
 				li.classList.contains('bitemselected').should.be.true;
 				editor.moveSelectionRange(outlineSetup.two);
@@ -105,7 +105,7 @@ describe('OutlineEditorElement', function() {
 			});
 
 			it('should render expanded state', function() {
-				var li = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
+				var li = outlineEditorElement.renderedLIForItem(outlineSetup.one);
 				li.classList.contains('bexpanded').should.be.true;
 				editor.setCollapsed(outlineSetup.one);
 				li.classList.contains('bexpanded').should.be.false;
@@ -148,7 +148,7 @@ describe('OutlineEditorElement', function() {
 		});
 
 		it('should pick at line wrap boundaries', function() {
-			var LI = outlineEditorElement.itemViewLIForItem(outlineSetup.one);
+			var LI = outlineEditorElement.renderedLIForItem(outlineSetup.one);
 			var P = outlineEditorElement._itemViewBodyP(LI);
 			var bounds = P.getBoundingClientRect();
 			var appendText = ' makethislinewrap';

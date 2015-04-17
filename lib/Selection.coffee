@@ -184,87 +184,13 @@ class Selection
       )
 
   Object.defineProperty @::, 'focusClientRect',
-    get: -> @clientRectForItemOffset @focusItem, @focusOffset
+    get: -> @getClientRectForItemOffset @focusItem, @focusOffset
 
   Object.defineProperty @::, 'anchorClientRect',
-    get: -> @clientRectForItemOffset @anchorItem, @anchorOffset
+    get: -> @getClientRectForItemOffset @anchorItem, @anchorOffset
 
-  clientRectForItemOffset: (item, offset) ->
-    outlineEditorElement = @editor.outlineEditorElement
-
-    return undefined unless item
-    viewP = outlineEditorElement.itemViewPForItem item
-    return undefined unless viewP
-    return undefined unless document.body.contains viewP
-
-    bodyText = item.bodyText
-    paddingBottom = 0
-    paddingTop = 0
-    computedStyle
-
-    if offset != undefined
-      positionedAtEndOfWrappingLine = false
-      baseRect
-      side
-
-      if bodyText.length > 0
-        domRange = document.createRange()
-        startDOMNodeOffset
-        endDOMNodeOffset
-
-        if offset < bodyText.length
-          startDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset)
-          endDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset + 1)
-          side = 'left'
-        else
-          startDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset - 1)
-          endDOMNodeOffset = outlineEditorElement.itemOffsetToNodeOffset(item, offset)
-          side = 'right'
-
-        domRange.setStart(startDOMNodeOffset.node, startDOMNodeOffset.offset)
-        domRange.setEnd(endDOMNodeOffset.node, endDOMNodeOffset.offset)
-
-        # This is hacky, not sure what's going one, but seems to work.
-        # The goal is to get a single zero width rect for cursor
-        # position. This is complicated by fact that when a line wraps
-        # two rects are returned, one for each possible location. That
-        # ambiguity is solved by tracking selectionAffinity.
-        #
-        # The messy part is that there are other times that two client
-        # rects get returned. Such as when the range start starts at the
-        # end of a <b>. Seems we can just ignore those cases and return
-        # the first rect. To detect those cases the check is
-        # clientRects[0].top !== clientRects[1].top, because if that's
-        # true then we can be at a line wrap.
-        clientRects = domRange.getClientRects()
-        baseRect = clientRects[0]
-        if clientRects.length > 1
-          alternateRect = clientRects[1]
-          sameLine = alternateRect.top < baseRect.bottom
-          if sameLine
-            unless baseRect.width
-              baseRect = alternateRect
-          else if @selectionAffinity == Constants.SelectionAffinityUpstream
-            positionedAtEndOfWrappingLine = true
-          else
-            baseRect = alternateRect
-      else
-        computedStyle = window.getComputedStyle(viewP)
-        paddingTop = parseInt(computedStyle.paddingTop, 10)
-        paddingBottom = parseInt(computedStyle.paddingBottom, 10)
-        baseRect = viewP.getBoundingClientRect()
-        side = 'left'
-
-      return {} =
-        positionedAtEndOfWrappingLine: positionedAtEndOfWrappingLine
-        bottom: baseRect.bottom - paddingBottom
-        height: baseRect.height - (paddingBottom + paddingTop)
-        left: baseRect[side]
-        right: baseRect[side] # trim
-        top: baseRect.top + paddingTop
-        width: 0 # trim
-    else
-      viewP.getBoundingClientRect()
+  getClientRectForItemOffset: (item, offset) ->
+    @editor.outlineEditorElement.getClientRectForItemOffset item, offset
 
   equals: (otherSelection) ->
     @focusItem is otherSelection.focusItem and
@@ -357,7 +283,7 @@ class Selection
         )
 
       when 'lineboundary'
-        currentRect = @clientRectForItemOffset focusItem, focusOffset
+        currentRect = @getClientRectForItemOffset focusItem, focusOffset
         if currentRect
           next = outlineEditorElement.pick(
             if upstream then Number.MIN_VALUE else Number.MAX_VALUE,
@@ -478,7 +404,7 @@ class Selection
     viewLineHeight = parseInt(focusViewPStyle.lineHeight, 10)
     viewPaddingTop = parseInt(focusViewPStyle.paddingTop, 10)
     viewPaddingBottom = parseInt(focusViewPStyle.paddingBottom, 10)
-    focusCaretRect = @clientRectForItemOffset(focusItem, focusOffset)
+    focusCaretRect = @getClientRectForItemOffset(focusItem, focusOffset)
     x = editor.selectionVerticalAnchor()
     picked
     y

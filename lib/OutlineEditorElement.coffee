@@ -67,12 +67,6 @@ class OutlineEditorElement extends HTMLElement
     @appendChild animationLayerElement
     @animationLayerElement = animationLayerElement
 
-    popoverLayerElement = document.createElement 'DIV'
-    popoverLayerElement.className = 'popoverLayer'
-    popoverLayerElement.style.position = 'absolute'
-    @appendChild popoverLayerElement
-    @popoverLayerElement = popoverLayerElement
-
     @styledTextCaretElement = document.createElement 'DIV'
     @styledTextCaretElement.className = 'styledTextCaret'
     @styledTextCaretElement.style.position = 'absolute'
@@ -226,6 +220,84 @@ class OutlineEditorElement extends HTMLElement
       right: left + rect.width
       width: rect.width
       height: rect.height
+
+  getClientRectForItemOffset: (item, offset) ->
+    return undefined unless item
+    viewP = @itemViewPForItem item
+    return undefined unless viewP
+    return undefined unless document.body.contains viewP
+
+    if offset is undefined
+      return viewP.getBoundingClientRect()
+
+    bodyText = item.bodyText
+    paddingBottom = 0
+    paddingTop = 0
+    computedStyle
+
+    if offset != undefined
+      positionedAtEndOfWrappingLine = false
+      baseRect
+      side
+
+      if bodyText.length > 0
+        domRange = document.createRange()
+        startDOMNodeOffset
+        endDOMNodeOffset
+
+        if offset < bodyText.length
+          startDOMNodeOffset = @itemOffsetToNodeOffset(item, offset)
+          endDOMNodeOffset = @itemOffsetToNodeOffset(item, offset + 1)
+          side = 'left'
+        else
+          startDOMNodeOffset = @itemOffsetToNodeOffset(item, offset - 1)
+          endDOMNodeOffset = @itemOffsetToNodeOffset(item, offset)
+          side = 'right'
+
+        domRange.setStart(startDOMNodeOffset.node, startDOMNodeOffset.offset)
+        domRange.setEnd(endDOMNodeOffset.node, endDOMNodeOffset.offset)
+
+        # This is hacky, not sure what's going one, but seems to work.
+        # The goal is to get a single zero width rect for cursor
+        # position. This is complicated by fact that when a line wraps
+        # two rects are returned, one for each possible location. That
+        # ambiguity is solved by tracking selectionAffinity.
+        #
+        # The messy part is that there are other times that two client
+        # rects get returned. Such as when the range start starts at the
+        # end of a <b>. Seems we can just ignore those cases and return
+        # the first rect. To detect those cases the check is
+        # clientRects[0].top !== clientRects[1].top, because if that's
+        # true then we can be at a line wrap.
+        clientRects = domRange.getClientRects()
+        baseRect = clientRects[0]
+        if clientRects.length > 1
+          alternateRect = clientRects[1]
+          sameLine = alternateRect.top < baseRect.bottom
+          if sameLine
+            unless baseRect.width
+              baseRect = alternateRect
+          else if @selectionAffinity == Constants.SelectionAffinityUpstream
+            positionedAtEndOfWrappingLine = true
+          else
+            baseRect = alternateRect
+      else
+        computedStyle = window.getComputedStyle(viewP)
+        paddingTop = parseInt(computedStyle.paddingTop, 10)
+        paddingBottom = parseInt(computedStyle.paddingBottom, 10)
+        baseRect = viewP.getBoundingClientRect()
+        side = 'left'
+
+      return {} =
+        positionedAtEndOfWrappingLine: positionedAtEndOfWrappingLine
+        bottom: baseRect.bottom - paddingBottom
+        height: baseRect.height - (paddingBottom + paddingTop)
+        left: baseRect[side]
+        right: baseRect[side] # trim
+        top: baseRect.top + paddingTop
+        width: 0 # trim
+    else
+      viewP.getBoundingClientRect()
 
   ###
   Section: Scrolling
@@ -426,7 +498,7 @@ class OutlineEditorElement extends HTMLElement
             viewP.focus()
 
             if currentSelection.isCollapsed
-              rect = currentSelection.clientRectForItemOffset(currentSelection.focusItem, currentSelection.focusOffset)
+              rect = currentSelection.getClientRectForItemOffset(currentSelection.focusItem, currentSelection.focusOffset)
               if rect.positionedAtEndOfWrappingLine
                 selection.modify('move', 'backward', 'character')
                 selection.modify('move', 'forward', 'lineboundary')
@@ -567,7 +639,7 @@ class OutlineEditorElement extends HTMLElement
 
   onDragStart: (e) ->
     item = @itemForViewNode e.target
-    li = @itemViewLIForItem item
+    li = @renderedLIForItem item
     liRect = li.getBoundingClientRect()
     x = e.clientX - liRect.left
     y = e.clientY - liRect.top
@@ -660,17 +732,17 @@ class OutlineEditorElement extends HTMLElement
             compareTo = dropParentItem
 
           if insertItem.comparePosition(compareTo) & Node.DOCUMENT_POSITION_FOLLOWING
-            @scrollBy(-@itemViewLIForItem(insertItem).clientHeight)
+            @scrollBy(-@renderedLIForItem(insertItem).clientHeight)
 
         moveStartOffset
 
         if droppedItem is insertItem
-          viewLI = @itemViewLIForItem(droppedItem)
-          if viewLI
+          renderedLI = @renderedLIForItem(droppedItem)
+          if renderedLI
             editorElementRect = @getBoundingClientRect()
-            viewLIRect = viewLI.getBoundingClientRect()
-            editorLITop = viewLIRect.top - editorElementRect.top
-            editorLILeft = viewLIRect.left - editorElementRect.left
+            renderedLIRect = renderedLI.getBoundingClientRect()
+            editorLITop = renderedLIRect.top - editorElementRect.top
+            editorLILeft = renderedLIRect.left - editorElementRect.left
             editorX = e.clientX - editorElementRect.left
             editorY = e.clientY - editorElementRect.top
 
@@ -767,17 +839,17 @@ class OutlineEditorElement extends HTMLElement
   itemForViewNode: (viewNode) ->
     @itemRenderer.itemForRenderedNode viewNode
 
-  itemViewLIForItem: (item) ->
+  renderedLIForItem: (item) ->
     @itemRenderer.renderedLIForItem item
 
   itemViewPForItem: (item) ->
-    @_itemViewBodyP(@itemViewLIForItem(item))
+    @_itemViewBodyP(@renderedLIForItem(item))
 
   nodeOffsetToItemOffset: (node, offset) ->
-    ItemBodyEncoder.nodeOffsetToBodyTextOffset(node, offset, @_itemViewBodyP(@itemViewLIForItem(@itemForViewNode(node))))
+    ItemBodyEncoder.nodeOffsetToBodyTextOffset(node, offset, @_itemViewBodyP(@renderedLIForItem(@itemForViewNode(node))))
 
   itemOffsetToNodeOffset: (item, offset) ->
-    ItemBodyEncoder.bodyTextOffsetToNodeOffset(@_itemViewBodyP(@itemViewLIForItem(item)), offset)
+    ItemBodyEncoder.bodyTextOffsetToNodeOffset(@_itemViewBodyP(@renderedLIForItem(item)), offset)
 
   _itemViewBodyP: (itemViewLI) ->
     ItemRenderer.renderedBodyTextSPANForRenderedLI itemViewLI
@@ -839,7 +911,7 @@ EventRegistery.listen '.bitemcontent',
     editor = editorElement.editor
     typingFormattingTags = editor.typingFormattingTags()
     item = editorElement.itemForViewNode e.target
-    itemViewLI = editorElement.itemViewLIForItem item
+    itemViewLI = editorElement.renderedLIForItem item
     itemViewP = editorElement._itemViewBodyP itemViewLI
     newBodyText = ItemBodyEncoder.bodyEncodedTextContent itemViewP
     oldBodyText = item.bodyText
@@ -1020,7 +1092,9 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'birch-outline-editor:toggle-superscript': -> @editor.toggleFormattingTag 'SUP'
   'birch-outline-editor:toggle-underline': -> @editor.toggleFormattingTag 'U'
   'birch-outline-editor:toggle-variable': -> @editor.toggleFormattingTag 'VAR'
+  'birch-outline-editor:edit-formatting': -> @editor.editFormatting()
   'birch-outline-editor:edit-link': -> @editor.editLink()
+
   'birch-outline-editor:clear-formatting': -> @editor.clearFormatting()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()

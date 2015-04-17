@@ -1,5 +1,6 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
+FormattingBarElement = require './birch-ui/FormattingBarElement'
 TextInputElement = require './birch-ui/TextInputElement'
 OutlineEditorElement = require './OutlineEditorElement'
 AttributedString = require './AttributedString'
@@ -1592,6 +1593,28 @@ class OutlineEditor extends Model
   Section: Formatting
   ###
 
+  editFormatting: ->
+    editor = this
+    savedSelection = editor.selection
+    item = savedSelection.startItem
+    offset = savedSelection.startOffsetOffset
+    return unless item
+
+    formattingBar = document.createElement 'birch-formatting-bar'
+    formattingBarPanel = atom.workspace.addPopoverPanel
+      item: formattingBar
+      position:
+        xAnchor: 0.5 # center
+        yAnchor: 1.0 # bottom
+        targetXAnchor: 0.5 # center
+        targetYAnchor: 0 # top
+        target: =>
+          @getClientRectForItemOffset(item, offset)
+
+    subscription = @onDidChangeSelection ->
+      subscription.dispose()
+      formattingBarPanel.destroy()
+
   editLink: ->
     editor = this
     savedSelection = editor.selection
@@ -1646,9 +1669,12 @@ class OutlineEditor extends Model
         textInputPanel.destroy()
         @restoreFocus()
 
-    textInputPanel = atom.workspace.addModalPanel
+    textInputPanel = atom.workspace.addPopoverPanel
       item: textInput
-      visible: true
+      position: 'top center'
+      constrainToWindow: true
+      target: => @getClientRectForItemOffset(item, offset)
+
     textInput.focusTextEditor()
 
   toggleFormattingTag: (tagName, attributes={}) ->
@@ -1832,6 +1858,16 @@ class OutlineEditor extends Model
     @outlineEditorElement.scrollToItemIfNeeded(item, center)
 
   centerSelectionInVisibleArea: ->
+
+  ###
+  Section: Geometry
+  ###
+
+  getClientRectForItemOffset: (item, offset) ->
+    @outlineEditorElement.getClientRectForItemOffset item, offset
+
+  renderedLIForItem: (item) ->
+    @outlineEditorElement.renderedLIForItem(item)
 
   ###
   Section: File Details
