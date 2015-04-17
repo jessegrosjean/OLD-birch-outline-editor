@@ -1,3 +1,4 @@
+###
 BirchOutlineEditor = require '../lib/birch-outline-editor'
 
 # Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
@@ -60,3 +61,4 @@ describe "BirchOutlineEditor", ->
         expect(birchOutlineEditorElement).toBeVisible()
         atom.commands.dispatch workspaceElement, 'birch-outline-editor:toggle'
         expect(birchOutlineEditorElement).not.toBeVisible()
+###
