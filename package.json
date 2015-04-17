@@ -13,7 +13,7 @@
   "repository": "https://github.com/jessegrosjean/birch-outline-editor",
   "license": "Commercial",
   "engines": {
-    "atom": ">=0.174.0 <2.0.0"
+    "atom": ">=0.192.0 <2.0.0"
   },
   "providedServices": {
     "birch-outine-editor-service": {

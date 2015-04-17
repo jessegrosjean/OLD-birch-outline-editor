@@ -1,6 +1,6 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-{Emitter, CompositeDisposable} = require 'atom'
+{File, Emitter, CompositeDisposable} = require 'atom'
 ItemSerializer = require './ItemSerializer'
 UndoManager = require './UndoManager'
 Constants = require './Constants'
@@ -11,14 +11,6 @@ shortid = require './shortid'
 assert = require 'assert'
 Item = require './Item'
 Q = require 'q'
-
-File = null
-if atom.inBrowserMode
-  File = {}
-else
-  # construct path on separate line for endokken
-  pathwatcherPath = atom.config.resourcePath + '/node_modules/pathwatcher'
-  {File} = require pathwatcherPath
 
 # Essential: A mutable outline of {Item}s.
 #
