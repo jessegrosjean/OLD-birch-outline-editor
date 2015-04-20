@@ -151,13 +151,9 @@ editTags = (editor) ->
 
   listInputPanel = atom.workspace.addPopoverPanel
     item: listInput
-    position:
-      xAnchor: 0.5 # center
-      yAnchor: 0.0 # top
-      targetXAnchor: 0.5 # center
-      targetYAnchor: 1.0 # bottom
-      target: ->
-        editor.getClientRectForItemOffset item, item.bodyText.length
+    position: 'bottom left'
+    constrainToWindow: true
+    target: => editor.getClientRectForItemOffset(item)
 
   listInput.focusTextEditor()
 

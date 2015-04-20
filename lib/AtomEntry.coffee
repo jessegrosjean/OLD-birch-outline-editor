@@ -66,7 +66,7 @@ module.exports = BirchOutlineEditor =
       panel = atom.workspace.addPanel('popover', options)
       options ?= {}
       panel.target = options.target
-      panel.position = options.position or 'top center'
+      panel.position = options.position
       panel.constrainToWindow = options.constrainToWindow
       panel.constrainToScrollParent = options.constrainToScrollParent
       @schedulePositionPopovers()
@@ -88,19 +88,34 @@ module.exports = BirchOutlineEditor =
           targetSecondary = position[1]
           constrainToWindow = panel.constrainToWindow
           constrainToScrollParent = panel.constrainToScrollParent
+          constrainToRect = null
 
           panelElement = atom.views.getView(panel)
           panelRect = panelElement.getBoundingClientRect()
+          panelTop = 0
+          panelLeft = 0
 
-          targetRect ?= target.getBoundingClientRect?()
-          targetRect ?= target?()
-          targetRect ?= target
+          if targetRect = target.getBoundingClientRect?()
+            @schedulePositionPopovers()
+          else if targetRect ?= target?()
+            @schedulePositionPopovers()
+          else
+            targetRect = target
+
+          if constrainToWindow
+            constrainToRect = workspaceElement.getBoundingClientRect()
+          else if constrainToScrollParent
+            constrainToRect = getScrollParent(panelElement).getBoundingClientRect()
 
           switch targetPrimary
             when 'top'
               panelTop = targetRect.top - panelRect.height
+              if constrainToRect and panelTop < constrainToRect.top
+                panelTop = targetRect.bottom
             when 'bottom'
               panelTop = targetRect.bottom
+              if constrainToRect and (panelTop + panelRect.height > constrainToRect.bottom)
+                panelTop = targetRect.top - panelRect.height
             when 'left'
               panelLeft = targetRect.left - panelRect.width
             when 'right'
@@ -110,82 +125,22 @@ module.exports = BirchOutlineEditor =
             when 'left'
               panelLeft = targetRect.left
             when 'center'
-              panelLeft = targetRect.left + ((panelRect.width - targetRect.width) / 2.0)
+              panelLeft = targetRect.left - ((panelRect.width - targetRect.width) / 2.0)
             when 'right'
               panelLeft = targetRect.right - panelRect.width
             when 'top'
               panelTop = targetRect.top
             when 'middle'
-              panelTop = targetRect.top + ((panelRect.height - targetRect.height) / 2.0)
+              panelTop = targetRect.top - ((panelRect.height - targetRect.height) / 2.0)
             when 'bottom'
               panelTop = targetRect.bottom - panelRect.height
 
           unless panel.cachedTop is panelTop and panel.cachedLeft is panelLeft
-            panelElement.style.top = panelTop + 'px'
-            panelElement.style.left = panelLeft + 'px'
+            panelElement.style.transform = "translate(#{panelLeft}px,#{panelTop}px)"
+            #panelElement.style.top = panelTop + 'px'
+            #panelElement.style.left = panelLeft + 'px'
             position.cachedTop = panelTop
             position.cachedLeft = panelLeft
-
-
-          ###
-          # positioning
-          position = panel.position
-          target = position.target
-          xAnchor = position.xAnchor
-          yAnchor = position.yAnchor
-          targetXAnchor = position.targetXAnchor
-          targetYAnchor = position.targetYAnchor
-          cachedPanelRect = position.cachedPanelRect
-          cachedTargetRect = position.cachedTargetRect
-
-          # positioning defaults
-          xAnchor ?= 0.5
-          yAnchor ?= 0.5
-          target ?=
-            top: 0
-            height: window.innerHeight
-            bottom: window.innerHeight
-            left: 0
-            width: window.innerWidth
-            right: window.innerWidth
-          targetXAnchor ?= 0.5
-          targetYAnchor ?= 0.5
-
-          # calculated positioning
-          panelElement = atom.views.getView(panel)
-          panelRect = panelElement.getBoundingClientRect()
-
-          if targetRect = target?()
-            @schedulePositionPopovers()
-          else
-            targetRect = target
-
-          unless cachedPanelRect and
-             cachedPanelRect.top is panelRect.top and
-             cachedPanelRect.bottom is panelRect.bottom and
-             cachedPanelRect.left is panelRect.left and
-             cachedPanelRect.right is panelRect.right and
-             cachedTargetRect and
-             cachedTargetRect.top is targetRect.top and
-             cachedTargetRect.bottom is targetRect.bottom and
-             cachedTargetRect.left is targetRect.left and
-             cachedTargetRect.right is targetRect.right
-
-            yAnchor *= panelRect.height
-            targetYAnchor *= targetRect.height
-            top = (targetRect.top - yAnchor) + targetYAnchor
-
-            xAnchor *= panelRect.width
-            targetXAnchor *= targetRect.width
-            left = (targetRect.left - xAnchor) + targetXAnchor
-
-            # apply positioning
-            panelElement.style.top = top + 'px'
-            panelElement.style.left = left + 'px'
-            position.cachedPanelRect = panelRect
-            position.cachedTargetRect = targetRect
-            console.log 'boo'
-          ###
 
     #@initializeGlobalOutlineEditorStyleSheet()
     #@observeTextEditorFontConfig()
@@ -217,3 +172,24 @@ module.exports = BirchOutlineEditor =
 
   deactivate: ->
     @subscriptions.dispose()
+
+getScrollParent = (el) ->
+  position = getComputedStyle(el).position
+
+  if position is 'fixed'
+    return el
+
+  scrollParent = undefined
+
+  parent = el
+  while parent = parent.parentNode
+    try
+      style = getComputedStyle parent
+
+    return parent if not style?
+
+    if /(auto|scroll)/.test(style['overflow'] + style['overflowY'] + style['overflowX'])
+      if position isnt 'absolute' or style['position'] in ['relative', 'absolute', 'fixed']
+        return parent
+
+  return document.body

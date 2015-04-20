@@ -1603,13 +1603,9 @@ class OutlineEditor extends Model
     formattingBar = document.createElement 'birch-formatting-bar'
     formattingBarPanel = atom.workspace.addPopoverPanel
       item: formattingBar
-      position:
-        xAnchor: 0.5 # center
-        yAnchor: 1.0 # bottom
-        targetXAnchor: 0.5 # center
-        targetYAnchor: 0 # top
-        target: =>
-          @getClientRectForItemOffset(item, offset)
+      position: 'top center'
+      constrainToWindow: true
+      target: => @getClientRectForItemOffset(item, offset)
 
     subscription = @onDidChangeSelection ->
       subscription.dispose()
@@ -1672,7 +1668,7 @@ class OutlineEditor extends Model
     textInputPanel = atom.workspace.addPopoverPanel
       item: textInput
       position: 'top center'
-      constrainToWindow: true
+      constrainToScrollParent: true
       target: => @getClientRectForItemOffset(item, offset)
 
     textInput.focusTextEditor()
