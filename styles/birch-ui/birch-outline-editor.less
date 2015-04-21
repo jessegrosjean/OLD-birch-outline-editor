@@ -1,35 +1,11 @@
-@import 'birch-variables';
-@import "birch-token-input";
-@import "birch-formatting-bar";
-@import "birch-search-bar";
-
-@import "../packages/status.less";
-@import "../packages/tags/tags.less";
-@import "../packages/mentions.less";
-@import "../packages/priorities.less";
-
-//
-// Toolbar
-//
-
-//
-// Token Input Element
-//
-
-birch-text-input > atom-panel {
-  margin: @component-padding 0
-}
-
-
-birch-text-input > atom-text-editor {
-  min-width: 300px;
-}
+@import (reference) "birch-variables";
 
 //
 // Outline Editor
 //
 
 birch-outline-editor {
+  cursor: text;
   display: block;
   color: @syntax-text-color;
   background-color: @syntax-background-color;
@@ -80,11 +56,9 @@ birch-outline-editor > ul.background-message {
 }
 
 birch-outline-editor > ul.top-item-list {
-  cursor: text;
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
-  min-height: 100%;
   position: relative;
 }
 
