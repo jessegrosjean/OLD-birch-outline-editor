@@ -63,7 +63,7 @@ class MoveAnimation
 
           movingLIClone.appendChild selectDIV
 
-      @itemRenderer.editorElement.animationLayerElement.appendChild movingLIClone
+      @itemRenderer.editorElement.itemAnimationLayerElement.appendChild movingLIClone
       @_movingLIClone = movingLIClone
 
   performMove: (LI, position, context) ->

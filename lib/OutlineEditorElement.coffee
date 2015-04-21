@@ -60,18 +60,12 @@ class OutlineEditorElement extends HTMLElement
     @backgroundMessage.appendChild document.createElement 'LI'
     @appendChild @backgroundMessage
 
-    animationLayerElement = document.createElement 'DIV'
-    animationLayerElement.className = 'animationLayer'
-    animationLayerElement.style.position = 'absolute'
-    animationLayerElement.style.zIndex = '1'
-    @appendChild animationLayerElement
-    @animationLayerElement = animationLayerElement
-
-    @styledTextCaretElement = document.createElement 'DIV'
-    @styledTextCaretElement.className = 'styledTextCaret'
-    @styledTextCaretElement.style.position = 'absolute'
-    @styledTextCaretElement.style.zIndex = '1'
-    @appendChild @styledTextCaretElement
+    itemAnimationLayerElement = document.createElement 'DIV'
+    itemAnimationLayerElement.className = 'item-animation-layer'
+    itemAnimationLayerElement.style.position = 'absolute'
+    itemAnimationLayerElement.style.zIndex = '1'
+    @appendChild itemAnimationLayerElement
+    @itemAnimationLayerElement = itemAnimationLayerElement
 
     @focusElement = new FocusElement
     @appendChild(@focusElement)
@@ -98,11 +92,6 @@ class OutlineEditorElement extends HTMLElement
       dragleave: @onDragLeave
 
     @subscriptions = new CompositeDisposable
-
-    @useStyledTextCaret = atom.config.get 'birch-outline-editor.useStyledTextCaret'
-    @subscriptions.add atom.config.observe 'birch-outline-editor.useStyledTextCaret', (newValue) =>
-      @useStyledTextCaret = newValue
-      @updateSimulatedCursor()
 
     @disableAnimationOverride = atom.config.get 'birch-outline-editor.disableAnimation'
     @subscriptions.add atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
@@ -615,23 +604,6 @@ class OutlineEditorElement extends HTMLElement
       editor.moveSelectionRange(@editorRangeFromDOMSelection()) # Read in selection from double-click, etc.
     else
       editor.moveSelectionRange(selectionRange)
-
-  updateSimulatedCursor: ->
-    if @useStyledTextCaret
-      selection = @editor.selection
-      if selection.isTextMode and selection.isCollapsed
-        width = 2
-        rect = selection.focusClientRect
-        @styledTextCaretElement.style.top = rect.top + 'px'
-        @styledTextCaretElement.style.left = (rect.left - (width / 2)) + 'px'
-        @styledTextCaretElement.style.height = rect.height + 'px'
-        @styledTextCaretElement.style.width = width + 'px'
-
-        @styledTextCaretElement.style.display = null
-      else
-        @styledTextCaretElement.style.display = 'none'
-    else
-      @styledTextCaretElement.style.display = 'none'
 
   ###
   Section: Drag and Drop
