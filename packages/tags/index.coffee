@@ -151,9 +151,10 @@ editTags = (editor) ->
 
   listInputPanel = atom.workspace.addPopoverPanel
     item: listInput
-    position: 'bottom left'
-    constrainToWindow: true
-    target: => editor.getClientRectForItemOffset(item)
+    className: 'birch-text-input-panel'
+    target: -> editor.getClientRectForItemOffset(item, item.bodyText.length)
+    viewport: -> editor.outlineEditorElement.getBoundingClientRect()
+    placement: 'bottom'
 
   listInput.focusTextEditor()
 

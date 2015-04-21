@@ -210,6 +210,24 @@ class OutlineEditorElement extends HTMLElement
       width: rect.width
       height: rect.height
 
+  getClientRectForItemRange: (startItem, startOffset, endItem, endOffset) ->
+    endItem ?= startItem
+    endOffset ?= startOffset
+
+    startRect = @getClientRectForItemOffset startItem, startOffset
+    if endItem is startItem and endOffset is startOffset
+      startRect
+    else
+      endRect = @getClientRectForItemOffset endItem, endOffset
+      result =
+        top: Math.min startRect.top, endRect.top
+        bottom: Math.max startRect.bottom, endRect.bottom
+        left: Math.min startRect.left, endRect.left
+        right: Math.max startRect.right, endRect.right
+      result.height = result.bottom - result.top
+      result.width = result.right - result.left
+      result
+
   getClientRectForItemOffset: (item, offset) ->
     return undefined unless item
     viewP = @itemViewPForItem item
@@ -331,8 +349,8 @@ class OutlineEditorElement extends HTMLElement
     unless allowOverscroll
       newScrollLeft = 0
       bottomBoundary = @topListElement.scrollHeight - @getViewportRect().height
-      newScrollTop = Math.max 0, newScrollTop
       newScrollTop = Math.min bottomBoundary, newScrollTop
+      newScrollTop = Math.max 0, newScrollTop
 
     Velocity this, 'stop', true
 
@@ -358,8 +376,8 @@ class OutlineEditorElement extends HTMLElement
 
   _scrollTo: (newScrollLeft, newScrollTop) ->
     topUL = @topListElement
-    scrollHeight = topUL.scrollHeight
     viewportHeight = @getViewportRect().height
+    scrollHeight = Math.max topUL.scrollHeight, viewportHeight
 
     @scrollTop = newScrollTop
 
@@ -487,7 +505,7 @@ class OutlineEditorElement extends HTMLElement
             viewP.focus()
 
             if currentSelection.isCollapsed
-              rect = currentSelection.getClientRectForItemOffset(currentSelection.focusItem, currentSelection.focusOffset)
+              rect = currentSelection.focusClientRect
               if rect.positionedAtEndOfWrappingLine
                 selection.modify('move', 'backward', 'character')
                 selection.modify('move', 'forward', 'lineboundary')
@@ -856,12 +874,11 @@ Event and Command registration
 # Handle Selection Interaction
 #
 
-EventRegistery.listen 'birch-outline-editor > ul',
+EventRegistery.listen 'birch-outline-editor',
   'mousedown': (e) ->
-    editorElement = OutlineEditorElement.findOutlineEditorElement e.target
-    editorElement.editor.focus()
-    setTimeout ->
-      editorElement.beginExtendSelectionInteraction e
+    @editor.focus()
+    setTimeout =>
+      @beginExtendSelectionInteraction e
 
 EventRegistery.listen '.bbodytext',
   'mousedown': (e) ->
@@ -1064,7 +1081,6 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'birch-outline-editor:toggle-superscript': -> @editor.toggleFormattingTag 'SUP'
   'birch-outline-editor:toggle-underline': -> @editor.toggleFormattingTag 'U'
   'birch-outline-editor:toggle-variable': -> @editor.toggleFormattingTag 'VAR'
-  'birch-outline-editor:edit-formatting': -> @editor.editFormatting()
   'birch-outline-editor:edit-link': -> @editor.editLink()
 
   'birch-outline-editor:clear-formatting': -> @editor.clearFormatting()

@@ -1,6 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-FormattingBarElement = require './birch-ui/FormattingBarElement'
 TextInputElement = require './birch-ui/TextInputElement'
 OutlineEditorElement = require './OutlineEditorElement'
 AttributedString = require './AttributedString'
@@ -23,8 +22,6 @@ assert = require 'assert'
 Item = require './Item'
 Util = require './Util'
 path = require 'path'
-
-validUrl = null # defer until used
 
 # Public: Editor for {Outline}s.
 #
@@ -1219,8 +1216,6 @@ class OutlineEditor extends Model
       classList.remove('textMode')
       classList.add('outlineMode')
 
-    outlineEditorElement.updateSimulatedCursor()
-
     @emitter.emit 'did-change-selection', currentSelection
 
   ###
@@ -1593,24 +1588,6 @@ class OutlineEditor extends Model
   Section: Formatting
   ###
 
-  editFormatting: ->
-    editor = this
-    savedSelection = editor.selection
-    item = savedSelection.startItem
-    offset = savedSelection.startOffsetOffset
-    return unless item
-
-    formattingBar = document.createElement 'birch-formatting-bar'
-    formattingBarPanel = atom.workspace.addPopoverPanel
-      item: formattingBar
-      position: 'top center'
-      constrainToWindow: true
-      target: => @getClientRectForItemOffset(item, offset)
-
-    subscription = @onDidChangeSelection ->
-      subscription.dispose()
-      formattingBarPanel.destroy()
-
   editLink: ->
     editor = this
     savedSelection = editor.selection
@@ -1631,17 +1608,9 @@ class OutlineEditor extends Model
 
     textInput = document.createElement 'birch-text-input'
     textInput.setText linkAttributes?.href or 'http://'
-    textInput.showDefaultMessage()
+    #textInput.showDefaultMessage()
 
     textInput.setDelegate
-      didChangeText: ->
-        validUrl ?= require 'valid-url'
-        linkText = textInput.getText()
-        if not linkText or validUrl.isUri linkText
-          textInput.showDefaultMessage()
-        else
-          textInput.setMessage 'This does not look like a valid link.'
-
       restoreFocus: ->
         editor.focus()
         editor.moveSelectionRange savedSelection
@@ -1667,9 +1636,9 @@ class OutlineEditor extends Model
 
     textInputPanel = atom.workspace.addPopoverPanel
       item: textInput
-      position: 'top center'
-      constrainToScrollParent: true
-      target: => @getClientRectForItemOffset(item, offset)
+      className: 'birch-text-input-panel'
+      target: -> editor.selection.selectionClientRect
+      viewport: -> editor.outlineEditorElement.getBoundingClientRect()
 
     textInput.focusTextEditor()
 
@@ -1861,6 +1830,9 @@ class OutlineEditor extends Model
 
   getClientRectForItemOffset: (item, offset) ->
     @outlineEditorElement.getClientRectForItemOffset item, offset
+
+  getClientRectForItemRange: (startItem, startOffset, endItem, endOffset) ->
+    @outlineEditorElement.getClientRectForItemRange startItem, startOffset, endItem, endOffset
 
   renderedLIForItem: (item) ->
     @outlineEditorElement.renderedLIForItem(item)

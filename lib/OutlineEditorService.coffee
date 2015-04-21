@@ -139,7 +139,7 @@ class OutlineEditorService
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   @onDidChangeActiveOutlineEditorSelection: (callback) ->
     selectionSubscription = null
-    activeEditorSubscription = @onDidChangeActiveOutlineEditor (outlineEditor) ->
+    activeEditorSubscription = @observeActiveOutlineEditor (outlineEditor) ->
       selectionSubscription?.dispose()
       selectionSubscription = outlineEditor?.onDidChangeSelection callback
       callback outlineEditor?.selection or null

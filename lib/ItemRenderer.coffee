@@ -461,7 +461,7 @@ class ItemRenderer
 
   renderedItemLIPosition: (renderedLI) ->
     renderedPRect = ItemRenderer.renderedBodyTextSPANForRenderedLI(renderedLI).getBoundingClientRect()
-    animationRect = @editorElement.animationLayerElement.getBoundingClientRect()
+    animationRect = @editorElement.itemAnimationLayerElement.getBoundingClientRect()
     renderedLIRect = renderedLI.getBoundingClientRect()
     {} =
       top: renderedLIRect.top - animationRect.top

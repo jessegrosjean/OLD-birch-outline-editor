@@ -38,7 +38,6 @@
     "theorist": "^1.0.2",
     "typechecker": "^2.0.8",
     "underscore-plus": "^1.6.6",
-    "valid-url": "^1.0.9",
     "velocity-animate": "^1.2.1"
   },
   "devDependencies": {

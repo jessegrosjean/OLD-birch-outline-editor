@@ -184,13 +184,13 @@ class Selection
       )
 
   Object.defineProperty @::, 'focusClientRect',
-    get: -> @getClientRectForItemOffset @focusItem, @focusOffset
+    get: -> @editor.getClientRectForItemOffset @focusItem, @focusOffset
 
   Object.defineProperty @::, 'anchorClientRect',
-    get: -> @getClientRectForItemOffset @anchorItem, @anchorOffset
+    get: -> @editor.getClientRectForItemOffset @anchorItem, @anchorOffset
 
-  getClientRectForItemOffset: (item, offset) ->
-    @editor.outlineEditorElement.getClientRectForItemOffset item, offset
+  Object.defineProperty @::, 'selectionClientRect',
+    get: -> @editor.getClientRectForItemRange @anchorItem, @anchorOffset, @focusItem, @focusOffset
 
   equals: (otherSelection) ->
     @focusItem is otherSelection.focusItem and
@@ -283,7 +283,7 @@ class Selection
         )
 
       when 'lineboundary'
-        currentRect = @getClientRectForItemOffset focusItem, focusOffset
+        currentRect = editor.getClientRectForItemOffset focusItem, focusOffset
         if currentRect
           next = outlineEditorElement.pick(
             if upstream then Number.MIN_VALUE else Number.MAX_VALUE,
@@ -404,7 +404,7 @@ class Selection
     viewLineHeight = parseInt(focusViewPStyle.lineHeight, 10)
     viewPaddingTop = parseInt(focusViewPStyle.paddingTop, 10)
     viewPaddingBottom = parseInt(focusViewPStyle.paddingBottom, 10)
-    focusCaretRect = @getClientRectForItemOffset(focusItem, focusOffset)
+    focusCaretRect = editor.getClientRectForItemOffset(focusItem, focusOffset)
     x = editor.selectionVerticalAnchor()
     picked
     y

@@ -31,7 +31,7 @@ class ToolbarElement extends HTMLElement
       pane = atom.workspace.paneForItem? @editor
       if pane?.getActiveItem() is @editor
         paneElement = atom.views.getView pane
-        paneElement.insertBefore this, paneElement.lastChild
+        #paneElement.insertBefore this, paneElement.lastChild
       else
         @parentElement?.removeChild this
 
