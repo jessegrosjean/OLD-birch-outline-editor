@@ -308,7 +308,7 @@ class ItemRenderer
       unless unhoistViewportTop is undefined
         @editorElement.scrollTo 0, unhoistViewportTop
       else
-        @editorElement.scrollToItem @hoistAnchorItem, 'bottom'
+        @editorElement.scrollToItem @hoistAnchorItem, undefined, 'bottom'
     else
       @editorElement.scrollTo 0, 0
 

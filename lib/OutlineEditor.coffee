@@ -1187,7 +1187,7 @@ class OutlineEditor extends Model
       currentSelection = newSelection
 
       if newSelection.focusItem
-        @scrollToItemIfNeeded newSelection.focusItem, true
+        @scrollToItemIfNeeded newSelection.focusItem, newSelection.focusOffset, true
 
       @setSelectionVerticalAnchor(undefined)
 
@@ -1816,11 +1816,11 @@ class OutlineEditor extends Model
   scrollToOffsetRangeIfNeeded: (startOffset, endOffset, center) ->
     @outlineEditorElement.scrollToOffsetRangeIfNeeded(startOffset, endOffset, center)
 
-  scrollToItem: (item, align) ->
-    @outlineEditorElement.scrollToItem(item, align)
+  scrollToItem: (item, offset, align) ->
+    @outlineEditorElement.scrollToItem(item, offset, align)
 
-  scrollToItemIfNeeded: (item, center) ->
-    @outlineEditorElement.scrollToItemIfNeeded(item, center)
+  scrollToItemIfNeeded: (item, offset, center) ->
+    @outlineEditorElement.scrollToItemIfNeeded(item, offset, center)
 
   centerSelectionInVisibleArea: ->
 

@@ -445,23 +445,19 @@ class OutlineEditorElement extends HTMLElement
           else if endsBelowBottom
             @scrollToOffsetRange(startOffset, endOffset, 'bottom')
 
-  scrollToItem: (item, align) ->
-    viewP = @itemViewPForItem(item)
-    if viewP
+  scrollToItem: (item, offset, align) ->
+    if itemClientRect = @getClientRectForItemOffset item, offset
       viewportRect = @getViewportRect()
       scrollTop = viewportRect.top
-      itemClientRect = viewP.getBoundingClientRect()
       thisClientRect = @getBoundingClientRect()
       itemTop = scrollTop + (itemClientRect.top - thisClientRect.top)
       itemBottom = itemTop + itemClientRect.height
       @scrollToOffsetRange(itemTop, itemBottom, align)
 
-  scrollToItemIfNeeded: (item, center) ->
-    viewP = @itemViewPForItem(item)
-    if viewP
+  scrollToItemIfNeeded: (item, offset, center) ->
+    if itemClientRect = @getClientRectForItemOffset item, offset
       viewportRect = @getViewportRect()
       scrollTop = viewportRect.top
-      itemClientRect = viewP.getBoundingClientRect()
       thisClientRect = @getBoundingClientRect()
       itemTop = scrollTop + (itemClientRect.top - thisClientRect.top)
       itemBottom = itemTop + itemClientRect.height
