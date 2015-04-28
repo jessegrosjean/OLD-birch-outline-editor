@@ -200,6 +200,20 @@ class Selection
     @selectionAffinity is otherSelection.selectionAffinity and
     shallowEquals(@items, otherSelection.items)
 
+  contains: (item, offset) ->
+    if item in @items
+      if offset? and @isTextMode
+        if item is @startItem and offset < @startOffset
+          false
+        else if item is @endItem and offset > @endOffset
+          false
+        else
+          true
+      else
+        true
+    else
+      false
+
   selectionByExtending: (newFocusItem, newFocusOffset, newSelectionAffinity) ->
     new Selection(
       @editor,
