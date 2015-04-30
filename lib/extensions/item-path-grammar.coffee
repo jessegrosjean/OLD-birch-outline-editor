@@ -1,11 +1,7 @@
 ItemPath = require '../core/item-path'
-Grammar = null
-if atom.inBrowserMode
-  Grammar = {}
-else
-  # construct path on separate line for endokken
-  grammarPath = atom.config.resourcePath + '/node_modules/first-mate/lib/grammar'
-  Grammar = require grammarPath
+# construct path on separate line for endokken
+grammarPath = atom.config.resourcePath + '/node_modules/first-mate/lib/grammar'
+Grammar = require grammarPath
 
 module.exports=
 class ItemPathGrammar extends Grammar

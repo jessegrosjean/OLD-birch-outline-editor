@@ -23,6 +23,6 @@ class FocusElement extends HTMLInputElement
     @removeEventListener('compositionend', @_resetInput, true)
     @removeEventListener('input', @_resetInput, true)
 
-module.exports = document.registerElement 'outline-editor-focus',
+module.exports = document.registerElement 'ft-outline-editor-focus',
   extends: 'input'
   prototype: FocusElement.prototype

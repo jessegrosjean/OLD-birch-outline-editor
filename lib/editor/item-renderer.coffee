@@ -17,7 +17,7 @@ sortPriority = (a, b) ->
   else
     0
 
-Velocity.Easings.birchEasing = (p, opts, tweenDelta) ->
+Velocity.Easings.ftEasing = (p, opts, tweenDelta) ->
   tension = 1.5
   friction = Math.log((Math.abs(tweenDelta) + 1) * 10)
   1 - Math.cos(p * tension * Math.PI) * Math.exp(-p * friction)
@@ -26,7 +26,7 @@ module.exports =
 class ItemRenderer
 
   @DefaultAnimationContext:
-    easing: 'birchEasing'
+    easing: 'ftEasing'
     duration: 400
 
   editor: null
@@ -66,79 +66,79 @@ class ItemRenderer
     li
 
   renderItemLIClasses: (item) ->
-    classes = ['bitem']
+    classes = ['ft-item']
 
     unless item.hasBodyText
       classes.push 'bempy'
 
     if item.hasChildren
-      classes.push 'bhasChildren'
+      classes.push 'ft-has-children'
 
     if @editor.isExpanded item
-      classes.push 'bexpanded'
+      classes.push 'ft-expanded'
 
     if @editor.isSelected item
       if @editor.selection.isTextMode
-        classes.push 'btextselected'
+        classes.push 'ft-text-selected'
       else
-        classes.push 'bitemselected'
+        classes.push 'ft-itemselected'
 
     if @editor.getHoistedItem() is item
-      classes.push 'bhoistedItem'
+      classes.push 'ft-hoistedItem'
 
     if @editor.dropParentItem() is item
       classes.push 'bdropParentItem'
 
     if @editor.dropInsertBeforeItem() is item
-      classes.push 'bdropbefore'
+      classes.push 'ft-drop-before'
 
     if @editor.dropInsertAfterItem() is item
-      classes.push 'bdropafter'
+      classes.push 'ft-drop-after'
 
     classes.join ' '
 
   renderBranchControlsDIV: (item) ->
-    bframe = document.createElement 'DIV'
-    bframe.className = 'bbranchcontrols'
-    bframe.appendChild @renderBranchHandleA item
-    bframe.appendChild @renderBranchBorderDIV item
-    bframe
+    frame = document.createElement 'DIV'
+    frame.className = 'ft-branch-controls'
+    frame.appendChild @renderBranchHandleA item
+    frame.appendChild @renderBranchBorderDIV item
+    frame
 
   renderBranchHandleA: (item) ->
-    bhandle = document.createElement 'A'
-    bhandle.className = 'bhandle'
-    bhandle.draggable = true
-    #bhandle.tabIndex = -1
-    bhandle
+    handle = document.createElement 'A'
+    handle.className = 'ft-handle'
+    handle.draggable = true
+    #ft-handle.tabIndex = -1
+    handle
 
   renderBranchBorderDIV: (item) ->
-    bborder = document.createElement 'DIV'
-    bborder.className = 'bborder'
-    bborder
+    border = document.createElement 'DIV'
+    border.className = 'ft-border'
+    border
 
   renderBranchDIV: (item) ->
-    bbranch = document.createElement 'DIV'
-    bbranch.className = 'bbranch'
-    bbranch.appendChild @renderItemContentP item
-    if bchildrenUL = @renderChildrenUL item
-      bbranch.appendChild bchildrenUL
-    bbranch
+    branch = document.createElement 'DIV'
+    branch.className = 'ft-branch'
+    branch.appendChild @renderItemContentP item
+    if childrenUL = @renderChildrenUL item
+      branch.appendChild childrenUL
+    branch
 
   renderItemContentP: (item) ->
-    bitemcontent = document.createElement 'P'
-    bitemcontent.className = 'bitemcontent'
-    bitemcontent.appendChild @renderBodyTextSPAN item
+    itemContent = document.createElement 'P'
+    itemContent.className = 'ft-item-content'
+    itemContent.appendChild @renderBodyTextSPAN item
 
-    if bbadges = @renderBadgesSPAN item
-      bitemcontent.appendChild bbadges
-    bitemcontent
+    if badges = @renderBadgesSPAN item
+      itemContent.appendChild badges
+    itemContent
 
   renderBodyTextSPAN: (item) ->
-    bbodytext = document.createElement 'SPAN'
-    bbodytext.className = 'bbodytext'
-    bbodytext.contentEditable = true
-    bbodytext.innerHTML = @renderBodyTextInnerHTML item
-    bbodytext
+    bodyText = document.createElement 'SPAN'
+    bodyText.className = 'ft-body-text'
+    bodyText.contentEditable = true
+    bodyText.innerHTML = @renderBodyTextInnerHTML item
+    bodyText
 
   renderBodyTextInnerHTML: (item) ->
     if @textRenderers
@@ -159,27 +159,27 @@ class ItemRenderer
 
   renderBadgesSPAN: (item) ->
     if @badgeRenderers
-      bbadges = null
+      badges = null
       for each in @badgeRenderers
         each.render item, (badgeElement) ->
-          unless bbadges
-            bbadges = document.createElement 'SPAN'
-            bbadges.className = 'bbadges'
-          badgeElement.classList.add 'bbadge'
-          bbadges.appendChild badgeElement
-      bbadges
+          unless badges
+            badges = document.createElement 'SPAN'
+            badges.className = 'ft-badges'
+          badgeElement.classList.add 'ft-badge'
+          badges.appendChild badgeElement
+      badges
 
   renderChildrenUL: (item) ->
     if @editor.isExpanded(item) or @editor.getHoistedItem() is item
       each = item.firstChild
       if each
-        bchildren = document.createElement 'UL'
-        bchildren.className = 'bchildren'
+        children = document.createElement 'UL'
+        children.className = 'ft-children'
         while each
           if @editor.isVisible each
-            bchildren.appendChild @renderItemLI each
+            children.appendChild @renderItemLI each
           each = each.nextSibling
-        bchildren
+        children
 
   addBadgeRenderer: (callback, priority=0) ->
     renderer =
@@ -243,15 +243,15 @@ class ItemRenderer
     ItemRenderer.renderedItemContentPForRenderedLI(LI)?.lastChild
 
   @renderedChildrenULForRenderedLI: (LI, createIfNeeded) ->
-    bbranch = @renderedBranchDIVForRenderedLI LI
-    if bbranch
-      last = bbranch.lastChild
-      if last.classList.contains 'bchildren'
+    branch = @renderedBranchDIVForRenderedLI LI
+    if branch
+      last = branch.lastChild
+      if last.classList.contains 'ft-children'
         last
       else if createIfNeeded
         ul = document.createElement('UL')
-        ul.className = 'bchildren'
-        bbranch.appendChild ul
+        ul.className = 'ft-children'
+        branch.appendChild ul
         ul
 
   ###
@@ -272,7 +272,7 @@ class ItemRenderer
     hoistCommonItem
     each = start
 
-    while each and each isnt end and !hoistCommonItem
+    while each and each isnt end and not hoistCommonItem
       if editor.isVisible each, oldHoistedItem
         if editor.isVisible each, newHoistedItem
           hoistCommonItem = each
@@ -310,7 +310,7 @@ class ItemRenderer
         editorElement.scrollTo(newAnchorRect.left - oldAnchorRect.left, newAnchorRect.top - oldAnchorRect.top, true)
         editorElement.enableAnimation()
 
-    if @hoistAnchorItem and !oldHoistedItem.contains newHoistedItem
+    if @hoistAnchorItem and not oldHoistedItem.contains newHoistedItem
       # unhoist case, goal is to scroll up as far as possible such that new
       # anchorRect remains on screen and we do not scroll backward past zero.
       #@editorElement.scrollTo 0, Math.max(@editorElement.scrollTopWithOverscroll, 0)
@@ -379,7 +379,7 @@ class ItemRenderer
             addedChildrenLIs.push eachChildRenderedLI
             documentFragment.appendChild eachChildRenderedLI
 
-        if !renderedChildrenUL
+        if not renderedChildrenUL
           renderedChildrenUL = ItemRenderer.renderedChildrenULForRenderedLI(renderedLI, true)
 
         renderedChildrenUL.insertBefore documentFragment, nextSiblingRenderedLI
@@ -511,7 +511,7 @@ class ItemRenderer
     firstItemParentParent = firstItemParent?.parent
     newParentNeedsExpand =
       newParent isnt hoistedItem and
-      !editor.isExpanded(newParent) and
+      not editor.isExpanded(newParent) and
       editor.isVisible(newParent)
 
     # Special case indent and unindent indentations when vertical position of
@@ -519,9 +519,9 @@ class ItemRenderer
     # for the slide
     disableAnimation =
       (newParent is editor.getPreviousVisibleSibling(firstItem) and
-       !newNextSibling and
-        (!newParentNeedsExpand or
-         !newParent.firstChild)) or
+       not newNextSibling and
+        (not newParentNeedsExpand or
+         not newParent.firstChild)) or
       (newParent is firstItemParentParent and
        firstItemParent is lastItem.parent and
        editor.getLastVisibleChild(lastItem.parent) is lastItem)

@@ -2,7 +2,7 @@
 @priority-color-4: #6ccb49; // green
 @priority-color-5: #40b8f3; // blue
 
-.bbadge.bstatus {
+.ft-badge.bstatus {
   &[data-status="todo"] {
     background: @priority-color-5;
     &:before {
@@ -28,6 +28,6 @@
   }
 }
 
-.bitem[data-status="complete"] > .bbranch > .bitemcontent > .bbodytext {
+.ft-item[data-status="complete"] > .ft-branch > .ft-item-content > .ft-body-text {
   text-decoration: line-through;
 }

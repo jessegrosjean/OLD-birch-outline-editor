@@ -1,8 +1,8 @@
 'use strict';
 
-var OutlineEditor = require('birch/outline-editor'),
-	Outline = require('birch/outline'),
-	OutlineEditorElement = require('birch/outline-editor-element'),
+var OutlineEditor = require('ft/outline-editor'),
+	Outline = require('ft/outline'),
+	OutlineEditorElement = require('ft/outline-editor-element'),
 	should = require('should');
 
 describe('OutlineEditorElement', function() {
@@ -99,16 +99,16 @@ describe('OutlineEditorElement', function() {
 			it('should render selection state', function() {
 				var li = outlineEditorElement.renderedLIForItem(outlineSetup.one);
 				editor.moveSelectionRange(outlineSetup.one);
-				li.classList.contains('bitemselected').should.be.true;
+				li.classList.contains('ft-itemselected').should.be.true;
 				editor.moveSelectionRange(outlineSetup.two);
-				li.classList.contains('bitemselected').should.be.false;
+				li.classList.contains('ft-itemselected').should.be.false;
 			});
 
 			it('should render expanded state', function() {
 				var li = outlineEditorElement.renderedLIForItem(outlineSetup.one);
-				li.classList.contains('bexpanded').should.be.true;
+				li.classList.contains('ft-expanded').should.be.true;
 				editor.setCollapsed(outlineSetup.one);
-				li.classList.contains('bexpanded').should.be.false;
+				li.classList.contains('ft-expanded').should.be.false;
 			});
 		});
 	});

@@ -1,6 +1,6 @@
-OutlineEditorService = require '../../outline-editor-service'
+FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
-TextInputElement = require './ui/text-input-element'
+TextInputElement = require './text-input-element'
 
 class TokenInputElement extends HTMLElement
 
@@ -12,7 +12,7 @@ class TokenInputElement extends HTMLElement
     @list = document.createElement 'ol'
     @appendChild @list
 
-    @textInputElement = document.createElement 'birch-text-input'
+    @textInputElement = document.createElement 'ft-text-input'
     @textEditorElement = @textInputElement.textEditorElement
     @textEditor = @textInputElement.textEditor
     @appendChild @textInputElement
@@ -246,7 +246,7 @@ class TokenInputElement extends HTMLElement
     if tokensRect.width
       @textEditorElement.style.paddingLeft = (tokensRect.width + (defaultPaddingLeft * 1.25)) + 'px'
 
-OutlineEditorService.eventRegistery.listen 'birch-token-input > ol > li',
+FoldingTextService.eventRegistery.listen 'ft-token-input > ol > li',
   mousedown: (e) ->
     tokenInput = @parentElement.parentElement
     tokenInput.tokenizeText()
@@ -260,11 +260,11 @@ OutlineEditorService.eventRegistery.listen 'birch-token-input > ol > li',
     e.stopPropagation()
     e.preventDefault()
 
-OutlineEditorService.eventRegistery.listen 'birch-token-input > birch-text-input > atom-text-editor[mini]',
+FoldingTextService.eventRegistery.listen 'ft-token-input > ft-text-input > atom-text-editor[mini]',
   mousedown: (e) ->
     @parentElement.parentElement.setSelectedToken null
 
-atom.commands.add 'birch-token-input > birch-text-input > atom-text-editor[mini]',
+atom.commands.add 'ft-token-input > ft-text-input > atom-text-editor[mini]',
   'editor:move-to-first-character-of-line': (e) -> @parentElement.parentElement.moveToStart(e)
   'editor:move-to-beginning-of-line': (e) -> @parentElement.parentElement.moveToStart(e)
   'editor:move-to-beginning-of-paragraph': (e) -> @parentElement.parentElement.moveToStart(e)
@@ -289,4 +289,4 @@ atom.commands.add 'birch-token-input > birch-text-input > atom-text-editor[mini]
   'core:delete': (e) -> @parentElement.parentElement.delete(e, false)
   'core:backspace': (e) -> @parentElement.parentElement.delete(e, true)
 
-module.exports = document.registerElement 'birch-token-input', prototype: TokenInputElement.prototype
+module.exports = document.registerElement 'ft-token-input', prototype: TokenInputElement.prototype

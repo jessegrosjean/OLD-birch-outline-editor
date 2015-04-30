@@ -112,6 +112,7 @@ itemsFromHTML = (htmlString, outline, editor) ->
   rootUL = htmlDocument.getElementById(Constants.RootID)
   unless rootUL
     rootUL = htmlDocument.getElementById('Birch.Root')
+    rootUL ?= htmlDocument.getElementById('Birch')
     if rootUL
       rootUL.id = Constants.RootID
   expandedItemIDs = {}

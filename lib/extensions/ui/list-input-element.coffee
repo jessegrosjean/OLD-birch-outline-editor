@@ -1,4 +1,4 @@
-OutlineEditorService = require '../../outline-editor-service'
+FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
 fuzzyFilter = null # defer until used
@@ -32,7 +32,7 @@ class ListInputElement extends HTMLElement
     @list = document.createElement 'ol'
     @list.classList.add 'list-group'
 
-    @setTextInputElement document.createElement 'birch-text-input'
+    @setTextInputElement document.createElement 'ft-text-input'
 
   attachedCallback: ->
 
@@ -247,21 +247,21 @@ liForNode = (node) ->
     node = node.parentElement
   node
 
-birchListInputForNode = (node) ->
-  while node and node.tagName isnt 'BIRCH-LIST-INPUT'
+listInputForNode = (node) ->
+  while node and node.tagName isnt 'FT-LIST-INPUT'
     node = node.parentElement
   node
 
-OutlineEditorService.eventRegistery.listen 'birch-list-input birch-text-input > atom-panel > .list-group',
+FoldingTextService.eventRegistery.listen 'ft-list-input ft-text-input > atom-panel > .list-group',
   # This prevents the focusout event from firing on the filter editor element
   # when the list is scrolled by clicking the scrollbar and dragging.
   mousedown: (e) ->
-    birchListInputForNode(this).selectItemElement(liForNode(e.target))
+    listInputForNode(this).selectItemElement(liForNode(e.target))
     e.preventDefault()
     e.stopPropagation()
 
   click: (e) ->
-    listInput = birchListInputForNode(this)
+    listInput = listInputForNode(this)
     li = liForNode(e.target)
     if li?.classList.contains('selected')
       if listInput.getDelegate().mouseClickListItem
@@ -269,23 +269,23 @@ OutlineEditorService.eventRegistery.listen 'birch-list-input birch-text-input > 
     e.preventDefault()
     e.stopPropagation()
 
-atom.commands.add 'birch-list-input birch-text-input > atom-text-editor[mini]',
-  'core:move-up': (e) -> birchListInputForNode(this).selectPreviousItemElement(e)
-  'core:move-down': (e) -> birchListInputForNode(this).selectNextItemElement(e)
-  'core:move-to-top': (e) -> birchListInputForNode(this).selectFirstElement(e)
-  'core:move-to-bottom': (e) -> birchListInputForNode(this).selectLastElement(e)
+atom.commands.add 'ft-list-input ft-text-input > atom-text-editor[mini]',
+  'core:move-up': (e) -> listInputForNode(this).selectPreviousItemElement(e)
+  'core:move-down': (e) -> listInputForNode(this).selectNextItemElement(e)
+  'core:move-to-top': (e) -> listInputForNode(this).selectFirstElement(e)
+  'core:move-to-bottom': (e) -> listInputForNode(this).selectLastElement(e)
 
-  'editor:move-to-first-character-of-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-beginning-of-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-beginning-of-paragraph': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-beginning-of-word': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'core:move-backward': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'core:move-left': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-end-of-word': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'core:move-forward': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'core:move-right': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-end-of-screen-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-end-of-line': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
-  'editor:move-to-end-of-paragraph': (e) -> birchListInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-first-character-of-line': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-beginning-of-line': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-beginning-of-paragraph': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-beginning-of-word': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-backward': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-left': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-word': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-forward': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'core:move-right': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-screen-line': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-line': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
+  'editor:move-to-end-of-paragraph': (e) -> listInputForNode(this).clearListSelectionOnTextMovement(e)
 
-module.exports = document.registerElement 'birch-list-input', prototype: ListInputElement.prototype
+module.exports = document.registerElement 'ft-list-input', prototype: ListInputElement.prototype

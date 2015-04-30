@@ -1,15 +1,15 @@
-outlineEditorService = require '../outline-editor-service'
+foldingTextService = require '../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
 exports.consumeStatusBarService = (statusBar) ->
   hoistElement = document.createElement 'a'
-  hoistElement.className = 'birch-statusbar-hoisted icon-location inline-block'
+  hoistElement.className = 'ft-statusbar-hoisted icon-location inline-block'
   hoistElement.addEventListener 'click', (e) ->
-    editor = outlineEditorService.getActiveOutlineEditor()
+    editor = foldingTextService.getActiveOutlineEditor()
     savedSelection = editor.selection
     return unless editor
 
-    listInput = document.createElement 'birch-list-input'
+    listInput = document.createElement 'ft-list-input'
     listInput.setText editor.getSearch().query
 
     listInput.setDelegate
@@ -37,7 +37,7 @@ exports.consumeStatusBarService = (statusBar) ->
 
     listInput.setItems editor.outline.evaluateItemPath '//*/parent::*'
     listInputPanel = atom.workspace.addPopoverPanel
-      className: 'birch-text-input-panel'
+      className: 'ft-text-input-panel'
       item: listInput
       target: e.target
 
@@ -46,7 +46,7 @@ exports.consumeStatusBarService = (statusBar) ->
   locationStatusBarItem = statusBar.addLeftTile(item: hoistElement, priority: 0)
 
   activeOutlineEditorSubscriptions = null
-  activeOutlineEditorSubscription = outlineEditorService.observeActiveOutlineEditor (outlineEditor) ->
+  activeOutlineEditorSubscription = foldingTextService.observeActiveOutlineEditor (outlineEditor) ->
     activeOutlineEditorSubscriptions?.dispose()
     if outlineEditor
       update = ->

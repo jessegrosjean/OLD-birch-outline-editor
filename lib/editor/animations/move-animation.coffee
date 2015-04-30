@@ -55,10 +55,10 @@ class MoveAnimation
           selectDIV.style.zIndex = '-1'
 
           if rect.width <= 1
-            selectDIV.className = 'bsimulatedSelectionCursor'
+            selectDIV.className = 'ft-simulated-selection-cursor'
             selectDIV.style.width = '1px'
           else
-            selectDIV.className = 'bsimulatedSelection'
+            selectDIV.className = 'ft-simulated-selection'
 
           movingLIClone.appendChild selectDIV
 

@@ -1,17 +1,6 @@
-@import (reference) '../editor/birch-variables';
+@import (reference) '../editor/variables';
 
-.birch-statusbar-hoisted {
-  &:before {
-    font-size: inherit;
-    line-height: inherit;
-    width: auto;
-  }
-  &.active {
-    color: @text-color-info;
-  }
-}
-
-.status-bar birch-text-input.birch-statusbar-filter {
+.status-bar ft-text-input.ft-statusbar-filter {
   vertical-align: middle;
   max-width: none;
   overflow: visible;
@@ -19,7 +8,7 @@
   position: relative; // hack for one themes that don't put status bar text in exact middle
   top: -1px;
 
-  > .birch-text-input-addon {
+  > .ft-text-input-addon {
     &:before {
       font-size: inherit;
       line-height: inherit;
@@ -76,12 +65,12 @@ outline-editor-search {
       border-top-right-radius: @component-border-radius;
       border-bottom-right-radius: @component-border-radius;
       transform: scaleX(-1);
-      transition:width @hoist-animation-duration;
+      transition:width @ft-hoist-animation-duration;
     }
 
     &.find {
       left: 0;
-      transition:left @hoist-animation-duration;
+      transition:left @ft-hoist-animation-duration;
     }
 
     &.cancel {
@@ -93,12 +82,12 @@ outline-editor-search {
     flex-grow: 1;
     padding-left: @search-button-width;
     padding-right: @search-button-width;
-    transition:padding-left @hoist-animation-duration;
+    transition:padding-left @ft-hoist-animation-duration;
 
     &,
     &::shadow {
       font-size: @input-font-size;
-      font-family: @birch-font-family;
+      font-family: @ft-font-family;
       .source.itempath .string {
         color: @text-color;
       }
@@ -109,16 +98,16 @@ outline-editor-search {
     > button {
       &.unhoist {
         width: @search-button-width;
-        transition:width @hoist-animation-duration;
+        transition:width @ft-hoist-animation-duration;
       }
       &.find {
         left: @search-button-width;
-        transition:left @hoist-animation-duration;
+        transition:left @ft-hoist-animation-duration;
       }
     }
     > atom-text-editor[mini] {
       padding-left: @search-button-width * 2;
-      transition:padding-left @hoist-animation-duration;
+      transition:padding-left @ft-hoist-animation-duration;
     }
   }
 }

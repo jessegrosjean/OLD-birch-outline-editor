@@ -1,5 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
-OutlineEditorService = require '../../outline-editor-service'
+FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
 class DateTimeElement extends HTMLElement
@@ -23,4 +23,4 @@ class DateTimeElement extends HTMLElement
   renderDay: (date) ->
 
 
-module.exports = document.registerElement 'birch-date-time', prototype: DateTimeElement.prototype
+module.exports = document.registerElement 'ft-date-time', prototype: DateTimeElement.prototype

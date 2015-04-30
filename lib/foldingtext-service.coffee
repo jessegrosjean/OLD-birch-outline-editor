@@ -7,10 +7,10 @@ Item = require './core/item'
 
 # Public: This is the Atom [services
 # API](https://atom.io/docs/latest/creating-a-package#interacting-with-other-
-# packages-via-services) object vended for `birch-outline-editor-service`.
-# Please see the [Customizing Birch](README#customizing-birch) to get started
+# packages-via-services) object vended for `ft-foldingtext-service`.
+# Please see the [Customizing FoldingText](README#customizing-ft) to get started
 # in creating a package that uses this service.
-class OutlineEditorService
+class FoldingTextService
 
   ###
   Section: Classes
@@ -150,4 +150,4 @@ class OutlineEditorService
     callback @getActiveOutlineEditor()?.selection or null
     @onDidChangeActiveOutlineEditorSelection callback
 
-module.exports = OutlineEditorService
+module.exports = FoldingTextService

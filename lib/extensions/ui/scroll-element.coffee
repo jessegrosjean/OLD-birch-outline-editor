@@ -28,4 +28,4 @@ class ScrollElement extends HTMLElement
 
   scrollToBottom: ->
 
-module.exports = document.registerElement 'birch-scroll', prototype: ScrollElement.prototype
+module.exports = document.registerElement 'ft-scroll', prototype: ScrollElement.prototype

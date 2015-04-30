@@ -7,12 +7,12 @@ ItemSerializer = require '../core/item-serializer'
 EventRegistery = require './event-registery'
 ItemRenderer = require './item-renderer'
 {CompositeDisposable} = require 'atom'
+GlobalMouse = require './global-mouse'
 rafdebounce = require './raf-debounce'
 Velocity = require 'velocity-animate'
 Outline = require '../core/outline'
 Selection = require './selection'
 diff = require 'fast-diff'
-Mouse = require './mouse'
 
 module.exports =
 class OutlineEditorElement extends HTMLElement
@@ -82,8 +82,8 @@ class OutlineEditorElement extends HTMLElement
 
     @subscriptions = new CompositeDisposable
 
-    @disableAnimationOverride = atom.config.get 'birch-outline-editor.disableAnimation'
-    @subscriptions.add atom.config.observe 'birch-outline-editor.disableAnimation', (newValue) =>
+    @disableAnimationOverride = atom.config.get 'ft-outline-editor.disableAnimation'
+    @subscriptions.add atom.config.observe 'ft-outline-editor.disableAnimation', (newValue) =>
       @disableAnimationOverride = newValue
 
     if atom.styles
@@ -524,7 +524,7 @@ class OutlineEditorElement extends HTMLElement
     # it will say mouse is down when it really isn't, that that cause problem
     # in the selection interaction logic, since we never get mouseup event to
     # end it.
-    if Mouse.isGlobalLeftMouseDown()
+    if GlobalMouse.isGlobalLeftMouseDown()
       editor = @editor
       pick = @pick(e.clientX, e.clientY)
       caretPosition = pick.itemCaretPosition
@@ -572,7 +572,7 @@ class OutlineEditorElement extends HTMLElement
     caretPosition = pick.itemCaretPosition
 
     if caretPosition
-      #if e.target.classList.contains('bbodytext') and caretPosition.offsetItem isnt @editor.selection.anchorItem
+      #if e.target.classList.contains('ft-body-text') and caretPosition.offsetItem isnt @editor.selection.anchorItem
       #  e.preventDefault() # don't understand this
       @editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
@@ -741,9 +741,9 @@ class OutlineEditorElement extends HTMLElement
 
     try
       # If item is from another outline must import it into this outline.
-      draggedBirchIDs = JSON.parse e.dataTransfer.getData('application/json')
-      outline = Outline.getOutlineForID draggedBirchIDs.outlineID
-      draggedItem = outline.getItemForID draggedBirchIDs.itemID
+      draggedItemIDs = JSON.parse e.dataTransfer.getData('application/json')
+      outline = Outline.getOutlineForID draggedItemIDs.outlineID
+      draggedItem = outline.getItemForID draggedItemIDs.itemID
       draggedItem = @editor.outline.importItem draggedItem.cloneItem()
       return draggedItem if draggedItem
     catch error
@@ -805,7 +805,7 @@ class OutlineEditorElement extends HTMLElement
     @findOutlineEditorElement(element)?.editor
 
   @findOutlineEditorElement: (element) ->
-    while element and element.tagName isnt 'BIRCH-OUTLINE-EDITOR'
+    while element and element.tagName isnt 'FT-OUTLINE-EDITOR'
       element = element.parentNode
     element
 
@@ -857,14 +857,14 @@ Event and Command registration
 # Handle Selection Interaction
 #
 
-EventRegistery.listen 'birch-outline-editor > ul.top-item-list',
+EventRegistery.listen 'ft-outline-editor > ul.top-item-list',
   'mousedown': (e) ->
     editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editorElement.editor.focus()
     setTimeout ->
       editorElement.beginExtendSelectionInteraction e
 
-EventRegistery.listen '.bbodytext',
+EventRegistery.listen '.ft-body-text',
   'mousedown': (e) ->
     editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editorElement.editor.focus()
@@ -875,7 +875,7 @@ EventRegistery.listen '.bbodytext',
 # Handle Text Input
 #
 
-EventRegistery.listen '.bitemcontent',
+EventRegistery.listen '.ft-item-content',
   compositionstart: (e) ->
   compositionupdate: (e) ->
   compositionend: (e) ->
@@ -934,7 +934,7 @@ EventRegistery.listen '.bitemcontent',
 # Handle clicking on handle
 #
 
-EventRegistery.listen '.bhandle',
+EventRegistery.listen '.ft-handle',
   mousedown: (e) ->
     editorElement = OutlineEditorElement.findOutlineEditorElement e.target
     editor = editorElement.editor
@@ -979,7 +979,7 @@ EventRegistery.listen '.bhandle',
 # Handle clicking on file links
 #
 
-EventRegistery.listen '.bbodytext a',
+EventRegistery.listen '.ft-body-text a',
   click: (e) ->
     if href = e.target.href
       if href.indexOf('file://') is 0
@@ -1002,7 +1002,7 @@ clipboardAsDatatransfer =
   getData: (type) -> atom.clipboard.read()
   setData: (type, data) -> atom.clipboard.write(data)
 
-atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
+atom.commands.add 'ft-outline-editor', stopEventPropagationAndGroupUndo(
   'core:cut': (e) ->
     @editor.cutSelection clipboardAsDatatransfer
   'core:copy': (e) ->
@@ -1015,14 +1015,14 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
 # Handle Context Menu
 #
 
-EventRegistery.listen 'birch-outline-editor',
+EventRegistery.listen 'ft-outline-editor',
   'contextmenu': (e) -> @onContextMenu(e)
 
 #
 # Handle Commands
 #
 
-atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
+atom.commands.add 'ft-outline-editor', stopEventPropagationAndGroupUndo(
   'core:undo': -> @editor.undo()
   'core:redo': -> @editor.redo()
   'editor:newline': -> @editor.insertNewline()
@@ -1043,35 +1043,35 @@ atom.commands.add 'birch-outline-editor', stopEventPropagationAndGroupUndo(
   'editor:delete-to-end-of-word': -> @editor.deleteWordForward()
   'editor:move-line-up': -> @editor.moveItemsUp()
   'editor:move-line-down': -> @editor.moveItemsDown()
-  'birch-outline-editor:promote-child-items': -> @editor.promoteChildItems()
-  'birch-outline-editor:demote-trailing-sibling-items': -> @editor.demoteTrailingSiblingItems()
-  'birch-outline-editor:group-items': -> @editor.groupItems()
+  'outline-editor:promote-child-items': -> @editor.promoteChildItems()
+  'outline-editor:demote-trailing-sibling-items': -> @editor.demoteTrailingSiblingItems()
+  'outline-editor:group-items': -> @editor.groupItems()
   'deleteItemsBackward': -> @editor.deleteItemsBackward()
   'deleteItemsForward': -> @editor.deleteItemsForward()
-  'birch-outline-editor:toggle-abbreviation': -> @editor.toggleFormattingTag 'ABBR'
-  'birch-outline-editor:toggle-bold': -> @editor.toggleFormattingTag 'B'
-  'birch-outline-editor:toggle-citation': -> @editor.toggleFormattingTag 'CITE'
-  'birch-outline-editor:toggle-code': -> @editor.toggleFormattingTag 'CODE'
-  'birch-outline-editor:toggle-definition': -> @editor.toggleFormattingTag 'DFN'
-  'birch-outline-editor:toggle-emphasis': -> @editor.toggleFormattingTag 'EM'
-  'birch-outline-editor:toggle-italic': -> @editor.toggleFormattingTag 'I'
-  'birch-outline-editor:toggle-keyboard-input': -> @editor.toggleFormattingTag 'KBD'
-  'birch-outline-editor:toggle-inline-quote': -> @editor.toggleFormattingTag 'Q'
-  'birch-outline-editor:toggle-strikethrough': -> @editor.toggleFormattingTag 'S'
-  'birch-outline-editor:toggle-sample-output': -> @editor.toggleFormattingTag 'SAMP'
-  'birch-outline-editor:toggle-small': -> @editor.toggleFormattingTag 'SMALL'
-  'birch-outline-editor:toggle-strong': -> @editor.toggleFormattingTag 'STRONG'
-  'birch-outline-editor:toggle-subscript': -> @editor.toggleFormattingTag 'SUB'
-  'birch-outline-editor:toggle-superscript': -> @editor.toggleFormattingTag 'SUP'
-  'birch-outline-editor:toggle-underline': -> @editor.toggleFormattingTag 'U'
-  'birch-outline-editor:toggle-variable': -> @editor.toggleFormattingTag 'VAR'
+  'outline-editor:toggle-abbreviation': -> @editor.toggleFormattingTag 'ABBR'
+  'outline-editor:toggle-bold': -> @editor.toggleFormattingTag 'B'
+  'outline-editor:toggle-citation': -> @editor.toggleFormattingTag 'CITE'
+  'outline-editor:toggle-code': -> @editor.toggleFormattingTag 'CODE'
+  'outline-editor:toggle-definition': -> @editor.toggleFormattingTag 'DFN'
+  'outline-editor:toggle-emphasis': -> @editor.toggleFormattingTag 'EM'
+  'outline-editor:toggle-italic': -> @editor.toggleFormattingTag 'I'
+  'outline-editor:toggle-keyboard-input': -> @editor.toggleFormattingTag 'KBD'
+  'outline-editor:toggle-inline-quote': -> @editor.toggleFormattingTag 'Q'
+  'outline-editor:toggle-strikethrough': -> @editor.toggleFormattingTag 'S'
+  'outline-editor:toggle-sample-output': -> @editor.toggleFormattingTag 'SAMP'
+  'outline-editor:toggle-small': -> @editor.toggleFormattingTag 'SMALL'
+  'outline-editor:toggle-strong': -> @editor.toggleFormattingTag 'STRONG'
+  'outline-editor:toggle-subscript': -> @editor.toggleFormattingTag 'SUB'
+  'outline-editor:toggle-superscript': -> @editor.toggleFormattingTag 'SUP'
+  'outline-editor:toggle-underline': -> @editor.toggleFormattingTag 'U'
+  'outline-editor:toggle-variable': -> @editor.toggleFormattingTag 'VAR'
 
-  'birch-outline-editor:clear-formatting': -> @editor.clearFormatting()
+  'outline-editor:clear-formatting': -> @editor.clearFormatting()
   'editor:upper-case': -> @editor.upperCase()
   'editor:lower-case': -> @editor.lowerCase()
 )
 
-atom.commands.add 'birch-outline-editor', stopEventPropagation(
+atom.commands.add 'ft-outline-editor', stopEventPropagation(
   'core:cancel': ->
     if @editor.isTextMode()
       @editor.extendSelectionRangeToItemBoundaries()
@@ -1114,8 +1114,8 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'editor:select-paragraph-forward': -> @editor.moveParagraphForwardAndModifySelection()
   'core:select-all': -> @editor.selectAll()
   'editor:select-line': -> @editor.extendSelectionRangeToItemBoundaries()
-  'birch-outline-editor:hoist': -> @editor.hoistItem()
-  'birch-outline-editor:unhoist': -> @editor.unhoist()
+  'outline-editor:hoist': -> @editor.hoistItem()
+  'outline-editor:unhoist': -> @editor.unhoist()
   'editor:scroll-to-top': -> @editor.scrollToBeginningOfDocument()
   'editor:scroll-to-bottom': -> @editor.scrollToEndOfDocument()
   'editor:scroll-to-selection': -> @editor.centerSelectionInVisibleArea()
@@ -1128,9 +1128,9 @@ atom.commands.add 'birch-outline-editor', stopEventPropagation(
   'core:page-down': -> @editor.pageDown()
   'editor:fold-current-row': -> @editor.foldItems()
   'editor:unfold-current-row': -> @editor.unfoldItems()
-  'birch-outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
-  'birch-outline-editor:toggle-fully-fold-items': -> @editor.toggleFullyFoldItems()
+  'outline-editor:toggle-fold-items': -> @editor.toggleFoldItems()
+  'outline-editor:toggle-fully-fold-items': -> @editor.toggleFullyFoldItems()
   'editor:copy-path': -> @editor.copyPathToClipboard()
 )
 
-document.registerElement 'birch-outline-editor', prototype: OutlineEditorElement.prototype
+document.registerElement 'ft-outline-editor', prototype: OutlineEditorElement.prototype

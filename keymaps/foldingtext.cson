@@ -1,7 +1,7 @@
 'body':
-  'alt-cmd-n': 'birch-outline-editor:new-outline'
+  'alt-cmd-n': 'outline-editor:new-outline'
 
-'birch-outline-editor':
+'ft-outline-editor':
 
   # Platform Bindings
   'home': 'editor:move-to-first-character-of-line'
@@ -24,10 +24,10 @@
   'alt-shift-right': 'editor:select-to-end-of-word'
 
   # Apple Specific
-  'alt-up' : 'editor:move-paragraph-backward',
-  'shift-alt-up' : 'editor:select-paragraph-backward',
-  'alt-down' : 'editor:move-paragraph-forward',
-  'shift-alt-down' : 'editor:select-paragraph-forward',
+  'alt-up': 'editor:move-paragraph-backward',
+  'shift-alt-up': 'editor:select-paragraph-backward',
+  'alt-down': 'editor:move-paragraph-forward',
+  'shift-alt-down': 'editor:select-paragraph-forward',
 
   'cmd-backspace': 'editor:delete-to-beginning-of-line'
   'cmd-shift-backspace': 'editor:delete-to-beginning-of-line'
@@ -64,10 +64,10 @@
   'cmd-[': 'editor:outdent-selected-rows'
   'ctrl-cmd-up': 'editor:move-line-up'
   'ctrl-cmd-down': 'editor:move-line-down'
-  'ctrl-cmd-left' : 'editor:outdent-selected-rows'
-  'ctrl-cmd-right' : 'editor:indent-selected-rows'
+  'ctrl-cmd-left': 'editor:outdent-selected-rows'
+  'ctrl-cmd-right': 'editor:indent-selected-rows'
 
-  'alt-cmd-g': 'birch-outline-editor:group-items'
+  'alt-cmd-g': 'outline-editor:group-items'
 
   'cmd-j': 'editor:join-lines'
   'cmd-D': 'editor:duplicate-lines'
@@ -89,27 +89,27 @@
   'cmd-k cmd-7': 'editor:fold-at-indent-level-7'
   'cmd-k cmd-8': 'editor:fold-at-indent-level-8'
   'cmd-k cmd-9': 'editor:fold-at-indent-level-9'
-  'cmd-.': 'birch-outline-editor:toggle-fold-items'
-  'shift-cmd-.': 'birch-outline-editor:toggle-fully-fold-items'
+  'cmd-.': 'outline-editor:toggle-fold-items'
+  'shift-cmd-.': 'outline-editor:toggle-fully-fold-items'
 
-  'cmd-alt-down' : 'birch-outline-editor:hoist',
-  'cmd-alt-up' : 'birch-outline-editor:unhoist',
+  'cmd-alt-down': 'outline-editor:hoist',
+  'cmd-alt-up': 'outline-editor:unhoist',
 
-  'cmd-b' : 'birch-outline-editor:toggle-bold'
-  'cmd-i' : 'birch-outline-editor:toggle-italic'
-  'cmd-u' : 'birch-outline-editor:toggle-underline'
-  'cmd-C' : 'birch-outline-editor:toggle-code'
-  'cmd-k' : 'birch-outline-editor:toggle-strikethrough'
-  'cmd-K' : 'birch-outline-editor:edit-link'
-  'ctrl-c' : 'birch-outline-editor:clear-formatting'
+  'cmd-b': 'outline-editor:toggle-bold'
+  'cmd-i': 'outline-editor:toggle-italic'
+  'cmd-u': 'outline-editor:toggle-underline'
+  'cmd-C': 'outline-editor:toggle-code'
+  'cmd-k': 'outline-editor:toggle-strikethrough'
+  'cmd-K': 'outline-editor:edit-link'
+  'ctrl-c': 'outline-editor:clear-formatting'
 
-'birch-outline-editor.outlineMode':
-  'left' : 'editor:move-to-beginning-of-paragraph',
-  'right' : 'editor:move-to-end-of-paragraph',
-  'i' : 'editor:move-to-beginning-of-paragraph',
-  'a' : 'editor:move-to-end-of-paragraph',
+'ft-outline-editor.outlineMode':
+  'left': 'editor:move-to-beginning-of-paragraph',
+  'right': 'editor:move-to-end-of-paragraph',
+  'i': 'editor:move-to-beginning-of-paragraph',
+  'a': 'editor:move-to-end-of-paragraph',
 
-  'o' : 'editor:newline',
-  'O' : 'editor:newline-above',
+  'o': 'editor:newline',
+  'O': 'editor:newline-above',
 
-  '.' : 'birch-outline-editor:toggle-fold-items'
+  '.': 'outline-editor:toggle-fold-items'

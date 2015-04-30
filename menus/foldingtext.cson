@@ -1,22 +1,22 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 #'context-menu':
-#  'birch-outline-editor': [
-#    { label: 'Bold', command: 'birch-outline-editor:toggle-bold' }
-#    { label: 'Italic', command: 'birch-outline-editor:toggle-italic' }
-#    { label: 'Underline', command: 'birch-outline-editor:toggle-underline' }
+#  'ft-outline-editor': [
+#    { label: 'Bold', command: 'outline-editor:toggle-bold' }
+#    { label: 'Italic', command: 'outline-editor:toggle-italic' }
+#    { label: 'Underline', command: 'outline-editor:toggle-underline' }
 #    { type: 'separator' }
 #  ]
 'menu': [
   {
     label: 'File'
     submenu: [
-      { label: 'New Outline', command: 'birch-outline-editor:new-outline' }
+      { label: 'New Outline', command: 'outline-editor:new-outline' }
     ]
   }
 ]
 
 'context-menu':
-  'birch-outline-editor': [
+  'ft-outline-editor': [
     { label: 'Undo', command: 'core:undo' },
     { label: 'Redo', command: 'core:redo' },
     { type: 'separator' },

@@ -1,12 +1,12 @@
-outlineEditorService = require '../outline-editor-service'
+foldingTextService = require '../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 TextInputElement = require './ui/text-input-element'
 ItemPathGrammar = require './item-path-grammar'
 
 exports.consumeStatusBarService = (statusBar) ->
-  searchElement = document.createElement 'birch-text-input'
+  searchElement = document.createElement 'ft-text-input'
   searchElement.classList.add 'inline-block'
-  searchElement.classList.add 'birch-statusbar-filter'
+  searchElement.classList.add 'ft-statusbar-filter'
   searchElement.cancelOnBlur = false
   searchElement.setPlaceholderText 'Search'
   searchElement.setGrammar new ItemPathGrammar(atom.grammars)
@@ -21,22 +21,22 @@ exports.consumeStatusBarService = (statusBar) ->
 
   searchElement.setDelegate
     didChangeText: ->
-      outlineEditorService.getActiveOutlineEditor()?.setSearch searchElement.getText()
+      foldingTextService.getActiveOutlineEditor()?.setSearch searchElement.getText()
     restoreFocus: ->
     cancelled: ->
-      editor = outlineEditorService.getActiveOutlineEditor()
+      editor = foldingTextService.getActiveOutlineEditor()
       if editor.getSearch()?.query
         editor?.setSearch ''
       else
         editor?.focus()
     confirm: ->
-      outlineEditorService.getActiveOutlineEditor()?.focus()
+      foldingTextService.getActiveOutlineEditor()?.focus()
 
   searchStatusBarItem = statusBar.addLeftTile(item: searchElement, priority: 0)
   searchElement.setSizeToFit true
 
   activeOutlineEditorSubscriptions = null
-  activeOutlineEditorSubscription = outlineEditorService.observeActiveOutlineEditor (outlineEditor) ->
+  activeOutlineEditorSubscription = foldingTextService.observeActiveOutlineEditor (outlineEditor) ->
     activeOutlineEditorSubscriptions?.dispose()
     if outlineEditor
       update = ->
@@ -59,7 +59,7 @@ exports.consumeStatusBarService = (statusBar) ->
     else
       searchElement.style.display = 'none'
 
-    commandsSubscriptions = atom.commands.add 'birch-outline-editor',
+    commandsSubscriptions = atom.commands.add 'ft-outline-editor',
       'core:cancel': (e) ->
         unless @editor.isTextMode()
           searchElement.focusTextEditor()

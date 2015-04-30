@@ -1,8 +1,8 @@
 {
-  "name": "birch-outline-editor",
-  "main": "./lib/outline-editor",
+  "name": "foldingtext",
+  "main": "./lib/foldingtext",
   "version": "1.8.0",
-  "description": "Extensible outline editor",
+  "description": "FoldingText outline editor.",
   "keywords": [
     "outline",
     "notes",
@@ -10,8 +10,8 @@
     "todos",
     "GTD"
   ],
-  "repository": "https://github.com/jessegrosjean/birch-outline-editor",
-  "license": "Commercial",
+  "repository": "https://github.com/jessegrosjean/outline-editor",
+  "license": "Commercial Shared Source",
   "engines": {
     "atom": ">=0.192.0 <2.0.0"
   },
@@ -23,10 +23,10 @@
     }
   },
   "providedServices": {
-    "birch-outine-editor-service": {
-      "description": "Birch Outline Editor Service",
+    "foldingtext-service": {
+      "description": "FoldingText Editor Service",
       "versions": {
-        "1.0.0": "birchOutlineEditorService"
+        "1.0.0": "foldingTextService"
       }
     }
   },

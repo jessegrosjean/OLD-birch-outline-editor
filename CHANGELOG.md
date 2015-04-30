@@ -93,8 +93,8 @@
 
 - Added {Outline::importItem} API.
 - Added {Outline::observeSelection} API.
-- Added {OutlineEditorService.observeActiveEditor} API.
-- Added {OutlineEditorService.observeActiveEditorSelection} API.
+- Added {FoldingTextService.observeActiveEditor} API.
+- Added {FoldingTextService.observeActiveEditorSelection} API.
 - Fixed edit link inserts link text if there's an empty selection.
 - Fixed toggle formatting (Bold, Italic, etc) works with empty selection.
 - Fixed bug where consecutive formatting tags could be lost.

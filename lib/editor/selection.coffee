@@ -85,10 +85,10 @@ class Selection
     if text.length is 0
       return 0
 
-    iframe = document.getElementById('birchTextCalculationIFrame')
+    iframe = document.getElementById('ft-text-calculation-frame')
     unless iframe
       iframe = document.createElement("iframe")
-      iframe.id = 'birchTextCalculationIFrame'
+      iframe.id = 'ft-text-calculation-frame'
       document.body.appendChild(iframe)
       iframe.contentWindow.document.body.appendChild(iframe.contentWindow.document.createElement('P'))
 

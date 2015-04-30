@@ -5,7 +5,7 @@
 </head>
 
 <body>
-  <ul id="Birch">
+  <ul id="FoldingText">
     <li id="1">
       <p>one</p>
       <ul>

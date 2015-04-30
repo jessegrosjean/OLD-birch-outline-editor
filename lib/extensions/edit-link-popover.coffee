@@ -18,8 +18,7 @@ editLink = (outlineEditorElement) ->
   else
     linkAttributes = item.getElementAtBodyTextIndex('A', offset or 0)
 
-  console.log linkAttributes
-  textInput = document.createElement 'birch-text-input'
+  textInput = document.createElement 'ft-text-input'
   textInput.setText linkAttributes?.href or ''
   textInput.setPlaceholderText 'http://'
 
@@ -49,11 +48,11 @@ editLink = (outlineEditorElement) ->
 
   textInputPanel = atom.workspace.addPopoverPanel
     item: textInput
-    className: 'birch-text-input-panel'
+    className: 'ft-text-input-panel'
     target: -> editor.selection.selectionClientRect
     viewport: -> outlineEditorElement.getBoundingClientRect()
 
   textInput.focusTextEditor()
 
-atom.commands.add 'birch-outline-editor',
-  'birch-outline-editor:edit-link': -> editLink this
+atom.commands.add 'ft-outline-editor',
+  'outline-editor:edit-link': -> editLink this

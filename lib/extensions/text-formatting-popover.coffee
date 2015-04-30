@@ -1,5 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
-OutlineEditorService = require '../outline-editor-service'
+FoldingTextService = require '../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
 class TextFormattingPopover extends HTMLElement
@@ -15,43 +15,43 @@ class TextFormattingPopover extends HTMLElement
 
     @boldButton = document.createElement 'button'
     @boldButton.className = 'btn fa fa-bold fa-lg'
-    @boldButton.setAttribute 'data-command', 'birch-outline-editor:toggle-bold'
+    @boldButton.setAttribute 'data-command', 'outline-editor:toggle-bold'
     @formattingButtonGroup.appendChild @boldButton
 
     @italicButton = document.createElement 'button'
     @italicButton.className = 'btn fa fa-italic fa-lg'
-    @italicButton.setAttribute 'data-command', 'birch-outline-editor:toggle-italic'
+    @italicButton.setAttribute 'data-command', 'outline-editor:toggle-italic'
     @formattingButtonGroup.appendChild @italicButton
 
     @underlineButton = document.createElement 'button'
     @underlineButton.className = 'btn fa fa-underline fa-lg'
-    @underlineButton.setAttribute 'data-command', 'birch-outline-editor:toggle-underline'
+    @underlineButton.setAttribute 'data-command', 'outline-editor:toggle-underline'
     @formattingButtonGroup.appendChild @underlineButton
 
     @linkButton = document.createElement 'button'
     @linkButton.className = 'btn fa fa-link fa-lg'
-    @linkButton.setAttribute 'data-command', 'birch-outline-editor:edit-link'
+    @linkButton.setAttribute 'data-command', 'outline-editor:edit-link'
     @formattingButtonGroup.appendChild @linkButton
 
     @clearFormattingButton = document.createElement 'button'
     @clearFormattingButton.className = 'btn fa fa-eraser fa-lg'
-    @clearFormattingButton.setAttribute 'data-command', 'birch-outline-editor:clear-formatting'
+    @clearFormattingButton.setAttribute 'data-command', 'outline-editor:clear-formatting'
     @formattingButtonGroup.appendChild @clearFormattingButton
 
     ###
     @headingButton = document.createElement 'button'
     @headingButton.className = 'btn fa fa-header fa-lg'
-    @headingButton.setAttribute 'data-command', 'birch-outline-editor:edit-link'
+    @headingButton.setAttribute 'data-command', 'outline-editor:edit-link'
     @formattingButtonGroup.appendChild @headingButton
 
     @statusButton = document.createElement 'button'
     @statusButton.className = 'btn fa fa-check fa-lg'
-    @statusButton.setAttribute 'data-command', 'birch-outline-editor:toggle-status-complete'
+    @statusButton.setAttribute 'data-command', 'outline-editor:toggle-status-complete'
     @formattingButtonGroup.appendChild @statusButton
 
     @tagsButton = document.createElement 'button'
     @tagsButton.className = 'btn fa fa-tags fa-lg'
-    @tagsButton.setAttribute 'data-command', 'birch-outline-editor:edit-tags'
+    @tagsButton.setAttribute 'data-command', 'outline-editor:edit-tags'
     @formattingButtonGroup.appendChild @tagsButton
     ###
 
@@ -59,25 +59,25 @@ class TextFormattingPopover extends HTMLElement
     @tooltipSubs = new CompositeDisposable
     @tooltipSubs.add atom.tooltips.add @boldButton,
       title: "Bold",
-      keyBindingCommand: 'birch-outline-editor:toggle-bold'
+      keyBindingCommand: 'outline-editor:toggle-bold'
     @tooltipSubs.add atom.tooltips.add @italicButton,
       title: "Italic",
-      keyBindingCommand: 'birch-outline-editor:toggle-italic'
+      keyBindingCommand: 'outline-editor:toggle-italic'
     @tooltipSubs.add atom.tooltips.add @underlineButton,
       title: "Underline",
-      keyBindingCommand: 'birch-outline-editor:edit-underline'
+      keyBindingCommand: 'outline-editor:edit-underline'
     @tooltipSubs.add atom.tooltips.add @linkButton,
       title: "Edit Link",
-      keyBindingCommand: 'birch-outline-editor:edit-link'
+      keyBindingCommand: 'outline-editor:edit-link'
     @tooltipSubs.add atom.tooltips.add @clearFormattingButton,
       title: "Clear Formatting",
-      keyBindingCommand: 'birch-outline-editor:clear-formatting'
+      keyBindingCommand: 'outline-editor:clear-formatting'
 
   detachedCallback: ->
     @tooltipSubs.dispose()
 
   validateButtons: ->
-    formattingTags = OutlineEditorService.getActiveOutlineEditor()?.getTypingFormattingTags() or {}
+    formattingTags = FoldingTextService.getActiveOutlineEditor()?.getTypingFormattingTags() or {}
 
     unless @boldButton.classList.contains('selected') is formattingTags['B']?
       @boldButton.classList.toggle('selected')
@@ -91,11 +91,11 @@ class TextFormattingPopover extends HTMLElement
     unless @linkButton.classList.contains('selected') is formattingTags['A']?
       @linkButton.classList.toggle('selected')
 
-OutlineEditorService.eventRegistery.listen 'text-formatting-popover button',
+FoldingTextService.eventRegistery.listen 'text-formatting-popover button',
   mousedown: (e) ->
-    outlineEditorElement = OutlineEditorService.getActiveOutlineEditor()?.outlineEditorElement
+    outlineEditorElement = FoldingTextService.getActiveOutlineEditor()?.outlineEditorElement
     if outlineEditorElement and command = e.target.getAttribute?('data-command')
-      if command is 'birch-outline-editor:edit-link'
+      if command is 'outline-editor:edit-link'
         formattingBarPanel.hide()
       atom.commands.dispatch outlineEditorElement, command
       e.stopImmediatePropagation()
@@ -106,11 +106,11 @@ formattingBar = document.createElement 'text-formatting-popover'
 formattingBarPanel = atom.workspace.addPopoverPanel
   item: formattingBar
   target: ->
-    OutlineEditorService.getActiveOutlineEditor()?.selection?.selectionClientRect
+    FoldingTextService.getActiveOutlineEditor()?.selection?.selectionClientRect
   viewport: ->
-    OutlineEditorService.getActiveOutlineEditor()?.outlineEditorElement.getBoundingClientRect()
+    FoldingTextService.getActiveOutlineEditor()?.outlineEditorElement.getBoundingClientRect()
 
-OutlineEditorService.observeActiveOutlineEditorSelection (selection) ->
+FoldingTextService.observeActiveOutlineEditorSelection (selection) ->
   if selection?.isTextMode and not selection.isCollapsed and not selection.editor.outlineEditorElement.isPerformingExtendSelectionInteraction()
     formattingBarPanel.show()
     formattingBar.validateButtons()
@@ -118,18 +118,3 @@ OutlineEditorService.observeActiveOutlineEditorSelection (selection) ->
     formattingBarPanel.hide()
 
 module.exports = document.registerElement 'text-formatting-popover', prototype: TextFormattingPopover.prototype
-
-
-###
-  editFormatting: ->
-    editor = this
-    savedSelection = editor.selection
-    item = savedSelection.startItem
-    offset = savedSelection.startOffsetOffset
-    return unless item
-
-
-    subscription = @onDidChangeSelection ->
-      subscription.dispose()
-      formattingBarPanel.destroy()
-###

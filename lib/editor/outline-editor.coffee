@@ -30,7 +30,7 @@ path = require 'path'
 # editors, but each maintains its own selection, expanded items, etc.
 #
 # The easiest way to get hold of `OutlineEditor` objects is by registering a
-# callback with `::observeOutlineEditors` through the {OutlineEditorService}.
+# callback with `::observeOutlineEditors` through the {FoldingTextService}.
 module.exports =
 class OutlineEditor
   atom.deserializers.add(this)
@@ -66,7 +66,7 @@ class OutlineEditor
     @outline = outline or Outline.buildOutlineSync()
     @subscribeToOutline()
 
-    outlineEditorElement = document.createElement('birch-outline-editor').initialize(this)
+    outlineEditorElement = document.createElement('ft-outline-editor').initialize(this)
     outlineEditorElement.id = id
     outlineEditorElement.classList.add('beditor')
     @outlineEditorElement = outlineEditorElement

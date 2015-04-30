@@ -1,4 +1,4 @@
-OutlineEditorService = require '../../outline-editor-service'
+FoldingTextService = require '../../foldingtext-service'
 
 toggleStatus = (editor, status) ->
   outline = editor.outline
@@ -18,15 +18,15 @@ toggleStatus = (editor, status) ->
     undoManager.endUndoGrouping()
     outline.endUpdates()
 
-OutlineEditorService.eventRegistery.listen '.bstatus',
+FoldingTextService.eventRegistery.listen '.bstatus',
   click: (e) ->
     status = e.target.dataset.status
-    outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
+    outlineEditor = FoldingTextService.OutlineEditor.findOutlineEditor e.target
     outlineEditor.setSearch "@status = #{status}"
     e.stopPropagation()
     e.preventDefault()
 
-OutlineEditorService.observeOutlineEditors (editor) ->
+FoldingTextService.observeOutlineEditors (editor) ->
   editor.addSearchAttributeShortcut 'status', 'data-status'
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if status = item.getAttribute 'data-status'
@@ -35,16 +35,16 @@ OutlineEditorService.observeOutlineEditors (editor) ->
       a.setAttribute 'data-status', status
       addBadgeElement a
 
-atom.commands.add 'birch-outline-editor',
-  'birch-outline-editor:toggle-status-todo': -> toggleStatus @editor, 'todo'
-  'birch-outline-editor:toggle-status-waiting': -> toggleStatus @editor, 'waiting'
-  'birch-outline-editor:toggle-status-active': -> toggleStatus @editor, 'active'
-  'birch-outline-editor:toggle-status-complete': -> toggleStatus @editor, 'complete'
+atom.commands.add 'ft-outline-editor',
+  'outline-editor:toggle-status-todo': -> toggleStatus @editor, 'todo'
+  'outline-editor:toggle-status-waiting': -> toggleStatus @editor, 'waiting'
+  'outline-editor:toggle-status-active': -> toggleStatus @editor, 'active'
+  'outline-editor:toggle-status-complete': -> toggleStatus @editor, 'complete'
 
 atom.keymaps.add 'status-bindings',
-  'birch-outline-editor.outlineMode':
-    's t' : 'birch-outline-editor:toggle-status-todo'
-    's w' : 'birch-outline-editor:toggle-status-waiting'
-    's a' : 'birch-outline-editor:toggle-status-active'
-    's c' : 'birch-outline-editor:toggle-status-complete'
-    'space' : 'birch-outline-editor:toggle-status-complete'
+  'ft-outline-editor.outlineMode':
+    's t' : 'outline-editor:toggle-status-todo'
+    's w' : 'outline-editor:toggle-status-waiting'
+    's a' : 'outline-editor:toggle-status-active'
+    's c' : 'outline-editor:toggle-status-complete'
+    'space' : 'outline-editor:toggle-status-complete'

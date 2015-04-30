@@ -1,4 +1,4 @@
-OutlineEditorService = require '../../outline-editor-service'
+FoldingTextService = require '../../foldingtext-service'
 
 togglePriority = (editor, priority) ->
   outline = editor.outline
@@ -17,7 +17,7 @@ togglePriority = (editor, priority) ->
     undoManager.endUndoGrouping()
     outline.endUpdates()
 
-OutlineEditorService.observeOutlineEditors (editor) ->
+FoldingTextService.observeOutlineEditors (editor) ->
   editor.addSearchAttributeShortcut 'priority', 'data-priority'
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if value = item.getAttribute 'data-priority'
@@ -26,31 +26,31 @@ OutlineEditorService.observeOutlineEditors (editor) ->
       span.setAttribute 'data-priority', value
       addBadgeElement span
 
-OutlineEditorService.eventRegistery.listen '.bpriority',
+FoldingTextService.eventRegistery.listen '.bpriority',
   click: (e) ->
     priority = e.target.dataset.priority
-    outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
+    outlineEditor = FoldingTextService.OutlineEditor.findOutlineEditor e.target
     outlineEditor.setSearch "@priority = #{priority}"
     e.stopPropagation()
     e.preventDefault()
 
-atom.commands.add 'birch-outline-editor',
-  'birch-outline-editor:toggle-priority-1': -> togglePriority @editor, '1'
-  'birch-outline-editor:toggle-priority-2': -> togglePriority @editor, '2'
-  'birch-outline-editor:toggle-priority-3': -> togglePriority @editor, '3'
-  'birch-outline-editor:toggle-priority-4': -> togglePriority @editor, '4'
-  'birch-outline-editor:toggle-priority-5': -> togglePriority @editor, '5'
-  'birch-outline-editor:toggle-priority-6': -> togglePriority @editor, '6'
-  'birch-outline-editor:toggle-priority-7': -> togglePriority @editor, '7'
-  'birch-outline-editor:clear-priority': -> togglePriority @editor, undefined
+atom.commands.add 'ft-outline-editor',
+  'outline-editor:toggle-priority-1': -> togglePriority @editor, '1'
+  'outline-editor:toggle-priority-2': -> togglePriority @editor, '2'
+  'outline-editor:toggle-priority-3': -> togglePriority @editor, '3'
+  'outline-editor:toggle-priority-4': -> togglePriority @editor, '4'
+  'outline-editor:toggle-priority-5': -> togglePriority @editor, '5'
+  'outline-editor:toggle-priority-6': -> togglePriority @editor, '6'
+  'outline-editor:toggle-priority-7': -> togglePriority @editor, '7'
+  'outline-editor:clear-priority': -> togglePriority @editor, undefined
 
 atom.keymaps.add 'priorities-bindings',
-  'birch-outline-editor.outlineMode':
-    '1' : 'birch-outline-editor:toggle-priority-1'
-    '2' : 'birch-outline-editor:toggle-priority-2'
-    '3' : 'birch-outline-editor:toggle-priority-3'
-    '4' : 'birch-outline-editor:toggle-priority-4'
-    '5' : 'birch-outline-editor:toggle-priority-5'
-    '6' : 'birch-outline-editor:toggle-priority-6'
-    '7' : 'birch-outline-editor:toggle-priority-7'
-    '0' : 'birch-outline-editor:clear-priority'
+  'ft-outline-editor.outlineMode':
+    '1' : 'outline-editor:toggle-priority-1'
+    '2' : 'outline-editor:toggle-priority-2'
+    '3' : 'outline-editor:toggle-priority-3'
+    '4' : 'outline-editor:toggle-priority-4'
+    '5' : 'outline-editor:toggle-priority-5'
+    '6' : 'outline-editor:toggle-priority-6'
+    '7' : 'outline-editor:toggle-priority-7'
+    '0' : 'outline-editor:clear-priority'

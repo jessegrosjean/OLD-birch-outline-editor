@@ -19,7 +19,7 @@ Q = require 'q'
 # Internally a {HTMLDocument} is used to store the underlying outline data.
 # You should never modify the content of this HTMLDocument directly, but you
 # can query it using {::evaluateXPath}. The structure of this document is
-# described in [Birch Markup Language](README#birch-markup-language).
+# described in [FoldingText Markup Language](README#ft-markup-language).
 #
 # ## Examples
 #

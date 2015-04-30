@@ -1,6 +1,6 @@
-@import (reference) '../../editor/birch-variables';
+@import (reference) '../../editor/variables';
 
-birch-token-input {
+ft-token-input {
   cursor: text;
   position: relative;
 
@@ -17,7 +17,7 @@ birch-token-input {
       cursor: default;
       padding: 0px 2px;
       border-radius: 2px;
-      margin-right: @item-badge-spacing;
+      margin-right: @ft-item-badge-spacing;
       color: @syntax-background-color;
       background: @syntax-invisible-character-color;
       pointer-events: all;
@@ -31,7 +31,7 @@ birch-token-input {
     }
   }
 
-  &.has-token-selected > birch-text-input > atom-text-editor[mini]::shadow {
+  &.has-token-selected > ft-text-input > atom-text-editor[mini]::shadow {
     .cursors {
       visibility: hidden;
     }

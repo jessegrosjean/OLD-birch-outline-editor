@@ -1,4 +1,4 @@
-OutlineEditorService = require '../../outline-editor-service'
+FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
 fuzzyFilter = null # defer until used
@@ -88,7 +88,7 @@ class TextInputElement extends HTMLElement
     addOnCollection.push addon
     addOnCollection.sort (a, b) ->
       a.priority - b.priority
-    element.classList.add 'birch-text-input-addon'
+    element.classList.add 'ft-text-input-addon'
     element.style.position = 'absolute'
     element.style.fontSize = 'inherit'
     element.style.lineHeight = 'inherit'
@@ -241,8 +241,8 @@ class TextInputElement extends HTMLElement
     @delegate?.confirm?()
     @confirming = false
 
-atom.commands.add 'birch-text-input > atom-text-editor[mini]',
+atom.commands.add 'ft-text-input > atom-text-editor[mini]',
   'core:confirm': (e) -> @parentElement.confirm(e)
   'core:cancel': (e) -> @parentElement.cancel(e)
 
-module.exports = document.registerElement 'birch-text-input', prototype: TextInputElement.prototype
+module.exports = document.registerElement 'ft-text-input', prototype: TextInputElement.prototype

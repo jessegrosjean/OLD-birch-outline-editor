@@ -1,8 +1,8 @@
 'use strict';
 
-var OutlineEditor = require('birch/outline-editor'),
-	Selection = require('birch/selection'),
-	Outline = require('birch/outline'),
+var OutlineEditor = require('ft/outline-editor'),
+	Selection = require('ft/selection'),
+	Outline = require('ft/outline'),
 	should = require('should');
 
 describe('Selection', function() {

@@ -1,9 +1,9 @@
-OutlineEditorService = require '../../outline-editor-service'
-TokenInputElement = require './ui/token-input-element'
-ListInputElement = require '.ui/list-input-element'
+FoldingTextService = require '../../foldingtext-service'
+TokenInputElement = require '../ui/token-input-element'
+ListInputElement = require '../ui/list-input-element'
 {CompositeDisposable} = require 'atom'
 
-OutlineEditorService.observeOutlineEditors (editor) ->
+FoldingTextService.observeOutlineEditors (editor) ->
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if tags = item.getAttribute 'data-tags', true
       for each in tags
@@ -14,10 +14,10 @@ OutlineEditorService.observeOutlineEditors (editor) ->
         a.textContent = each
         addBadgeElement a
 
-OutlineEditorService.eventRegistery.listen '.btag',
+FoldingTextService.eventRegistery.listen '.btag',
   click: (e) ->
     tag = e.target.textContent
-    outlineEditor = OutlineEditorService.OutlineEditor.findOutlineEditor e.target
+    outlineEditor = FoldingTextService.OutlineEditor.findOutlineEditor e.target
     outlineEditor.setSearch "##{tag}"
     e.stopPropagation()
     e.preventDefault()
@@ -40,7 +40,7 @@ editTags = (editor) ->
 
   addedTokens = {}
   deletedTokens = {}
-  tokenInput = document.createElement 'birch-token-input'
+  tokenInput = document.createElement 'ft-token-input'
   tokenInput.tokenizeText(Object.keys(selectedTagsMap).join(','))
 
   tokenInput.setDelegate
@@ -90,7 +90,7 @@ editTags = (editor) ->
 
   tokenInputPanel = atom.workspace.addPopoverPanel
     item: tokenInput
-    className: 'birch-text-input-panel'
+    className: 'ft-text-input-panel'
     target: -> editor.getClientRectForItemOffset(item, item.bodyText.length)
     viewport: -> editor.outlineEditorElement.getBoundingClientRect()
     placement: 'bottom'
@@ -110,14 +110,14 @@ clearTags = (editor) ->
     outline.endUpdates()
     undoManager.endUndoGrouping()
 
-atom.commands.add 'birch-outline-editor',
-  'birch-outline-editor:edit-tags': -> editTags @editor
-  'birch-outline-editor:clear-tags': -> clearTags @editor
+atom.commands.add 'ft-outline-editor',
+  'outline-editor:edit-tags': -> editTags @editor
+  'outline-editor:clear-tags': -> clearTags @editor
 
-atom.commands.add 'birch-outline-editor .btag',
-  'birch-outline-editor:delete-tag': (e) ->
+atom.commands.add 'ft-outline-editor .btag',
+  'outline-editor:delete-tag': (e) ->
     tag = @textContent
-    editor = OutlineEditorService.OutlineEditor.findOutlineEditor this
+    editor = FoldingTextService.OutlineEditor.findOutlineEditor this
     item = editor.selection.focusItem
     tags = item.getAttribute 'data-tags', true
     if tag in tags
@@ -127,6 +127,6 @@ atom.commands.add 'birch-outline-editor .btag',
     e.preventDefault()
 
 atom.contextMenu.add
-  'birch-outline-editor .btag': [
-    {label: 'Delete Tag', command:'birch-outline-editor:delete-tag'}
+  'ft-outline-editor .btag': [
+    {label: 'Delete Tag', command:'outline-editor:delete-tag'}
   ]
