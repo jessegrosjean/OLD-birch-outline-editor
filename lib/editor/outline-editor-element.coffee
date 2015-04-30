@@ -7,10 +7,10 @@ ItemSerializer = require '../core/item-serializer'
 EventRegistery = require './event-registery'
 ItemRenderer = require './item-renderer'
 {CompositeDisposable} = require 'atom'
+rafdebounce = require './raf-debounce'
 Velocity = require 'velocity-animate'
 Outline = require '../core/outline'
 Selection = require './selection'
-debounce = require 'debounce'
 diff = require 'fast-diff'
 Mouse = require './mouse'
 
@@ -89,7 +89,7 @@ class OutlineEditorElement extends HTMLElement
     if atom.styles
       process.nextTick =>
         @onStylesheetsChanged()
-        onStylesheetsChanged = debounce(@onStylesheetsChanged, 100)
+        onStylesheetsChanged = rafdebounce(@onStylesheetsChanged, 100)
         @subscriptions.add atom.styles.onDidAddStyleElement(onStylesheetsChanged)
         @subscriptions.add atom.styles.onDidRemoveStyleElement(onStylesheetsChanged)
         @subscriptions.add atom.styles.onDidUpdateStyleElement(onStylesheetsChanged)
@@ -152,7 +152,7 @@ class OutlineEditorElement extends HTMLElement
   ###
 
   isAnimationEnabled: ->
-    not @disableAnimationOverride and @_animationDisabled == 0
+    not @disableAnimationOverride and @_animationDisabled is 0
 
   disableAnimation: ->
     @_animationDisabled++
@@ -182,7 +182,7 @@ class OutlineEditorElement extends HTMLElement
     endItem = @getViewportLastItem()
     each = startItem
     items = []
-    while each and each != endItem
+    while each and each isnt endItem
       items.push(each)
       each = @editor.getNextVisibleItem(each)
     results
@@ -231,7 +231,7 @@ class OutlineEditorElement extends HTMLElement
     paddingTop = 0
     computedStyle
 
-    if offset != undefined
+    if offset isnt undefined
       positionedAtEndOfWrappingLine = false
       baseRect
       side
@@ -273,7 +273,7 @@ class OutlineEditorElement extends HTMLElement
           if sameLine
             unless baseRect.width
               baseRect = alternateRect
-          else if @selectionAffinity == Selection.SelectionAffinityUpstream
+          else if @selectionAffinity is Selection.SelectionAffinityUpstream
             positionedAtEndOfWrappingLine = true
           else
             baseRect = alternateRect
@@ -546,8 +546,8 @@ class OutlineEditorElement extends HTMLElement
       @_extendingSelectionInteractionLastScrollTop = editor.outlineEditorElement.scrollTop
       @_extendSelectionDisposables = new CompositeDisposable(
         EventRegistery.listen(document, 'mouseup', @onDocumentMouseUp.bind(this)), # Listen to document otherwise will miss some mouse ups
-        EventRegistery.listen('.beditor', 'mousemove', debounce(@onMouseMove.bind(this))),
-        EventRegistery.listen(this, 'scroll', debounce(@onScroll.bind(this))) # Listen directly to self since scroll doesn't bubble
+        EventRegistery.listen('.beditor', 'mousemove', rafdebounce(@onMouseMove.bind(this))),
+        EventRegistery.listen(this, 'scroll', rafdebounce(@onScroll.bind(this))) # Listen directly to self since scroll doesn't bubble
       )
 
   onContextMenu: (e) ->
@@ -572,7 +572,7 @@ class OutlineEditorElement extends HTMLElement
     caretPosition = pick.itemCaretPosition
 
     if caretPosition
-      #if e.target.classList.contains('bbodytext') and caretPosition.offsetItem != @editor.selection.anchorItem
+      #if e.target.classList.contains('bbodytext') and caretPosition.offsetItem isnt @editor.selection.anchorItem
       #  e.preventDefault() # don't understand this
       @editor.extendSelectionRange(caretPosition.offsetItem, caretPosition.offset)
 
@@ -638,7 +638,7 @@ class OutlineEditorElement extends HTMLElement
     e.stopPropagation()
     item = @itemForViewNode e.target
     draggedItem = @editor.draggedItem()
-    if item != draggedItem
+    if item isnt draggedItem
       e.preventDefault()
 
   onDragEnd: (e) ->
@@ -669,14 +669,14 @@ class OutlineEditorElement extends HTMLElement
 
     @editor.debouncedSetDragState
       'draggedItem': draggedItem
-      'dropEffect' : dropEffect
-      'dropParentItem' : dropTarget.parent
-      'dropInsertBeforeItem' : dropTarget.insertBefore
+      'dropEffect': dropEffect
+      'dropParentItem': dropTarget.parent
+      'dropInsertBeforeItem': dropTarget.insertBefore
 
   onDragLeave: (e) ->
     @editor.debouncedSetDragState
       'draggedItem': @editor.draggedItem()
-      'dropEffect' : e.dataTransfer.dropEffect
+      'dropEffect': e.dataTransfer.dropEffect
 
   onDrop: (e) ->
     e.stopPropagation()
@@ -693,12 +693,12 @@ class OutlineEditorElement extends HTMLElement
       insertItem
       if dropEffect is 'all' or dropEffect is 'move'
         insertItem = droppedItem
-      else if dropEffect == 'copy'
+      else if dropEffect is 'copy'
         insertItem = droppedItem.cloneItem()
-      else if dropEffect == 'link'
+      else if dropEffect is 'link'
         console.log 'link'
 
-      if insertItem and insertItem != dropInsertBeforeItem
+      if insertItem and insertItem isnt dropInsertBeforeItem
         outline = dropParentItem.outline
         undoManager = outline.undoManager
 
@@ -767,7 +767,7 @@ class OutlineEditorElement extends HTMLElement
     newDropInsertAfterItem = null
     newDropParent = null
 
-    if itemPickAffinity == Selection.ItemAffinityAbove or itemPickAffinity == Selection.ItemAffinityTopHalf
+    if itemPickAffinity is Selection.ItemAffinityAbove or itemPickAffinity is Selection.ItemAffinityTopHalf
       {} =
         parent: pickedItem.parent
         insertBefore: pickedItem
@@ -791,7 +791,7 @@ class OutlineEditorElement extends HTMLElement
     else
       if dropEffect is 'move'
         if draggedItem and dropTarget.parent
-          dropTarget.parent != draggedItem and not draggedItem.contains dropTarget.parent
+          dropTarget.parent isnt draggedItem and not draggedItem.contains dropTarget.parent
         else
           false
       else
@@ -805,7 +805,7 @@ class OutlineEditorElement extends HTMLElement
     @findOutlineEditorElement(element)?.editor
 
   @findOutlineEditorElement: (element) ->
-    while element and element.tagName != 'BIRCH-OUTLINE-EDITOR'
+    while element and element.tagName isnt 'BIRCH-OUTLINE-EDITOR'
       element = element.parentNode
     element
 
@@ -919,7 +919,7 @@ EventRegistery.listen '.bitemcontent',
           when diff.EQUAL
             location += text.length
           when diff.DELETE
-            if text != '^'
+            if text isnt '^'
               item.replaceBodyTextInRange '', location, text.length
 
 

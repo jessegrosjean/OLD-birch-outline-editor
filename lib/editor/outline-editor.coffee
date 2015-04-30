@@ -1,24 +1,21 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
+OutlineEditorItemState = require './outline-editor-item-state'
 OutlineEditorElement = require './outline-editor-element'
 AttributedString = require '../core/attributed-string'
 ItemBodyEncoder = require '../core/item-body-encoder'
-{Emitter, CompositeDisposable} = require 'atom'
-ItemEditorState = require './item-editor-state'
 ItemSerializer = require '../core/item-serializer'
+{Emitter, CompositeDisposable} = require 'atom'
 UndoManager = require '../core/undo-manager'
-shallowEquals = require 'shallow-equals'
-Velocity = require 'velocity-animate'
+rafdebounce = require './raf-debounce'
 ItemPath = require '../core/item-path'
+Velocity = require 'velocity-animate'
 Mutation = require '../core/mutation'
-shallowCopy = require 'shallow-copy'
-typechecker = require 'typechecker'
 shortid = require '../core/shortid'
 Outline = require '../core/outline'
 Selection = require './selection'
-debounce = require 'debounce'
+_ = require 'underscore-plus'
 Item = require '../core/item'
-{Model} = require 'theorist'
 assert = require 'assert'
 path = require 'path'
 
@@ -35,7 +32,7 @@ path = require 'path'
 # The easiest way to get hold of `OutlineEditor` objects is by registering a
 # callback with `::observeOutlineEditors` through the {OutlineEditorService}.
 module.exports =
-class OutlineEditor extends Model
+class OutlineEditor
   atom.deserializers.add(this)
 
   @deserialize: (data) ->
@@ -45,6 +42,7 @@ class OutlineEditor extends Model
     id = shortid()
 
     @emitter = new Emitter()
+    @subscriptions = new CompositeDisposable
     @outline = null
     @_overrideIsFocused = false
     @_selection = new Selection(this)
@@ -109,40 +107,40 @@ class OutlineEditor extends Model
 
     outline.retain()
 
-    @subscribe outline.onDidChange @outlineDidChange.bind(this)
+    @subscriptions.add outline.onDidChange @outlineDidChange.bind(this)
 
-    @subscribe outline.onDidChangePath =>
+    @subscriptions.add outline.onDidChangePath =>
       unless atom.project.getPaths()[0]?
         atom.project.setPaths([path.dirname(@getPath())])
       @emitter.emit 'did-change-title', @getTitle()
 
-    @subscribe outline.onWillReload =>
+    @subscriptions.add outline.onWillReload =>
       @outlineEditorElement.disableAnimation()
 
-    @subscribe outline.onDidReload =>
+    @subscriptions.add outline.onDidReload =>
       @loadSerializedState()
       @outlineEditorElement.enableAnimation()
 
-    @subscribe outline.onDidDestroy => @destroy()
+    @subscriptions.add outline.onDidDestroy => @destroy()
 
-    @subscribe undoManager.onDidOpenUndoGroup () =>
+    @subscriptions.add undoManager.onDidOpenUndoGroup =>
       if not undoManager.isUndoing and not undoManager.isRedoing
         undoManager.setUndoGroupMetadata('undoSelection', @selection)
 
-    @subscribe undoManager.onWillUndo (undoGroupMetadata) =>
+    @subscriptions.add undoManager.onWillUndo (undoGroupMetadata) =>
       @_overrideIsFocused = @isFocused()
       undoManager.setUndoGroupMetadata('redoSelection', @selection)
 
-    @subscribe undoManager.onDidUndo (undoGroupMetadata) =>
+    @subscriptions.add undoManager.onDidUndo (undoGroupMetadata) =>
       selectionRange = undoGroupMetadata.undoSelection
       if selectionRange
         @moveSelectionRange(selectionRange)
       @_overrideIsFocused = false
 
-    @subscribe undoManager.onWillRedo (undoGroupMetadata) =>
+    @subscriptions.add undoManager.onWillRedo (undoGroupMetadata) =>
       @_overrideIsFocused = @isFocused()
 
-    @subscribe undoManager.onDidRedo (undoGroupMetadata) =>
+    @subscriptions.add undoManager.onDidRedo (undoGroupMetadata) =>
       selectionRange = undoGroupMetadata.redoSelection
       if selectionRange
         @moveSelectionRange(selectionRange)
@@ -152,7 +150,7 @@ class OutlineEditor extends Model
     if @getSearch()?.query
       hoistedItem = @getHoistedItem()
       for eachMutation in mutations
-        if eachMutation.type == Mutation.CHILDREN_CHANGED
+        if eachMutation.type is Mutation.CHILDREN_CHANGED
           for eachItem in eachMutation.addedItems
             if hoistedItem.contains(eachItem)
               @_addSearchResult(eachItem)
@@ -164,7 +162,7 @@ class OutlineEditor extends Model
     @_overrideIsFocused = false
 
     for eachMutation in mutations
-      if eachMutation.type == Mutation.CHILDREN_CHANGED
+      if eachMutation.type is Mutation.CHILDREN_CHANGED
         targetItem = eachMutation.target
         if not targetItem.hasChildren
           @setCollapsed targetItem
@@ -173,11 +171,13 @@ class OutlineEditor extends Model
 
   destroy: ->
     unless @destroyed
-      @unsubscribe()
+      @destroyed = true
+      @subscriptions.dispose()
+      @subscriptions = null
       @outline.release @id
+      @outline = null
       @outlineEditorElement.destroy()
       @outlineEditorElement = null
-      @destroyed = true
       @emitter.emit 'did-destroy'
 
   ###
@@ -320,7 +320,7 @@ class OutlineEditor extends Model
     item ?= @selection.focusItem
     hoistedItem = @getHoistedItem()
 
-    if item and item != hoistedItem
+    if item and item isnt hoistedItem
       if hoistedItem
         hoistedItem.setUserData(@id + '-unhoist-viewport-top', @outlineEditorElement.getViewportRect().top)
       stack = @_hoistStack.slice()
@@ -347,7 +347,7 @@ class OutlineEditor extends Model
 
     # Validate that hoisted items each contain the next.
     for each in newHoistedItems by -1
-      unless each.isInOutline and each.outline == outline
+      unless each.isInOutline and each.outline is outline
         newHoistedItems.pop()
       else
         if next
@@ -364,7 +364,7 @@ class OutlineEditor extends Model
 
     newHoistedItem = newHoistedItems[newHoistedItems.length - 1]
 
-    if oldHoistedItem != newHoistedItem
+    if oldHoistedItem isnt newHoistedItem
       # Add placeholder child if non exists
       unless newHoistedItem.firstChild
         newHoistedItem.appendChild outline.createItem()
@@ -417,13 +417,13 @@ class OutlineEditor extends Model
   #
   # - `item` {Item} to test.
   isExpanded: (item) ->
-    return item and @editorState(item).expanded
+    return item and @editorItemState(item).expanded
 
   # Public: Returns true if the item is collapsed.
   #
   # - `item` {Item} to test.
   isCollapsed: (item) ->
-    return item and not @editorState(item).expanded
+    return item and not @editorItemState(item).expanded
 
   # Public: Expand the given items in this editor.
   #
@@ -440,28 +440,28 @@ class OutlineEditor extends Model
   _setExpandedState: (items, expanded) ->
     items ?= @selection.itemsCommonAncestors
 
-    if not typechecker.isArray(items)
+    if not _.isArray(items)
       items = [items]
 
     if expanded
       # for better animations
       for each in items
         if not @isVisible(each)
-          @editorState(each).expanded = expanded
+          @editorItemState(each).expanded = expanded
 
       for each in items
-        if @isExpanded(each) != expanded
-          @editorState(each).expanded = expanded
+        if @isExpanded(each) isnt expanded
+          @editorItemState(each).expanded = expanded
           @outlineEditorElement.updateItemExpanded(each)
     else
       # for better animations
       for each in Item.getCommonAncestors(items)
-        if @isExpanded(each) != expanded
-          @editorState(each).expanded = expanded
+        if @isExpanded(each) isnt expanded
+          @editorItemState(each).expanded = expanded
           @outlineEditorElement.updateItemExpanded(each)
 
       for each in items
-        @editorState(each).expanded = expanded
+        @editorItemState(each).expanded = expanded
 
     @outlineEditorElement.disableScrolling()
     @_revalidateSelectionRange()
@@ -478,7 +478,7 @@ class OutlineEditor extends Model
 
   _foldItems: (items, expand, fully) ->
     items ?= @selection.itemsCommonAncestors
-    unless typechecker.isArray(items)
+    unless _.isArray(items)
       items = [items]
 
     unless items.length
@@ -495,15 +495,15 @@ class OutlineEditor extends Model
 
     foldItems = []
 
-    if expand == undefined
+    if expand is undefined
       expand = not @isExpanded((each for each in items when each.hasChildren)[0])
 
     if fully
-      for each in Item.getCommonAncestors(items) when each.hasChildren and @isExpanded(each) != expand
+      for each in Item.getCommonAncestors(items) when each.hasChildren and @isExpanded(each) isnt expand
         foldItems.push each
-        foldItems.push each for each in each.descendants when each.hasChildren and @isExpanded(each) != expand
+        foldItems.push each for each in each.descendants when each.hasChildren and @isExpanded(each) isnt expand
     else
-      foldItems = (each for each in items when each.hasChildren and @isExpanded(each) != expand)
+      foldItems = (each for each in items when each.hasChildren and @isExpanded(each) isnt expand)
 
     if foldItems.length
       @_setExpandedState foldItems, expand
@@ -559,7 +559,7 @@ class OutlineEditor extends Model
     @_search.type = type
 
     for each in @_searchResults
-      eachState = @editorState(each)
+      eachState = @editorItemState(each)
       if @_searchExpanded[each.id]
         eachState.expanded = false
       eachState.matched = false
@@ -597,13 +597,13 @@ class OutlineEditor extends Model
 
   _addSearchResult: (item) ->
     itemFilterPathItems = @_searchResults
-    itemState = @editorState(item)
+    itemState = @editorItemState(item)
     itemState.matched = true
     itemFilterPathItems.push(item)
 
     each = item.parent
     while each
-      eachState = @editorState(each)
+      eachState = @editorItemState(each)
       if eachState.matchedAncestor
         return
       else
@@ -626,7 +626,7 @@ class OutlineEditor extends Model
   # ```coffee
   # editor.addItemBodyTextRenderer (item, renderElementInBodyTextRange) ->
   #   highlight = 'super!'
-  #   while (index = item.bodyText.indexOf highlight, index) != -1
+  #   while (index = item.bodyText.indexOf highlight, index) isnt -1
   #     renderElementInBodyTextRange 'B', null, index, highlight.length
   #     index += highlight.length
   # ```
@@ -682,12 +682,12 @@ class OutlineEditor extends Model
     parent = item?.parent
     hoistedItem = hoistedItem or @getHoistedItem()
 
-    while parent != hoistedItem
+    while parent isnt hoistedItem
       return false unless @isExpanded(parent)
       parent = parent.parent
 
     return true unless @_search.query
-    itemState = @editorState(item)
+    itemState = @editorItemState(item)
     itemState.matched or itemState.matchedAncestor
 
   # Public: Make the given item visible in the outline, expanding ancestors,
@@ -709,7 +709,7 @@ class OutlineEditor extends Model
 
     parentsToExpand = []
     eachParent = item.parent
-    while eachParent != hoistedItem
+    while eachParent isnt hoistedItem
       if @isCollapsed eachParent
         parentsToExpand.push eachParent
       eachParent = eachParent.parent
@@ -869,7 +869,7 @@ class OutlineEditor extends Model
   #
   # - `item` {Item}
   isSelected: (item) ->
-    @editorState(item).selected
+    @editorItemState(item).selected
 
   # Public: Returns `true` if is selecting at item level.
   isOutlineMode: ->
@@ -880,7 +880,7 @@ class OutlineEditor extends Model
     @_selection.isTextMode
 
   selectionVerticalAnchor: ->
-    if @_selectionVerticalAnchor == undefined
+    if @_selectionVerticalAnchor is undefined
       focusRect = @selection.focusClientRect
       @_selectionVerticalAnchor = if focusRect then focusRect.left else 0
     @_selectionVerticalAnchor
@@ -1100,7 +1100,7 @@ class OutlineEditor extends Model
     saved = @selectionVerticalAnchor()
     checkForTextModeSnapback = false
 
-    if alter == 'extend'
+    if alter is 'extend'
       selectionRange = @selection
       if selectionRange.isTextMode
         @_textModeExtendingFromSnapbackRange = selectionRange
@@ -1128,7 +1128,7 @@ class OutlineEditor extends Model
 
       if item
         textLength = item.bodyText.length
-        if startOffset == 0 and endOffset == textLength
+        if startOffset is 0 and endOffset is textLength
           @moveSelectionRange(item, undefined, item, undefined)
         else
           @moveSelectionRange(item, 0, item, textLength)
@@ -1145,7 +1145,7 @@ class OutlineEditor extends Model
     isFocused = @isFocused()
 
     if checkForTextModeSnapback
-      if not newSelection.isTextMode and newSelection.focusItem == newSelection.anchorItem and @_textModeExtendingFromSnapbackRange
+      if not newSelection.isTextMode and newSelection.focusItem is newSelection.anchorItem and @_textModeExtendingFromSnapbackRange
         newSelection = @_textModeExtendingFromSnapbackRange
         @_textModeExtendingFromSnapbackRange = null
 
@@ -1156,23 +1156,23 @@ class OutlineEditor extends Model
       @_selection = newSelection
 
       for each in currentRangeItems
-        @editorState(each).selected = wasSelectedMarker
+        @editorItemState(each).selected = wasSelectedMarker
 
       for each in newRangeItems
-        state = @editorState(each)
-        if state.selected == wasSelectedMarker
+        state = @editorItemState(each)
+        if state.selected is wasSelectedMarker
           state.selected = true
         else
           state.selected = true
           outlineEditorElement.updateItemClass(each)
 
       for each in currentRangeItems
-        state = @editorState(each)
-        if state.selected == wasSelectedMarker
+        state = @editorItemState(each)
+        if state.selected is wasSelectedMarker
           state.selected = false
           outlineEditorElement.updateItemClass(each)
 
-      if currentSelection.isTextMode != newSelection.isTextMode
+      if currentSelection.isTextMode isnt newSelection.isTextMode
         # Bit of overrendering... but need to handle item class case
         # .selectedItemWithTextSelection. So if selection has changed
         # from/to text mode then rerender all the endpoints.
@@ -1255,7 +1255,7 @@ class OutlineEditor extends Model
       focusItem = selectionRange.focusItem
       focusOffset = selectionRange.focusOffset
 
-      if focusOffset == 0
+      if focusOffset is 0
         @insertItem('', true)
         @moveSelectionRange(focusItem, 0)
       else
@@ -1333,12 +1333,12 @@ class OutlineEditor extends Model
 
   setTypingFormattingTags: (typingFormattingTags) ->
     if typingFormattingTags
-      typingFormattingTags = shallowCopy(typingFormattingTags)
+      typingFormattingTags = _.clone(typingFormattingTags)
     @_textModeTypingFormattingTags = typingFormattingTags or {}
 
   toggleTypingFormattingTag: (tagName, tagValue) ->
     typingFormattingTags = @getTypingFormattingTags()
-    if typingFormattingTags[tagName] != undefined
+    if typingFormattingTags[tagName] isnt undefined
       delete typingFormattingTags[tagName]
     else
       typingFormattingTags[tagName] = tagValue or null
@@ -1367,24 +1367,24 @@ class OutlineEditor extends Model
       newNextSibling
       newParent
 
-      if direction == 'up'
+      if direction is 'up'
         newNextSibling  = @getPreviousVisibleSibling(startItem)
         if newNextSibling
           newParent = startItem.parent
-      else if direction == 'down'
+      else if direction is 'down'
         endItem = selectedItems[selectedItems.length - 1]
         newNextSibling = @getNextVisibleSibling(endItem)
         if newNextSibling
           newParent = endItem.parent
           newNextSibling = @getNextVisibleSibling(newNextSibling)
-      else if direction == 'left'
+      else if direction is 'left'
         startItemParent = startItem.parent
-        if startItemParent != @getHoistedItem()
+        if startItemParent isnt @getHoistedItem()
           newParent = startItemParent.parent
           newNextSibling = @getNextVisibleSibling(startItemParent)
           while newNextSibling and newNextSibling in selectedItems
             newNextSibling = @getNextVisibleSibling(newNextSibling)
-      else if direction == 'right'
+      else if direction is 'right'
         newParent = @getPreviousVisibleSibling(startItem)
 
       if newParent
@@ -1490,14 +1490,14 @@ class OutlineEditor extends Model
         undoManager.beginUndoGrouping()
         outline.beginUpdates()
 
-        if 0 == startOffset && startItem != endItem && startItem == endItem.previousSibling && startItem.bodyText.length == 0
+        if 0 is startOffset && startItem isnt endItem && startItem is endItem.previousSibling && startItem.bodyText.length is 0
           @moveSelectionRange(endItem, 0)
           endItem.replaceBodyTextInRange('', 0, endOffset)
           for each in selectionRange.items[...-1]
             each.removeFromParent()
         else
           @moveSelectionRange(startItem, startOffset)
-          if startItem == endItem
+          if startItem is endItem
             startItem.replaceBodyTextInRange('', startOffset, endOffset - startOffset)
           else
             startItem.replaceBodyTextInRange(endItem.getAttributedBodyTextSubstring(endOffset, -1), startOffset, -1)
@@ -1671,7 +1671,7 @@ class OutlineEditor extends Model
     @_dragState.dropInsertAfterItem
 
   _refreshIfDifferent: (item1, item2) ->
-    if item1 != item2
+    if item1 isnt item2
       outlineEditorElement = @outlineEditorElement
       outlineEditorElement.updateItemClass(item1)
       outlineEditorElement.updateItemClass(item2)
@@ -1689,7 +1689,7 @@ class OutlineEditor extends Model
     @_refreshIfDifferent(oldState.dropInsertBeforeItem, state.dropInsertBeforeItem)
     @_refreshIfDifferent(oldState.dropInsertAfterItem, state.dropInsertAfterItem)
 
-  OutlineEditor::debouncedSetDragState = debounce(OutlineEditor::setDragState)
+  OutlineEditor::debouncedSetDragState = rafdebounce(OutlineEditor::setDragState)
 
   ###
   Section: Undo
@@ -1704,7 +1704,7 @@ class OutlineEditor extends Model
     @outline.undoManager.redo()
 
   didOpenUndoGroup: (undoManager) ->
-    if !undoManager.isUndoing && !undoManager.isRedoing
+    if !undoManager.isUndoing and !undoManager.isRedoing
       undoManager.setUndoGroupMetadata('undoSelection', @selection)
 
   didReopenUndoGroup: (undoManager) ->
@@ -1842,13 +1842,13 @@ class OutlineEditor extends Model
   @findOutlineEditor: (element) ->
     OutlineEditorElement.findOutlineEditor element
 
-  editorState: (item) ->
+  editorItemState: (item) ->
     if item
-      editorStateKey = @id + 'editor-state'
-      unless editorState = item.getUserData editorStateKey
-        editorState = new ItemEditorState
-        item.setUserData editorStateKey, editorState
-      editorState
+      editorItemStateKey = @id + 'editor-state'
+      unless editorItemState = item.getUserData editorItemStateKey
+        editorItemState = new OutlineEditorItemState
+        item.setUserData editorItemStateKey, editorItemState
+      editorItemState
 
   #OutlineEditor::DOMGetElementById(id) {
   #  let shadowRoot = this._shadowRoot;

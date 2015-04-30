@@ -76,7 +76,7 @@ itemsToHTML = (items, editor) ->
   if editor
     for each in items
       end = each.nextBranch
-      while each != end
+      while each isnt end
         if editor.isExpanded each
           expandedIDs.push each.id
         each = each.nextItem

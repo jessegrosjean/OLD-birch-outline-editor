@@ -243,12 +243,12 @@ class ListInputElement extends HTMLElement
     @scheduleTimeout = setTimeout(populateCallback,  @inputThrottle)
 
 liForNode = (node) ->
-  while node and node.tagName != 'LI'
+  while node and node.tagName isnt 'LI'
     node = node.parentElement
   node
 
 birchListInputForNode = (node) ->
-  while node and node.tagName != 'BIRCH-LIST-INPUT'
+  while node and node.tagName isnt 'BIRCH-LIST-INPUT'
     node = node.parentElement
   node
 

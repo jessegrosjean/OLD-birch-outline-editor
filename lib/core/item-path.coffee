@@ -1,5 +1,5 @@
 ItemPathParser = require './item-path-parser'
-typechecker = require 'typechecker'
+_ = require 'underscore-plus'
 
 module.exports=
 class ItemPath
@@ -27,7 +27,7 @@ class ItemPath
 
   @evaluate: (itemPath, contextItem, options) ->
     options ?= {}
-    if typechecker.isString itemPath
+    if _.isString itemPath
       itemPath = new ItemPath itemPath, options
     itemPath.options = options
     results = itemPath.evaluate contextItem
@@ -212,7 +212,7 @@ class ItemPath
       when 'descendant-or-self'
         end = item.nextBranch
         each = item
-        while each and each != end
+        while each and each isnt end
           if @evaluatePredicate type, predicate, each
             results.push each
           each = each.nextItem
@@ -220,7 +220,7 @@ class ItemPath
       when 'descendant'
         end = item.nextBranch
         each = item.firstChild
-        while each and each != end
+        while each and each isnt end
           if @evaluatePredicate type, predicate, each
             results.push each
           each = each.nextItem
@@ -265,7 +265,7 @@ class ItemPath
     @sliceResultsFrom step.slice, results, from
 
   evaluatePredicate: (type, predicate, item) ->
-    if type != '*' and type != item.getAttribute 'data-type'
+    if type isnt '*' and type isnt item.getAttribute 'data-type'
       false
     else if predicate is '*'
       true
@@ -282,7 +282,7 @@ class ItemPath
       value = predicate.value
 
       if !relation and !value
-        return @valueForAttributePath(attributePath, item) != null
+        return @valueForAttributePath(attributePath, item) isnt null
 
       predicateValueCache = predicate.predicateValueCache
       unless predicateValueCache
@@ -290,7 +290,7 @@ class ItemPath
         predicate.predicateValueCache = predicateValueCache
 
       attributeValue = @valueForAttributePath attributePath, item
-      if attributeValue != null
+      if attributeValue isnt null
         attributeValue = @convertValueForModifier attributeValue.toString(), modifier
 
       @evaluateRelation attributeValue, relation, predicateValueCache, predicate
@@ -320,7 +320,7 @@ class ItemPath
       when '='
         left is right
       when '!='
-        left != right
+        left isnt right
       when '<'
         if left
           left < right
@@ -348,7 +348,7 @@ class ItemPath
           false
       when 'contains'
         if left
-          left.indexOf(right) != -1
+          left.indexOf(right) isnt -1
         else
           false
       when 'endswith'
@@ -385,7 +385,7 @@ class ItemPath
       if end > length
         end = length
 
-      if start != 0 or end != length
+      if start isnt 0 or end isnt length
         sliced
         if start < 0
           start += length
@@ -427,16 +427,17 @@ class ItemPath
             result.push('@' + attributePath.join(':'))
 
         if relation = predicate.relation
-          if relation != 'contains' #default
+          if relation isnt 'contains' #default
             result.push relation
 
         if modifier = predicate.modifier
-          if modifier != 'i' #default
+          if modifier isnt 'i' #default
             result.push('[' + modifier + ']')
 
         if value = predicate.value
           try
-            ItemPathParser.parse(value,  { startRule : 'Value' })
+            ItemPathParser.parse value,
+              startRule: 'Value'
           catch error
             value = '"' + value + '"'
           result.push value
@@ -468,7 +469,7 @@ class ItemPath
         stepStrings.push @stepToString step, true
       else
         stepStrings.push @stepToString step
-    if pathAST.absolute and !(firstStep.axis is 'descendant')
+    if pathAST.absolute and not (firstStep.axis is 'descendant')
       '/' + stepStrings.join('/')
     else
       stepStrings.join('/')

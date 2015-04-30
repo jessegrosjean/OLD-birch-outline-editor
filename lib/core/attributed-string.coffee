@@ -1,7 +1,7 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
 AttributeRun = require './attribute-run'
-deepEqual = require 'deep-equal'
+_ = require 'underscore-plus'
 assert = require 'assert'
 Util = require './util'
 
@@ -29,14 +29,14 @@ class AttributedString
     @_pendingAddAttributes = []
 
   attributesAtIndex: (index, effectiveRange, longestEffectiveRange) ->
-    if index == -1
+    if index is -1
       index = @_string.length - location
 
     @_validateRange(index)
     @_ensureClean()
 
     runIndex = @_indexOfAttributeRunWithCharacterIndex(index)
-    if runIndex == -1
+    if runIndex is -1
       return null
 
     attributeRun = this.attributeRuns()[runIndex]
@@ -48,7 +48,7 @@ class AttributedString
     if longestEffectiveRange
       attributes = attributeRun.attributes
       @_longestEffectiveRange runIndex, attributeRun, longestEffectiveRange, (candiateRun) ->
-        deepEqual(candiateRun.attributes, attributes)
+        _.isEqual(candiateRun.attributes, attributes)
     attributeRun.attributes
 
   copy: ->

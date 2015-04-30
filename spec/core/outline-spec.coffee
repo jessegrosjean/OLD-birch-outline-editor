@@ -93,7 +93,7 @@ describe 'Outline', ->
       one.setAttribute('myattr', 'test')
       one.getAttribute('myattr').should.equal('test')
       outline.undoManager.undo()
-      expect(one.getAttribute('myattr') == null).toBe(true)
+      expect(one.getAttribute('myattr') is null).toBe(true)
 
     describe 'Body Text', ->
       it 'should undo set body text', ->

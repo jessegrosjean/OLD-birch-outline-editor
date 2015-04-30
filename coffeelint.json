@@ -1,8 +1,31 @@
 {
-    "max_line_length": {
-        "name": "max_line_length",
-        "value": 500,
-        "level": "warn",
-        "limitComments": true
-    }
+  "max_line_length": {
+    "level": "ignore"
+  },
+  "no_empty_param_list": {
+    "level": "error"
+  },
+  "arrow_spacing": {
+    "level": "error"
+  },
+  "no_interpolation_in_single_quotes": {
+    "level": "error"
+  },
+  "no_debugger": {
+    "level": "error"
+  },
+  "prefer_english_operator": {
+    "level": "error"
+  },
+  "colon_assignment_spacing": {
+    "spacing": {
+      "left": 0,
+      "right": 1
+    },
+    "level": "error"
+  },
+  "braces_spacing": {
+    "spaces": 0,
+    "level": "error"
+  }
 }

@@ -159,7 +159,7 @@ class Selection
       @isValid and (
         !!@anchorItem and
         !!@focusItem and
-          (@anchorItem != @focusItem or
+          (@anchorItem isnt @focusItem or
           @anchorOffset is undefined and @focusOffset is undefined)
       )
 
@@ -168,8 +168,8 @@ class Selection
       @isValid and (
         !!@anchorItem and
         @anchorItem is @focusItem and
-        @anchorOffset != undefined and
-        @focusOffset != undefined
+        @anchorOffset isnt undefined and
+        @focusOffset isnt undefined
       )
 
   Object.defineProperty @::, 'isReversed',
@@ -179,8 +179,8 @@ class Selection
 
       if focusItem is anchorItem
         return (
-          @focusOffset != undefined and
-          @anchorOffset != undefined and
+          @focusOffset isnt undefined and
+          @anchorOffset isnt undefined and
           @focusOffset < @anchorOffset
         )
 

@@ -106,8 +106,8 @@ describe 'OutlineEditor', ->
       editor.selection.isOutlineMode.should.be.true
       editor.selection.focusItem.should.equal(one)
       editor.selection.anchorItem.should.equal(one)
-      expect(editor.selection.focusOffset == undefined).toBe(true)
-      expect(editor.selection.anchorOffset == undefined).toBe(true)
+      expect(editor.selection.focusOffset is undefined).toBe(true)
+      expect(editor.selection.anchorOffset is undefined).toBe(true)
 
     it 'should select item text', ->
       editor.moveSelectionRange(one, 1)
@@ -124,8 +124,8 @@ describe 'OutlineEditor', ->
     it 'should null/undefined selection if invalid', ->
       editor.moveSelectionRange(one, 4)
       editor.selection.isValid.should.be.false
-      expect(editor.selection.focusItem == null).toBe(true)
-      expect(editor.selection.focusOffset == undefined).toBe(true)
+      expect(editor.selection.focusItem is null).toBe(true)
+      expect(editor.selection.focusOffset is undefined).toBe(true)
 
   describe 'Formatting', ->
     it 'should toggle formatting', ->
@@ -285,7 +285,7 @@ describe 'OutlineEditor', ->
     it 'should focus item mode focus element when selecting item', ->
       editor.focus()
       editor.moveSelectionRange(one)
-      expect(document.getSelection().focusNode == null).toBe(true)
+      expect(document.getSelection().focusNode is null).toBe(true)
       document.activeElement.should.equal(editor.outlineEditorElement.focusElement)
 
     it 'should focus item text when selecting item text', ->
@@ -308,7 +308,7 @@ describe 'OutlineEditor', ->
       editor.setExpanded(one)
       editor.moveSelectionRange(two, 1)
       editor.extendSelectionRange(five, 3)
-      expect(document.getSelection().focusNode == null).toBe(true)
+      expect(document.getSelection().focusNode is null).toBe(true)
       document.activeElement.should.equal(editor.outlineEditorElement.focusElement)
 
     it 'should focus item mode focus element on invalid selection', ->

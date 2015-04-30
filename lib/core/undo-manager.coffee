@@ -50,7 +50,7 @@ class UndoManager
 
   beginUndoGrouping: (metadata) ->
     @groupingLevel++
-    if @groupingLevel == 1
+    if @groupingLevel is 1
       @currentGroup = []
       @currentGroup.metadata = metadata or {}
       @emitter.emit 'did-open-undo-group'
@@ -58,7 +58,7 @@ class UndoManager
   endUndoGrouping: ->
     if @groupingLevel > 0
       @groupingLevel--
-      if @groupingLevel == 0
+      if @groupingLevel is 0
         if @currentGroup.length > 0
           if @isUndoing
             @redoStack.push(@currentGroup)
@@ -75,7 +75,7 @@ class UndoManager
   Section: Undo Registration
   ###
 
-  isUndoRegistrationEnabled: -> @disabledLevel == 0
+  isUndoRegistrationEnabled: -> @disabledLevel is 0
 
   disableUndoRegistration: -> @disabledLevel++
 
@@ -107,8 +107,8 @@ class UndoManager
     !@isUndoing && !@isRedoing && @redoStack.length > 0
 
   undo: (context) ->
-    assert.ok(@groupingLevel == 0, 'Unclosed grouping')
-    assert.ok(@disabledLevel == 0, 'Unclosed disable')
+    assert.ok(@groupingLevel is 0, 'Unclosed grouping')
+    assert.ok(@disabledLevel is 0, 'Unclosed disable')
 
     return unless @canUndo()
 
@@ -129,8 +129,8 @@ class UndoManager
     @emitter.emit 'did-undo', @getRedoGroupMetadata()
 
   redo: (context) ->
-    assert.ok(@groupingLevel == 0, 'Unclosed grouping')
-    assert.ok(@disabledLevel == 0, 'Unclosed disable')
+    assert.ok(@groupingLevel is 0, 'Unclosed grouping')
+    assert.ok(@disabledLevel is 0, 'Unclosed disable')
 
     return unless @canRedo()
 
@@ -155,8 +155,8 @@ class UndoManager
     @redoStack[@redoStack.length - 1]?.metadata
 
   removeAllActions: ->
-    assert.ok(@groupingLevel == 0, 'Unclosed grouping')
-    assert.ok(@disabledLevel == 0, 'Unclosed disable')
+    assert.ok(@groupingLevel is 0, 'Unclosed grouping')
+    assert.ok(@disabledLevel is 0, 'Unclosed disable')
     @undoStack = []
     @redoStack = []
 

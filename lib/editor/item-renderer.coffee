@@ -272,7 +272,7 @@ class ItemRenderer
     hoistCommonItem
     each = start
 
-    while each and each != end and !hoistCommonItem
+    while each and each isnt end and !hoistCommonItem
       if editor.isVisible each, oldHoistedItem
         if editor.isVisible each, newHoistedItem
           hoistCommonItem = each
@@ -343,7 +343,7 @@ class ItemRenderer
 
     if renderedBodyContentP
       newHTML = @renderItemContentP(item).innerHTML
-      if renderedBodyContentP.innerHTML != newHTML
+      if renderedBodyContentP.innerHTML isnt newHTML
         renderedBodyContentP.innerHTML = newHTML
 
   updateItemChildren: (item, removedChildren, addedChildren, nextSibling) ->
@@ -480,7 +480,7 @@ class ItemRenderer
       width: renderedLIRect.width
 
   animateMoveItems: (items, newParent, newNextSibling, startOffset) ->
-    if items.length == 0
+    if items.length is 0
       return
 
     editor = @editor
@@ -510,7 +510,7 @@ class ItemRenderer
     firstItemParent = firstItem.parent
     firstItemParentParent = firstItemParent?.parent
     newParentNeedsExpand =
-      newParent != hoistedItem and
+      newParent isnt hoistedItem and
       !editor.isExpanded(newParent) and
       editor.isVisible(newParent)
 
@@ -561,7 +561,7 @@ class ItemRenderer
           scrollToBottom = Math.max position.bottom, scrollToBottom
           animation.performMove renderedLI, position, ItemRenderer.DefaultAnimationContext
 
-    if scrollToTop != Number.MAX_VALUE
+    if scrollToTop isnt Number.MAX_VALUE
       @editorElement.scrollToOffsetRangeIfNeeded scrollToTop, scrollToBottom, true
 
   ###
@@ -710,7 +710,7 @@ class ItemRenderer
     end = Util.nodeNextBranch(element)
     idsToLIs = @idsToLIs
     each = element
-    while each != end
+    while each isnt end
       if each.id
         delete idsToLIs[each.id]
         each.removeAttribute('id')

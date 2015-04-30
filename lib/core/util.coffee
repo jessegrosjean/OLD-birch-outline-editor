@@ -3,7 +3,6 @@
 Constants = require './constants'
 
 `
-raf = require('raf');
 
 if (typeof Array.prototype.lastObject !== 'function') {
 	Array.prototype.lastObject = function () {

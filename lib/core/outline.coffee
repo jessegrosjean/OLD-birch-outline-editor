@@ -6,7 +6,6 @@ UndoManager = require './undo-manager'
 Constants = require './constants'
 ItemPath = require './item-path'
 Mutation = require './mutation'
-emissary = require 'emissary'
 shortid = require './shortid'
 assert = require 'assert'
 Item = require './item'
@@ -358,7 +357,7 @@ class Outline
     firstChild = @root.firstChild
     not firstChild or
         (not firstChild.nextItem and
-        firstChild.bodyText.length == 0)
+        firstChild.bodyText.length is 0)
 
   # Public: Returns {Item} for given id.
   #
@@ -392,7 +391,7 @@ class Outline
 
   cloneItem: (item) ->
     assert.ok(not item.isRoot, 'Can not clone root')
-    assert.ok(item.outline == @, 'Item must be owned by this outline')
+    assert.ok(item.outline is @, 'Item must be owned by this outline')
     @createItem(null, item._liOrRootUL.cloneNode(true))
 
   # Public: Creates a copy of an {Item} from an external outline that can be
@@ -403,7 +402,7 @@ class Outline
   # Returns {Item} copy.
   importItem: (item) ->
     assert.ok(!item.isRoot, 'Can not import root item')
-    assert.ok(item.outline != @, 'Item must not be owned by this outline')
+    assert.ok(item.outline isnt @, 'Item must not be owned by this outline')
     @createItem(null, @outlineStore.importNode(item._liOrRootUL, true))
 
   removeItemsFromParents: (items) ->
@@ -411,7 +410,7 @@ class Outline
     prev = null
 
     for each in items
-      if not prev or prev.nextSibling == each
+      if not prev or prev.nextSibling is each
         siblings.push(each)
       else
         @removeSiblingsFromParent(siblings)
@@ -519,7 +518,7 @@ class Outline
           each = each.parentNode
         if each
           eachItem = each._item
-          if eachItem != lastItem
+          if eachItem isnt lastItem
             items.push(eachItem)
             lastItem = eachItem
         each = xpathResult.iterateNext()
@@ -535,12 +534,12 @@ class Outline
   ###
 
   # Public: Returns {Boolean} true if outline is updating.
-  isUpdating: -> @updateCount != 0
+  isUpdating: -> @updateCount isnt 0
 
   # Public: Begin grouping changes. Must later call {::endUpdates} to balance
   # this call.
   beginUpdates: ->
-    if ++@updateCount == 1
+    if ++@updateCount is 1
       @updateMutations = []
 
   breakUndoCoalescing: ->
@@ -568,7 +567,7 @@ class Outline
   # Public: End grouping changes. Must call to balance a previous
   # {::beginUpdates} call.
   endUpdates: ->
-    if --@updateCount == 0
+    if --@updateCount is 0
       updateMutations = @updateMutations
       @updateMutations = null
       if updateMutations.length > 0
@@ -602,9 +601,9 @@ class Outline
   isModified: ->
     return false unless @loaded
     if @file
-      @changeCount != 0
+      @changeCount isnt 0
       #if @file.existsSync()
-      #  @getText() != @cachedDiskContents
+      #  @getText() isnt @cachedDiskContents
       #else
       #  @wasModifiedBeforeRemove ? not @isEmpty()
     else
@@ -626,7 +625,7 @@ class Outline
   #
   # - `filePath` A {String} representing the new file path
   setPath: (filePath) ->
-    return if filePath == @getPath()
+    return if filePath is @getPath()
 
     if filePath
       @file = new File(filePath)

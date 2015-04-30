@@ -1,7 +1,7 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
+rafdebounce = require '../../editor/raf-debounce'
 {Emitter, CompositeDisposable} = require 'atom'
-debounce = require 'debounce'
 
 # Private: A live query.
 module.exports =
@@ -11,7 +11,7 @@ class OutlineLiveQuery
 
   constructor: (@xpathExpression) ->
     @emitter = new Emitter()
-    @debouncedRun = debounce(@run.bind(this), 300)
+    @debouncedRun = rafdebounce(@run.bind(this), 300)
 
   ###
   Section: Events

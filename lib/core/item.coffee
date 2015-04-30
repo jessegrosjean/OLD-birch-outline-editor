@@ -2,10 +2,10 @@
 
 AttributedString = require './attributed-string'
 ItemBodyEncoder = require './item-body-encoder'
-typechecker = require 'typechecker'
 Constants = require './constants'
 Mutation = require './mutation'
 ItemPath = require './item-path'
+_ = require 'underscore-plus'
 assert = require 'assert'
 Util = require './util'
 
@@ -57,7 +57,7 @@ class Item
     assignedID = outline.nextOutlineUniqueItemID(originalID)
     ul = _childrenUL(liOrRootUL, false)
 
-    if originalID != assignedID
+    if originalID isnt assignedID
       liOrRootUL.id = assignedID
       if remappedIDCallback and originalID
         remappedIDCallback(originalID, assignedID)
@@ -98,7 +98,7 @@ class Item
 
       for i in [0..length - 1] by 1
         name = namedItemMap[i].name
-        if name != 'id'
+        if name isnt 'id'
           attributeNames.push(name)
 
       attributeNames
@@ -139,7 +139,7 @@ class Item
   # - `name` The {String} attribute name.
   # - `value` The new attribute value.
   setAttribute: (name, value) ->
-    assert.ok(name != 'id', 'id is reserved attribute name')
+    assert.ok(name isnt 'id', 'id is reserved attribute name')
 
     outline = @outline
     isInOutline = @isInOutline
@@ -178,11 +178,11 @@ class Item
         value
 
   @objectToAttributeValueString: (object) ->
-    if typechecker.isString object
+    if _.isString object
       object
-    else if typechecker.isDate object
+    else if _.isDate object
       object.toISOString()
-    else if typechecker.isArray object
+    else if _.isArray object
       (Item.objectToAttributeValueString(each) for each in object).join ','
     else if object
       object.toString()
@@ -268,7 +268,7 @@ class Item
   #
   # Returns elements attribute values as an {Object} or {undefined}
   getElementAtBodyTextIndex: (tagName, index, effectiveRange, longestEffectiveRange) ->
-    assert(tagName == tagName.toUpperCase(), 'Tag Names Must be Uppercase')
+    assert(tagName is tagName.toUpperCase(), 'Tag Names Must be Uppercase')
     @attributedBodyText.attributeAtIndex(
       tagName,
       index,
@@ -307,7 +307,7 @@ class Item
   addElementsInBodyTextRange: (elements, location, length) ->
     for eachTagName of elements
       assert(
-        eachTagName == eachTagName.toUpperCase(),
+        eachTagName is eachTagName.toUpperCase(),
         'Tag Names Must be Uppercase'
       )
     changedText = @getAttributedBodyTextSubstring(location, length)
@@ -321,13 +321,13 @@ class Item
   # - `location` Start location character index.
   # - `length` Range length.
   removeElementInBodyTextRange: (tagName, location, length) ->
-    assert(tagName == tagName.toUpperCase(), 'Tag Names Must be Uppercase')
+    assert(tagName is tagName.toUpperCase(), 'Tag Names Must be Uppercase')
     @removeElementsInBodyTextRange([tagName], location, length)
 
   removeElementsInBodyTextRange: (tagNames, location, length) ->
     for eachTagName in tagNames
       assert(
-        eachTagName == eachTagName.toUpperCase(),
+        eachTagName is eachTagName.toUpperCase(),
         'Tag Names Must be Uppercase'
       )
     changedText = @getAttributedBodyTextSubstring(location, length)
@@ -358,7 +358,7 @@ class Item
       insertedString = insertedText
 
     assert.ok(
-      insertedString.indexOf('\n') == -1,
+      insertedString.indexOf('\n') is -1,
       'Item body text cannot contain newlines'
     )
 
@@ -412,7 +412,7 @@ class Item
   # Public: Read-only true if is root {Item}.
   isRoot: null
   Object.defineProperty @::, 'isRoot',
-    get: -> @id == Constants.RootID
+    get: -> @id is Constants.RootID
 
   # Public: Read-only {Boolean} true if this item has no body text and no
   # attributes and no children.
@@ -495,7 +495,7 @@ class Item
       descendants = []
       end = @nextBranch
       each = @nextItem
-      while each != end
+      while each isnt end
         descendants.push(each)
         each = each.nextItem
       return descendants
@@ -678,7 +678,7 @@ class Item
 
     for each in children
       assert.ok(
-        each._liOrRootUL.ownerDocument == ownerDocument,
+        each._liOrRootUL.ownerDocument is ownerDocument,
         'children must share same owner document'
       )
       documentFragment.appendChild(each._liOrRootUL)
@@ -723,7 +723,7 @@ class Item
     lastSibling
 
     for each in children
-      if lastSibling and lastSibling.nextSibling != each
+      if lastSibling and lastSibling.nextSibling isnt each
         @_removeSiblingChildren(siblingChildren)
         siblingChildren = [each]
       else
@@ -806,21 +806,21 @@ _parentLIOrRootUL = (liOrRootUL) ->
     parentNode = parentNode.parentNode
 
 _bodyP = (liOrRootUL) ->
-  if liOrRootUL.tagName == 'UL'
+  if liOrRootUL.tagName is 'UL'
     # In case of root element just return an empty disconnected P for api
     # compatibilty.
-    assert.ok(liOrRootUL.id == Constants.RootID)
+    assert.ok(liOrRootUL.id is Constants.RootID)
     liOrRootUL.ownerDocument.createElement('p')
   else
     liOrRootUL.firstElementChild
 
 _childrenUL = (liOrRootUL, createIfNeeded) ->
-  if liOrRootUL.tagName == 'UL'
-    assert.ok(liOrRootUL.id == Constants.RootID)
+  if liOrRootUL.tagName is 'UL'
+    assert.ok(liOrRootUL.id is Constants.RootID)
     liOrRootUL
   else
     ul = liOrRootUL.lastElementChild
-    if ul?.tagName == 'UL'
+    if ul?.tagName is 'UL'
       ul
     else if createIfNeeded
       ul = liOrRootUL.ownerDocument.createElement('UL')

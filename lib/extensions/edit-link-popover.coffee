@@ -11,7 +11,7 @@ editLink = (outlineEditorElement) ->
   if savedSelection.isCollapsed
     longestRange = {}
     linkAttributes = item.getElementAtBodyTextIndex('A', offset, null, longestRange)
-    if linkAttributes?.href != undefined
+    if linkAttributes?.href isnt undefined
       editor.moveSelectionRange(item, longestRange.location, item, longestRange.end)
       savedSelection = editor.selection
       offset = longestRange.location

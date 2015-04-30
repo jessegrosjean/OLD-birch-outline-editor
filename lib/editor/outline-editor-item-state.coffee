@@ -9,7 +9,7 @@
 # should be properly restored.
 
 module.exports =
-class ItemEditorState
+class OutlineEditorItemState
   constructor: ->
     @marked = false
     @selected = false

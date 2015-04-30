@@ -240,7 +240,7 @@ describe 'AttributedString', ->
       attributedString.addAttributeInRange('age', '35', 3, 5)
 
       attributedString.attributesAtIndex(0, effectiveRange).name.should.equal('jesse')
-      (attributedString.attributesAtIndex(0, effectiveRange).age == undefined).should.be.true
+      (attributedString.attributesAtIndex(0, effectiveRange).age is undefined).should.be.true
       effectiveRange.location.should.equal(0)
       effectiveRange.length.should.equal(3)
 
@@ -249,7 +249,7 @@ describe 'AttributedString', ->
       effectiveRange.location.should.equal(3)
       effectiveRange.length.should.equal(2)
 
-      (attributedString.attributesAtIndex(6, effectiveRange).name == undefined).should.be.true
+      (attributedString.attributesAtIndex(6, effectiveRange).name is undefined).should.be.true
       attributedString.attributesAtIndex(6, effectiveRange).age.should.equal('35')
       effectiveRange.location.should.equal(5)
       effectiveRange.length.should.equal(3)
@@ -267,8 +267,8 @@ describe 'AttributedString', ->
       attributedString.toString(true).should.equal('(Hel/)(lo wor/name="jesse")(ld!/)')
 
     it 'should return null when accessing attributes at end of string', ->
-      expect(attributedString.attributesAtIndex(0, null) != null).toBe(true)
-      expect(attributedString.attributesAtIndex(11, null) != null).toBe(true)
-      expect(attributedString.attributesAtIndex(12, null) == null).toBe(true)
+      expect(attributedString.attributesAtIndex(0, null) isnt null).toBe(true)
+      expect(attributedString.attributesAtIndex(11, null) isnt null).toBe(true)
+      expect(attributedString.attributesAtIndex(12, null) is null).toBe(true)
       attributedString.replaceCharactersInRange('', 0, 12)
-      expect(attributedString.attributesAtIndex(0, null) == null).toBe(true)
+      expect(attributedString.attributesAtIndex(0, null) is null).toBe(true)

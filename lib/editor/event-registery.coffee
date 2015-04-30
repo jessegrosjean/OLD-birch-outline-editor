@@ -2,7 +2,7 @@
 
 {Emitter, Disposable, CompositeDisposable} = require 'atom'
 matchesSelector = require 'matches-selector'
-{specificity} = require 'clear-cut'
+{calculateSpecificity} = require 'clear-cut'
 
 SequenceCount = 0
 SpecificityCache = {}
@@ -16,6 +16,7 @@ class EventRegistery
 
   destroy: ->
     @subscribers.dispose()
+    @subscribers = null
 
   listen: (target, eventType, callback, useCapture=false) ->
     if typeof eventType is 'object'
@@ -127,7 +128,7 @@ class EventRegistery
 
 class SelectorBasedListener
   constructor: (@selector, @callback) ->
-    @specificity = (SpecificityCache[@selector] ?= specificity(@selector))
+    @specificity = (SpecificityCache[@selector] ?= calculateSpecificity(@selector))
     @sequenceNumber = SequenceCount++
 
   compare: (other) ->

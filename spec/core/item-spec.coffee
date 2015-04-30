@@ -21,7 +21,7 @@ describe 'Item', ->
 
   it 'should delete item', ->
     two.removeFromParent()
-    expect(two.parent == undefined).toBe(true)
+    expect(two.parent is undefined).toBe(true)
 
   it 'should make item connections', ->
     one.firstChild.should.equal(two)
@@ -38,7 +38,7 @@ describe 'Item', ->
 
   describe 'Attributes', ->
     it 'should set/get attribute', ->
-      expect(five.getAttribute('test') == null).toBe(true)
+      expect(five.getAttribute('test') is null).toBe(true)
       five.setAttribute('test', 'hello')
       five.getAttribute('test').should.equal('hello')
 

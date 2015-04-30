@@ -2,7 +2,7 @@
 
 AttributedString = require './attributed-string'
 Constants = require './constants'
-deepEqual = require 'deep-equal'
+_ = require 'underscore-plus'
 assert = require 'assert'
 Util = require './util'
 
@@ -28,7 +28,7 @@ _calculateInitialNodeRanges = (attributedString, ownerDocument) ->
   for run in attributedString.attributeRuns()
     for tag, tagAttributes of run.attributes
       nodeRange = tagsToRanges[tag]
-      if !nodeRange or nodeRange.end <= run.location
+      if not nodeRange or nodeRange.end <= run.location
         assert(tag is tag.toUpperCase(), 'Tags Names Must be Uppercase')
 
         element = ownerDocument.createElement tag
@@ -45,7 +45,7 @@ _calculateInitialNodeRanges = (attributedString, ownerDocument) ->
         nodeRanges.push nodeRange
 
     text = string.substr run.location, run.length
-    if text != Constants.ObjectReplacementCharacter and text != Constants.LineSeparatorCharacter
+    if text isnt Constants.ObjectReplacementCharacter and text isnt Constants.LineSeparatorCharacter
       nodeRanges.push
         start: run.location
         end: run.location + run.length
@@ -62,7 +62,7 @@ _seekTagRangeEnd = (tagName, seekTagAttributes, runIndex, attributedString) ->
   while true
     run = attributeRuns[runIndex++]
     runTagAttributes = run.attributes[tagName]
-    equalAttributes = runTagAttributes is seekTagAttributes or deepEqual(runTagAttributes, seekTagAttributes)
+    equalAttributes = runTagAttributes is seekTagAttributes or _.isEqual(runTagAttributes, seekTagAttributes)
     unless equalAttributes
       return run.location
     else if runIndex is end
@@ -73,12 +73,12 @@ _compareNodeRanges = (a, b) ->
     -1
   else if a.start > b.start
     1
-  else if a.end != b.end
+  else if a.end isnt b.end
     b.end - a.end
   else
     aNodeType = a.node.nodeType
     bNodeType = b.node.nodeType
-    if aNodeType != bNodeType
+    if aNodeType isnt bNodeType
       if aNodeType is Node.TEXT_NODE
         1
       else if bNodeType is Node.TEXT_NODE
