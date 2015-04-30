@@ -1,0 +1,296 @@
+@import (reference) "./birch-variables";
+
+//
+// Outline Editor
+//
+
+birch-outline-editor {
+  display: block;
+  color: @syntax-text-color;
+  background-color: @syntax-background-color;
+  font-family: @birch-font-family;
+  font-size: @birch-font-size;
+  line-height: @line-height-mult;
+  overflow-y: auto;
+  overflow-x: hidden;
+  .user-select(none);
+  width: 100%;
+  height: 100%;
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+}
+
+#birchTextCalculationIFrame {
+  position: absolute;
+  left:-9999px;
+}
+
+input[is="outline-editor-focus"] {
+  position: fixed;
+  width:1px;
+  height:1px;
+  color: transparent;
+  background: none;
+  border:none;
+  margin:0;
+  padding:0;
+  pointer-events: none;
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+}
+
+birch-outline-editor > ul.background-message {
+  margin: 1em;
+  line-height: 1em;
+  .keystroke {
+    border: 2px solid;
+    padding: 0 @component-padding/2;
+    border-radius: @component-border-radius * 3;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+birch-outline-editor > ul.top-item-list {
+  cursor: text;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.bhoistedItem {
+  margin: round(@line-height-pixels / 2);
+  > .bbranchcontrols {
+    display: none;
+  }
+  > .bbranch > .bitemcontent {
+    display: none;
+  }
+}
+
+#Birch.bhoistedItem > .bbranch > .bitemcontent::before {
+  display: none;
+}
+
+//
+// Structure
+//
+
+.bitem {
+  display:flex;
+  flex-direction: row;
+}
+
+.bbranchcontrols {
+  .user-select(none);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.bhandle {
+  cursor: pointer;
+  pointer-events: all;
+  line-height: @line-height-mult;
+  font-size: @birch-font-size;
+  text-decoration:none;
+  flex-grow: 0;
+  padding: @item-vertical-spacing 0;
+  color: @syntax-text-color;
+}
+
+.bhandle:hover {
+  color: @syntax-text-color;
+}
+
+//@handleImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{syntax-text-color}" cx="12px" cy="12px" r="2.5px" /></g></svg>');
+//@expandableHandleBackgroundColor: fade(@syntax-text-color, 15%);
+//@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><circle fill="@{expandableHandleBackgroundColor}" cx="12px" cy="12px" r="8px" /></g></svg>');
+//@expandableHandleBackgroundImage: url('data:image/svg+xml;utf8,<svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg"><g><polygon fill="red" points="14,20 20,20 20,14 14,20"/></g></svg>');
+
+
+.bhandle:before {
+  display: inline-block;
+  width: @item-indent-spacing;
+  font-weight: normal;
+  color: @syntax-invisible-character-color;
+  content: '▸︎';
+}
+
+.bhasChildren:not(.bexpanded) > .bbranchcontrols > .bhandle:before {
+  color: @syntax-text-color;
+  //background-repeat: no-repeat;
+  //background-position: center center;
+  //background-size: @line-height-pixels;
+  //background-image: @expandableHandleBackgroundImage;
+}
+
+.bborder {
+  flex-grow: 1;
+}
+
+.bexpanded > .bbranchcontrols > .bborder {
+  border-left: 1px dotted @syntax-indent-guide-color;
+}
+
+.bbranch {
+  flex-grow: 1;
+}
+
+.bitemcontent {
+  line-height: @line-height-mult;
+  margin: 0;
+  padding: @item-vertical-spacing 0;
+  //display: inline-block;
+  //min-width: 1px; // So cursor will display when empty since inline-block
+}
+
+.bbodytext {
+  .user-select(text);
+  .user-modify(read-write);
+  white-space: pre-wrap;
+  margin-right: @item-badge-spacing;
+  a {
+    color: @base-accent-color;
+    text-decoration: underline;
+  }
+  &:focus {
+    outline-color: transparent;
+    outline-style: none;
+  }
+
+  cite {
+    font-style: italic;
+  }
+
+  code {
+    white-space: pre-wrap;
+  }
+
+  kbd {
+    border: 1px solid mix(transparent, @syntax-invisible-character-color, 50%);
+    background-color: mix(transparent, @syntax-invisible-character-color, 90%);
+    padding: 0 4px;
+    border-radius: 4px;
+    font-family: @birch-font-family;
+  }
+}
+
+.bchildren {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+//
+// Badges
+//
+
+.bbadges {
+  display: inline-block;
+  vertical-align: baseline;
+  font-size: round(@birch-font-size * 0.7);
+}
+
+.bbadge {
+  display: inline-block;
+  vertical-align: baseline;
+  padding: 0px 2px;
+  border-radius: 2px;
+  margin-right: @item-badge-spacing;
+  color: @syntax-background-color;
+  background: @syntax-invisible-character-color;
+  text-decoration:none;
+  &:hover {
+    color: @syntax-background-color;
+    text-decoration: none;
+  }
+}
+
+.bduration {
+  &:before {
+    content: "Timer";
+  }
+}
+
+.bdue {
+  &:before {
+    content: "Alarm";
+  }
+}
+
+//
+// Selection
+//
+
+::selection {
+  // http://stackoverflow.com/questions/14970891/css-selection-color-behaving-strangely-on-chrome
+  background-color: fade(@syntax-selection-color, 99%);
+}
+
+.styledTextCaret {
+  pointer-events: none;
+  background: @syntax-cursor-color;
+}
+
+.bitemselected {
+  > .bbranch {
+    background: @syntax-secondary-selection-color;
+    > .bitemcontent {
+      background-color: @syntax-selection-color;
+      *::selection {
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+.btextselected > .bbranch > .bitemcontent {
+  background-color: transparent;
+}
+
+.bsimulatedSelectionCursor {
+  background-color: @syntax-text-color;
+}
+
+.bsimulatedSelection {
+  background-color: @syntax-selection-color;
+}
+
+//
+// Drag and Drop
+//
+
+.bdropbefore > .bbranch > .bitemcontent,
+.bdropafter > .bbranch > .bitemcontent {
+  position: relative;
+}
+
+@drop-ball-radius: round(@birch-font-size / 4);
+@drop-ball-diameter: round(@drop-ball-radius * 2.0);
+
+.bdropbefore > .bbranch > .bitemcontent::before,
+.bdropafter > .bbranch > .bitemcontent::after {
+  pointer-events: none;
+  display:block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: @drop-ball-diameter;
+  margin: -(@drop-ball-radius + @item-vertical-spacing) 0 0 -@drop-ball-diameter;
+  content: "";
+  background-image: url('data:image/svg+xml;utf8,<svg width="10000rem" height="0.5rem" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g id="dropIndicator"><circle fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" cx="4" cy="4" r="3.0" /><line fill="none" stroke="@{syntax-cursor-color}" stroke-width="2" x1="7" y1="4" x2="10000" y2="4" /></g></svg>');
+  background-repeat: no-repeat;
+}
+
+.bdropafter > .bbranch > .bitemcontent::after {
+  margin: -@drop-ball-radius + @item-vertical-spacing 0 0 -@drop-ball-diameter;
+}

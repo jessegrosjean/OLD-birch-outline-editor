@@ -1,0 +1,1 @@
+This directory contains generic UI elements. Ideally these will get cleaned up and moved to own package.
