@@ -1,7 +1,7 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
-LocationStatusBarItem = require './extensions/LocationStatusBarItem'
-SearchStatusBarItem = require './extensions/SearchStatusBarItem'
+LocationStatusBarItem = require './extensions/location-status-bar-item'
+SearchStatusBarItem = require './extensions/search-status-bar-item'
 outlineEditorService = require './outline-editor-service'
 OutlineEditor = require './editor/outline-editor'
 {CompositeDisposable} = require 'atom'
