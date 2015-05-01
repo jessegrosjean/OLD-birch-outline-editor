@@ -9,7 +9,7 @@ ItemBodyEncoder = require '../core/item-body-encoder'
 Mutation = require '../core/mutation'
 Velocity = require 'velocity-animate'
 Selection = require './selection'
-Util = require '../core/util'
+Util = require '../core/dom'
 
 sortPriority = (a, b) ->
   if a.priority < b.priority

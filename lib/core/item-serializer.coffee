@@ -2,7 +2,7 @@
 
 ItemBodyEncoder = require './item-body-encoder'
 Constants = require './constants'
-Util = require './util'
+Util = require './dom'
 
 itemsToTXT = (items, editor) ->
   itemToTXT = (item, indent) ->

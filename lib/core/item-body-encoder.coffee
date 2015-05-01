@@ -4,7 +4,7 @@ AttributedString = require './attributed-string'
 Constants = require './constants'
 _ = require 'underscore-plus'
 assert = require 'assert'
-Util = require './util'
+Util = require './dom'
 
 attributedStringToDocumentFragment = (attributedString, ownerDocument) ->
   attributedString._ensureClean()
@@ -126,245 +126,195 @@ _buildFragmentFromNodeRanges = (nodeRanges, nodeRangeStack, ownerDocument) ->
 
   nodeRangeStack[0].node
 
-`function elementToAttributedString(element, innerHTML) {
-  var attributedString = new AttributedString();
+elementToAttributedString = (element, innerHTML) ->
+  attributedString = new AttributedString()
+  if innerHTML
+    each = element.firstChild
+    while each
+      _addDOMNodeToAttributedString(each, attributedString)
+      each = each.nextSibling
+  else
+    _addDOMNodeToAttributedString(element, attributedString)
+  attributedString
 
-  if (innerHTML) {
-    var each = element.firstChild;
-    while (each) {
-      _addDOMNodeToAttributedString(each, attributedString);
-      each = each.nextSibling;
-    }
-  } else {
-    _addDOMNodeToAttributedString(element, attributedString);
-  }
+allowedTags =
+  # Inline text semantics
+  'A': true
+  'ABBR': true
+  'B': true
+  'BDI': true
+  'BDO': true
+  'BR': true
+  'CITE': true
+  'CODE': true
+  'DATA': true
+  'DFN': true
+  'EM': true
+  'I': true
+  'KBD': true
+  'MARK': true
+  'Q': true
+  'RP': true
+  'RT': true
+  'RUBY': true
+  'S': true
+  'SAMP': true
+  'SMALL': true
+  'SPAN': true
+  'STRONG': true
+  'SUB': true
+  'SUP': true
+  'TIME': true
+  'U': true
+  'VAR': true
+  'WBR': true
 
-  return attributedString;
-}
+  # Image & multimedia
+  'AUDIO': true
+  'IMG': true
+  'VIDEO': true
 
-var allowedTags = {
-  // Inline text semantics
-  'A': true,
-  'ABBR': true,
-  'B': true,
-  'BDI': true,
-  'BDO': true,
-  'BR': true,
-  'CITE': true,
-  'CODE': true,
-  'DATA': true,
-  'DFN': true,
-  'EM': true,
-  'I': true,
-  'KBD': true,
-  'MARK': true,
-  'Q': true,
-  'RP': true,
-  'RT': true,
-  'RUBY': true,
-  'S': true,
-  'SAMP': true,
-  'SMALL': true,
-  'SPAN': true,
-  'STRONG': true,
-  'SUB': true,
-  'SUP': true,
-  'TIME': true,
-  'U': true,
-  'VAR': true,
-  'WBR': true,
-
-  // Image & multimedia
-  'AUDIO': true,
-  'IMG': true,
-  'VIDEO': true,
-
-  // Edits
-  'DEL': true,
+  # Edits
+  'DEL': true
   'INS': true
-};
 
-function _addDOMNodeToAttributedString(node, attributedString) {
-  var nodeType = node.nodeType;
+_addDOMNodeToAttributedString = (node, attributedString) ->
+  nodeType = node.nodeType
 
-  if (nodeType === Node.TEXT_NODE) {
-    attributedString.appendString(new AttributedString(node.nodeValue.replace(/(\r\n|\n|\r)/gm,'')));
-  } else if (nodeType === Node.ELEMENT_NODE) {
-    var tagStart = attributedString.length,
-      each = node.firstChild;
+  if nodeType is Node.TEXT_NODE
+    attributedString.appendString(new AttributedString(node.nodeValue.replace(/(\r\n|\n|\r)/gm,'')))
+  else if nodeType is Node.ELEMENT_NODE
+    tagStart = attributedString.length
+    each = node.firstChild
 
-    if (each) {
-      while (each) {
-        _addDOMNodeToAttributedString(each, attributedString);
-        each = each.nextSibling;
-      }
+    if each
+      while each
+        _addDOMNodeToAttributedString(each, attributedString)
+        each = each.nextSibling
+      if allowedTags[node.tagName]
+        attributedString.addAttributeInRange(node.tagName, _elementAttributes(node), tagStart, attributedString.length - tagStart)
+    else if allowedTags[node.tagName]
+      if node.tagName is 'BR'
+        lineBreak = new AttributedString(Constants.LineSeparatorCharacter)
+        lineBreak.addAttributeInRange('BR', _elementAttributes(node), 0, 1)
+        attributedString.appendString(lineBreak)
+      else if node.tagName is 'IMG'
+        image = new AttributedString(Constants.ObjectReplacementCharacter)
+        image.addAttributeInRange('IMG', _elementAttributes(node), 0, 1)
+        attributedString.appendString(image)
 
-      if (allowedTags[node.tagName]) {
-        attributedString.addAttributeInRange(node.tagName, _elementAttributes(node), tagStart, attributedString.length - tagStart);
-      }
-    } else if (allowedTags[node.tagName]) {
-      if (node.tagName === 'BR') {
-        var lineBreak = new AttributedString(Constants.LineSeparatorCharacter);
-        lineBreak.addAttributeInRange('BR', _elementAttributes(node), 0, 1);
-        attributedString.appendString(lineBreak);
-      } else if (node.tagName === 'IMG') {
-        var image = new AttributedString(Constants.ObjectReplacementCharacter);
-        image.addAttributeInRange('IMG', _elementAttributes(node), 0, 1);
-        attributedString.appendString(image);
-      }
-    }
-  }
-}
+_elementAttributes = (element) ->
+  if element.hasAttributes()
+    result = {}
+    for each in element.attributes
+      result[each.name] = each.value
+    result
+  else
+    null
 
-function _elementAttributes(element) {
-  if (element.hasAttributes()) {
-    var attrs = element.attributes,
-      result = {};
-    for (var i = attrs.length - 1; i >= 0; i--) {
-        result[attrs[i].name] = attrs[i].value;
-    }
-    return result;
-  }
-  return null;
-}
+nodeOffsetToBodyTextOffset = (node, offset, bodyP) ->
+  if node and bodyP and bodyP.contains(node)
+    # If offset is > 0 and node is an element then map to child node
+    # possition such that a backward walk from that node will cross over
+    # all relivant text and void nodes.
+    if offset > 0 and node.nodeType is Node.ELEMENT_NODE
+      childAtOffset = node.firstChild
+      while offset
+        childAtOffset = childAtOffset.nextSibling
+        offset--
 
-function nodeOffsetToBodyTextOffset(node, offset, bodyP) {
-  if (node && bodyP && bodyP.contains(node)) {
-    // If offset is > 0 and node is an element then map to child node
-    // possition such that a backward walk from that node will cross over
-    // all relivant text and void nodes.
-    if (offset > 0 && node.nodeType === Node.ELEMENT_NODE) {
-      var childAtOffset = node.firstChild;
-      while (offset) {
-        childAtOffset = childAtOffset.nextSibling;
-        offset--;
-      }
+      if childAtOffset
+        node = childAtOffset
+      else
+        node = Util.lastDescendantNodeOrSelf(node.lastChild)
 
-      if (childAtOffset) {
-        node = childAtOffset;
-      } else {
-        node = Util.lastDescendantNodeOrSelf(node.lastChild);
-      }
-    }
+    # Walk backward to bodyP summing text characters and void elements
+    # inbetween.
+    each = node
+    while each isnt bodyP
+      nodeType = each.nodeType
+      length = 0
 
-    // Walk backward to bodyP summing text characters and void elements
-    // inbetween.
-    var each = node,
-      nodeType,
-      length;
+      if nodeType is Node.TEXT_NODE
+        if each isnt node
+          offset += each.nodeValue.length
+      else if nodeType is Node.ELEMENT_NODE and each.textContent.length is 0 and not each.firstElementChild
+        tagName = each.tagName
+        if tagName is 'BR' or tagName is 'IMG'
+          # Count void tags as 1
+          offset++
+      each = Util.previousNode(each)
+    offset
+  else
+    undefined
 
-    while (each !== bodyP) {
-      length = 0;
-      nodeType = each.nodeType;
+bodyTextOffsetToNodeOffset = (bodyP, offset, downstreamAffinity) ->
+  if bodyP
+    end = Util.nodeNextBranch(bodyP)
+    each = bodyP
 
-      if (nodeType === Node.TEXT_NODE) {
-        if (each !== node) {
-          offset += each.nodeValue.length;
-        }
-      } else if (nodeType === Node.ELEMENT_NODE && each.textContent.length === 0 && !each.firstElementChild) {
-        var tagName = each.tagName;
-        if (tagName === 'BR' || tagName === 'IMG') {
-          // Count void tags as 1
-          offset++;
-        }
-      }
+    while each isnt end
+      nodeType = each.nodeType
+      length = 0
 
-      each = Util.previousNode(each);
-    }
+      if nodeType is Node.TEXT_NODE
+        length = each.nodeValue.length
+      else if nodeType is Node.ELEMENT_NODE and not each.firstChild
+        tagName = each.tagName
 
-    return offset;
-  }
-  return undefined;
-}
+        if tagName is 'BR' or tagName is 'IMG'
+          # Count void tags as 1
+          length = 1
+          if length is offset
+            return {} =
+              node: each.parentNode
+              offset: Util.childIndexOfNode(each) + 1
 
-function bodyTextOffsetToNodeOffset(bodyP, offset, downstreamAffinity) {
-  if (bodyP) {
-    var end = Util.nodeNextBranch(bodyP),
-      each = bodyP,
-      nodeType,
-      length;
-
-    while (each !== end) {
-      length = 0;
-      nodeType = each.nodeType;
-
-      if (nodeType === Node.TEXT_NODE) {
-        length = each.nodeValue.length;
-      } else if (nodeType === Node.ELEMENT_NODE && !each.firstChild) {
-        var tagName = each.tagName;
-
-        if (tagName === 'BR' || tagName === 'IMG') {
-          // Count void tags as 1
-          length = 1;
-          if (length === offset) {
-            return {
-              node: each.parentNode,
-              offset: Util.childIndeOf(each) + 1
-            };
-          }
-        }
-      }
-
-      if (length < offset) {
-        offset -= length;
-      } else {
-        if (downstreamAffinity && length === offset) {
-          var next = Util.nextNode(each);
-          if (next) {
-            if (next.nodeType === Node.ELEMENT_NODE && !next.firstChild) {
-              each = next.parentNode;
-              offset = Util.childIndeOf(next);
-            } else {
-              each = next;
-              offset = 0;
-            }
-          }
-        }
-
-        return {
-          node: each,
+      if length < offset
+        offset -= length
+      else
+        if downstreamAffinity and length is offset
+          next = Util.nextNode(each)
+          if next
+            if next.nodeType is Node.ELEMENT_NODE and not next.firstChild
+              each = next.parentNode
+              offset = Util.childIndexOfNode(next)
+            else
+              each = next
+              offset = 0
+        return {} =
+          node: each
           offset: offset
-        };
-      }
+      each = Util.nextNode(each)
+  else
+    undefined
 
-      each = Util.nextNode(each);
-    }
-  }
-  return undefined;
-}
+bodyEncodedTextContent = (node) ->
+  if node
+    end = Util.nodeNextBranch(node)
+    each = node
+    text = []
 
-function bodyEncodedTextContent(node) {
-  if (node) {
-    var end = Util.nodeNextBranch(node),
-      each = node,
-      nodeType,
-      text = [];
+    while each isnt end
+      nodeType = each.nodeType
 
-    while (each !== end) {
-      nodeType = each.nodeType;
+      if nodeType is Node.TEXT_NODE
+        text.push(each.nodeValue)
+      else if nodeType is Node.ELEMENT_NODE and not each.firstChild
+        tagName = each.tagName
 
-      if (nodeType === Node.TEXT_NODE) {
-        text.push(each.nodeValue);
-      } else if (nodeType === Node.ELEMENT_NODE && !each.firstChild) {
-        var tagName = each.tagName;
+        if tagName is 'BR'
+          text.push(Constants.LineSeparatorCharacter)
+        else if tagName is 'IMG'
+          text.push(Constants.ObjectReplacementCharacter)
+      each = Util.nextNode(each)
+    text.join('')
+  else
+    ''
 
-        if (tagName === 'BR') {
-          text.push(Constants.LineSeparatorCharacter);
-        } else if (tagName === 'IMG') {
-          text.push(Constants.ObjectReplacementCharacter);
-        }
-      }
-      each = Util.nextNode(each);
-    }
-    return text.join('');
-  }
-  return '';
-}
-
-module.exports = {
-  attributedStringToDocumentFragment: attributedStringToDocumentFragment,
-  elementToAttributedString: elementToAttributedString,
-  nodeOffsetToBodyTextOffset: nodeOffsetToBodyTextOffset,
-  bodyTextOffsetToNodeOffset: bodyTextOffsetToNodeOffset,
+module.exports =
+  attributedStringToDocumentFragment: attributedStringToDocumentFragment
+  elementToAttributedString: elementToAttributedString
+  nodeOffsetToBodyTextOffset: nodeOffsetToBodyTextOffset
+  bodyTextOffsetToNodeOffset: bodyTextOffsetToNodeOffset
   bodyEncodedTextContent: bodyEncodedTextContent
-};`

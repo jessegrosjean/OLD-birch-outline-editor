@@ -7,7 +7,7 @@ Mutation = require './mutation'
 ItemPath = require './item-path'
 _ = require 'underscore-plus'
 assert = require 'assert'
-Util = require './util'
+Util = require './dom'
 
 # Essential: A paragraph of text in an {Outline}.
 #
