@@ -1,7 +1,7 @@
 {
   "name": "foldingtext",
   "main": "./lib/foldingtext",
-  "version": "1.8.0",
+  "version": "1.0.0",
   "description": "Outline editor with productivity features.",
   "keywords": [
     "outline",
@@ -26,7 +26,7 @@
     "foldingtext-service": {
       "description": "FoldingText Service",
       "versions": {
-        "1.0.0": "foldingTextService"
+        "1.0.0": "provideFoldingTextService"
       }
     }
   },

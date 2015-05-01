@@ -1,4 +1,4 @@
-loadOutlineFixture = require '../fixtures/load-outline-fixture'
+loadOutlineFixture = require '../load-outline-fixture'
 OutlineEditor = require '../../lib/editor/outline-editor'
 Outline = require '../../lib/core/outline'
 
@@ -6,7 +6,7 @@ describe 'OutlineEditorElement', ->
   [jasmineContent, editorElement, editor, outline, root, one, two, three, four, five, six] = []
 
   beforeEach ->
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
     jasmineContent = document.body.querySelector('#jasmine-content')
     editor = new OutlineEditor(outline)
     editorElement = editor.outlineEditorElement

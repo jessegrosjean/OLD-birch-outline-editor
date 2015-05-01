@@ -20,7 +20,7 @@ module.exports =
       type: 'boolean'
       default: false
 
-  foldingTextService: ->
+  provideFoldingTextService: ->
     foldingTextService
 
   activate: (state) ->
@@ -34,10 +34,9 @@ module.exports =
         new OutlineEditor
       else
         extension = path.extname(filePath).toLowerCase()
-        switch extension
-          when '.bml'
-            Outline.getOutlineForPath(filePath).then (outline) ->
-              new OutlineEditor(outline)
+        if extension is '.ftml'
+          Outline.getOutlineForPath(filePath).then (outline) ->
+            new OutlineEditor(outline)
 
     require './extensions/ui/popovers'
     require './extensions/edit-link-popover'

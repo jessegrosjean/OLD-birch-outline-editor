@@ -1,4 +1,4 @@
-loadOutlineFixture = require '../fixtures/load-outline-fixture'
+loadOutlineFixture = require '../load-outline-fixture'
 Outline = require '../../lib/core/outline'
 path = require 'path'
 fs = require 'fs'
@@ -7,7 +7,7 @@ describe 'Outline', ->
   [editor, outline, root, one, two, three, four, five, six] = []
 
   beforeEach ->
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
 
   it 'should create item', ->
     item = outline.createItem('hello')
@@ -157,7 +157,7 @@ describe 'Outline', ->
       console.profile('Load Many')
       console.time('Load Many')
       parser = new DOMParser()
-      outlinePath = path.join(__dirname, '..', 'fixtures', 'big-outline.bml')
+      outlinePath = path.join(__dirname, '..', 'fixtures', 'big-outline.ftml')
       outlineBML = fs.readFileSync(outlinePath, 'utf8')
       outlineHTML = parser.parseFromString(outlineBML, 'text/html')
       outline = new Outline({outlineStore: outlineHTML})

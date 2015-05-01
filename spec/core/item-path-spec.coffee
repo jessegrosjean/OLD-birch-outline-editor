@@ -1,4 +1,4 @@
-loadOutlineFixture = require '../fixtures/load-outline-fixture'
+loadOutlineFixture = require '../load-outline-fixture'
 ItemPath = require '../../lib/core/item-path'
 Outline = require '../../lib/core/outline'
 should = require 'should'
@@ -8,7 +8,7 @@ describe 'ItemPath', ->
 
   beforeEach ->
 
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
 
   describe 'Unions', ->
     it 'should union paths separated by "union"', ->

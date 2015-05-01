@@ -19,16 +19,16 @@ class FoldingTextService
   ###
 
   # Public: {Item} Class
-  @Item: Item
+  Item: Item
 
   # Public: {Outline} Class
-  @Outline: Outline
+  Outline: Outline
 
   # Public: {Mutation} Class
-  @Mutation: Mutation
+  Mutation: Mutation
 
   # Public: {OutlineEditor} Class
-  @OutlineEditor: OutlineEditor
+  OutlineEditor: OutlineEditor
 
   ###
   Section: Workspace Outline Editors
@@ -37,14 +37,14 @@ class FoldingTextService
   # Public: Get all outline editors in the workspace.
   #
   # Returns an {Array} of {OutlineEditor}s.
-  @getOutlineEditors: ->
+  getOutlineEditors: ->
     atom.workspace.getPaneItems().filter (item) -> item instanceof OutlineEditor
 
   # Public: Get the active item if it is an {OutlineEditor}.
   #
   # Returns an {OutlineEditor} or `undefined` if the current active item is
   # not an {OutlineEditor}.
-  @getActiveOutlineEditor: ->
+  getActiveOutlineEditor: ->
     activeItem = atom.workspace.getActivePaneItem()
     activeItem if activeItem instanceof OutlineEditor
 
@@ -53,7 +53,7 @@ class FoldingTextService
   # - `outline` The {Outline} to search for.
   #
   # Returns an {Array} of {OutlineEditor}s.
-  @getOutlineEditorsForOutline: (outline) ->
+  getOutlineEditorsForOutline: (outline) ->
     atom.workspace.getPaneItems().filter (item) ->
       item instanceof OutlineEditor and item.outline is outline
 
@@ -62,7 +62,7 @@ class FoldingTextService
   ###
 
   # Public: {EventRegistery} instance.
-  @eventRegistery: eventRegistery
+  eventRegistery: eventRegistery
 
   # Public: Invoke the given callback when an outline editor is added to the
   # workspace.
@@ -75,7 +75,7 @@ class FoldingTextService
   #       in its pane.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  @onDidAddOutlineEditor: (callback) ->
+  onDidAddOutlineEditor: (callback) ->
     atom.workspace.onDidAddPaneItem ({item, pane, index}) ->
       if item instanceof OutlineEditor
         callback({outlineEditor: item, pane, index})
@@ -89,7 +89,7 @@ class FoldingTextService
   #      at the time of subscription or that is added at some later time.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  @observeOutlineEditors: (callback) ->
+  observeOutlineEditors: (callback) ->
     callback(outlineEditor) for outlineEditor in @getOutlineEditors()
     @onDidAddOutlineEditor ({outlineEditor}) -> callback(outlineEditor)
 
@@ -99,7 +99,7 @@ class FoldingTextService
   #   * `outlineEditor` The active OutlineEditor.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  @onDidChangeActiveOutlineEditor: (callback) ->
+  onDidChangeActiveOutlineEditor: (callback) ->
     prev = null
     atom.workspace.onDidChangeActivePaneItem (item) ->
       unless item instanceof OutlineEditor
@@ -115,7 +115,7 @@ class FoldingTextService
   #   * `outlineEditor` The current active {OultineEditor}.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  @observeActiveOutlineEditor: (callback) ->
+  observeActiveOutlineEditor: (callback) ->
     prev = {}
     atom.workspace.observeActivePaneItem (item) ->
       unless item instanceof OutlineEditor
@@ -131,7 +131,7 @@ class FoldingTextService
   #   * `selection` The active {OutlineEditor} {Selection}.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  @onDidChangeActiveOutlineEditorSelection: (callback) ->
+  onDidChangeActiveOutlineEditorSelection: (callback) ->
     selectionSubscription = null
     activeEditorSubscription = @observeActiveOutlineEditor (outlineEditor) ->
       selectionSubscription?.dispose()
@@ -148,8 +148,8 @@ class FoldingTextService
   #   * `selection` The current active {OultineEditor} {Selection}.
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  @observeActiveOutlineEditorSelection: (callback) ->
+  observeActiveOutlineEditorSelection: (callback) ->
     callback @getActiveOutlineEditor()?.selection or null
     @onDidChangeActiveOutlineEditorSelection callback
 
-module.exports = FoldingTextService
+module.exports = new FoldingTextService

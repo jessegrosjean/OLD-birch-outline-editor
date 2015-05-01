@@ -1,4 +1,4 @@
-loadOutlineFixture = require '../fixtures/load-outline-fixture'
+loadOutlineFixture = require '../load-outline-fixture'
 Constants = require '../../lib/core/constants'
 Outline = require '../../lib/core/outline'
 Item = require '../../lib/core/item'
@@ -7,7 +7,7 @@ describe 'Item', ->
   [outline, root, one, two, three, four, five, six] = []
 
   beforeEach ->
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
 
   it 'should get parent', ->
     two.parent.should.equal(one)
