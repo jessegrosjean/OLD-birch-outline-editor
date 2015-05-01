@@ -7,7 +7,8 @@ describe 'ItemPath', ->
   [outline, root, one, two, three, four, five, six] = []
 
   beforeEach ->
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
+
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
 
   describe 'Unions', ->
     it 'should union paths separated by "union"', ->

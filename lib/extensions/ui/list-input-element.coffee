@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
@@ -185,7 +187,7 @@ class ListInputElement extends HTMLElement
   selectPreviousItemElement: (e) ->
     current = @getSelectedItemElement()
     previous = current?.previousSibling
-    if !previous and !current
+    if not previous and not current
       previous = @list.lastChild
     if previous
       @selectItemElement(previous)
@@ -194,7 +196,7 @@ class ListInputElement extends HTMLElement
   selectNextItemElement: (e) ->
     current = @getSelectedItemElement()
     next = current?.nextSibling
-    if !next and !current
+    if not next and not current
       next = @list.firstChild
     if next
       @selectItemElement(next)

@@ -7,7 +7,7 @@ describe 'Item', ->
   [outline, root, one, two, three, four, five, six] = []
 
   beforeEach ->
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
 
   it 'should get parent', ->
     two.parent.should.equal(one)

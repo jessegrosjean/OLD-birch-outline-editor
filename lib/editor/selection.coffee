@@ -316,7 +316,7 @@ class Selection
 
       when 'character'
         if upstream
-          if not @isCollapsed && !extending
+          if not @isCollapsed and not extending
             if focusOffset < anchorOffset
               next.offset = focusOffset
             else
@@ -330,7 +330,7 @@ class Selection
                 next.offsetItem = prevItem
                 next.offset = prevItem.bodyText.length
         else
-          if !@isCollapsed && !extending
+          if not @isCollapsed and not extending
             if focusOffset > anchorOffset
               next.offset = focusOffset
             else
@@ -435,7 +435,7 @@ class Selection
     else
       y = focusCaretRect.bottom + (viewLineHeight / 2.0)
 
-    if y >= (focusViewPRect.top + viewPaddingTop) && y <= (focusViewPRect.bottom - viewPaddingBottom)
+    if y >= (focusViewPRect.top + viewPaddingTop) and y <= (focusViewPRect.bottom - viewPaddingBottom)
       picked = outlineEditorElement.pick(x, y).itemCaretPosition
     else
       nextItem
@@ -465,7 +465,7 @@ class Selection
     picked
 
   _calculateSelectionItems: (overRideSelectionItems) ->
-    items = overRideSelectionItems || []
+    items = overRideSelectionItems or []
 
     if @isValid and not overRideSelectionItems
       editor = @editor

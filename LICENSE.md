@@ -1,11 +1,10 @@
 # License
 
-Copyright (c) 2015 Hog Bay Software
+Copyright (c) 2015 Jesse Grosjean
 
-THIS IS COMMERCIAL SOFTWARE. I have included source code ONLY as a reference
-so that it is easier for you to create Atom packages that work with this
-software. Please do not copy, redistribute, or reuse this code that I have
-provided.
+THIS IS COMMERCIAL SOFTWARE. I have shared the source code ONLY as a reference
+so that it is easier to create Atom packages that work with this software.
+Your may not copy, redistribute, or reuse this code that I have provided.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

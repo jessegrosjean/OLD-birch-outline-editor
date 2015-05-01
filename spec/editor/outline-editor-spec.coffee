@@ -3,11 +3,13 @@ OutlineEditor = require '../../lib/editor/outline-editor'
 Outline = require '../../lib/core/outline'
 
 describe 'OutlineEditor', ->
-  [editor, outline, root, one, two, three, four, five, six] = []
+  [jasmineContent, editor, outline, root, one, two, three, four, five, six] = []
 
   beforeEach ->
-    {outline, root, one, two, three, four, five, six} = loadOutlineFixture()
+    {outline, root, one, two, three, four, five, six} = loadOutlineFixture.openOutlineSync()
+    jasmineContent = document.body.querySelector('#jasmine-content')
     editor = new OutlineEditor(outline)
+    jasmineContent.appendChild editor.outlineEditorElement
 
   afterEach ->
     editor.destroy()
@@ -274,7 +276,6 @@ describe 'OutlineEditor', ->
       editor.selection.focusOffset.should.eql(3)
       two.isInOutline.should.be.false
 
-###
   describe 'Focus', ->
     it 'should not focus editor when setting selection unless it already has focus', ->
       editor.moveSelectionRange(one)
@@ -285,8 +286,9 @@ describe 'OutlineEditor', ->
     it 'should focus item mode focus element when selecting item', ->
       editor.focus()
       editor.moveSelectionRange(one)
-      expect(document.getSelection().focusNode is null).toBe(true)
       document.activeElement.should.equal(editor.outlineEditorElement.focusElement)
+      editor.moveSelectionRange(one, 1)
+      document.activeElement.textContent.should.equal(one.bodyText)
 
     it 'should focus item text when selecting item text', ->
       editor.focus()
@@ -308,12 +310,9 @@ describe 'OutlineEditor', ->
       editor.setExpanded(one)
       editor.moveSelectionRange(two, 1)
       editor.extendSelectionRange(five, 3)
-      expect(document.getSelection().focusNode is null).toBe(true)
       document.activeElement.should.equal(editor.outlineEditorElement.focusElement)
 
     it 'should focus item mode focus element on invalid selection', ->
       editor.focus()
       editor.moveSelectionRange(one, 4)
       document.activeElement.should.equal(editor.outlineEditorElement.focusElement)
-
-###

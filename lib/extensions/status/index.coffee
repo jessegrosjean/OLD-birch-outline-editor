@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../../foldingtext-service'
 
 toggleStatus = (editor, status) ->
@@ -43,8 +45,8 @@ atom.commands.add 'ft-outline-editor',
 
 atom.keymaps.add 'status-bindings',
   'ft-outline-editor.outlineMode':
-    's t' : 'outline-editor:toggle-status-todo'
-    's w' : 'outline-editor:toggle-status-waiting'
-    's a' : 'outline-editor:toggle-status-active'
-    's c' : 'outline-editor:toggle-status-complete'
-    'space' : 'outline-editor:toggle-status-complete'
+    's t': 'outline-editor:toggle-status-todo'
+    's w': 'outline-editor:toggle-status-waiting'
+    's a': 'outline-editor:toggle-status-active'
+    's c': 'outline-editor:toggle-status-complete'
+    'space': 'outline-editor:toggle-status-complete'

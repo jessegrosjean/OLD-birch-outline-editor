@@ -62,9 +62,7 @@ class AttributedString
       theCopy._attributeRuns = attributeRunsCopy
     theCopy
 
-`
-
-//
+`//
 // String
 //
 

@@ -401,7 +401,7 @@ class Outline
   #
   # Returns {Item} copy.
   importItem: (item) ->
-    assert.ok(!item.isRoot, 'Can not import root item')
+    assert.ok(not item.isRoot, 'Can not import root item')
     assert.ok(item.outline isnt @, 'Item must not be owned by this outline')
     @createItem(null, @outlineStore.importNode(item._liOrRootUL, true))
 
@@ -572,7 +572,7 @@ class Outline
       @updateMutations = null
       if updateMutations.length > 0
         @cachedText = null
-        @conflict = false if @conflict and !@isModified()
+        @conflict = false if @conflict and not @isModified()
         @emitter.emit('did-change', updateMutations)
         @scheduleModifiedEvents()
 

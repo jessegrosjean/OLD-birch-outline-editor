@@ -1,9 +1,11 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 foldingTextService = require '../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
 exports.consumeStatusBarService = (statusBar) ->
   hoistElement = document.createElement 'a'
-  hoistElement.className = 'ft-statusbar-hoisted icon-location inline-block'
+  hoistElement.className = 'ft-location-status-bar-item icon-location inline-block'
   hoistElement.addEventListener 'click', (e) ->
     editor = foldingTextService.getActiveOutlineEditor()
     savedSelection = editor.selection

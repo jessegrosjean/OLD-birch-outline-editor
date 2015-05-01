@@ -1,3 +1,4 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
 
 GlobalMouseDown = 0
 GlobalMouseButton = {}

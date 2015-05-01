@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 TextInputElement = require './text-input-element'
@@ -162,7 +164,7 @@ class TokenInputElement extends HTMLElement
     @updateLayout()
 
   delete: (e, backspace) ->
-    if backspace and !@textInputElement.isCursorAtStart()
+    if backspace and not @textInputElement.isCursorAtStart()
       return
 
     if selected = @getSelectedTokenElement()
@@ -178,7 +180,7 @@ class TokenInputElement extends HTMLElement
   selectPreviousTokenElement: ->
     current = @getSelectedTokenElement()
     previous = current?.previousSibling
-    if !previous and !current
+    if not previous and not current
       previous = @list.lastChild
     if previous
       @selectTokenElement(previous)

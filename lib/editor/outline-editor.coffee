@@ -173,11 +173,8 @@ class OutlineEditor
     unless @destroyed
       @destroyed = true
       @subscriptions.dispose()
-      @subscriptions = null
       @outline.release @id
-      @outline = null
       @outlineEditorElement.destroy()
-      @outlineEditorElement = null
       @emitter.emit 'did-destroy'
 
   ###
@@ -328,7 +325,7 @@ class OutlineEditor
       hadValidSelection = @selection.isValid
       @setHoistedItemsStack stack
       child = @getFirstVisibleChild item
-      if child and (!hadValidSelection or child.isEmpty)
+      if child and (not hadValidSelection or child.isEmpty)
         @moveSelectionRange child, 0
 
   # Public: Pop the current hoisted {Item}.
@@ -1490,7 +1487,7 @@ class OutlineEditor
         undoManager.beginUndoGrouping()
         outline.beginUpdates()
 
-        if 0 is startOffset && startItem isnt endItem && startItem is endItem.previousSibling && startItem.bodyText.length is 0
+        if 0 is startOffset and startItem isnt endItem and startItem is endItem.previousSibling and startItem.bodyText.length is 0
           @moveSelectionRange(endItem, 0)
           endItem.replaceBodyTextInRange('', 0, endOffset)
           for each in selectionRange.items[...-1]
@@ -1519,9 +1516,9 @@ class OutlineEditor
         nextSelection = null
 
         if Selection.isUpstreamDirection(direction)
-          nextSelection = previousSibling || nextSibling || parent
+          nextSelection = previousSibling or nextSibling or parent
         else
-          nextSelection = nextSibling || previousSibling || parent
+          nextSelection = nextSibling or previousSibling or parent
 
         undoManager.beginUndoGrouping()
         outline.beginUpdates()
@@ -1704,7 +1701,7 @@ class OutlineEditor
     @outline.undoManager.redo()
 
   didOpenUndoGroup: (undoManager) ->
-    if !undoManager.isUndoing and !undoManager.isRedoing
+    if not undoManager.isUndoing and not undoManager.isRedoing
       undoManager.setUndoGroupMetadata('undoSelection', @selection)
 
   didReopenUndoGroup: (undoManager) ->

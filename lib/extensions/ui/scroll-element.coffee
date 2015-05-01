@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 {Disposable, CompositeDisposable} = require 'atom'
 
 class ScrollElement extends HTMLElement

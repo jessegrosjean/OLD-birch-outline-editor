@@ -1,9 +1,9 @@
 @import (reference) '../editor/variables';
 
-.status-bar ft-text-input.ft-statusbar-filter {
-  vertical-align: middle;
-  max-width: none;
-  overflow: visible;
+.ft-search-status-bar-item {
+  vertical-align: middle !important;
+  max-width: none !important;
+  overflow: visible !important;
 
   position: relative; // hack for one themes that don't put status bar text in exact middle
   top: -1px;
@@ -21,93 +21,5 @@
     font-size: inherit;
     line-height: 1.5em;
     overflow: visible;
-  }
-}
-
-//
-// Search
-//
-
-outline-editor-toolbar {
-  padding: @component-padding / 2;
-  background: @tab-background-color-active;
-  border-bottom: 1px solid  @pane-item-border-color;
-  display: flex;
-}
-
-@search-button-width: @component-line-height + (@component-padding / 2.0);
-
-outline-editor-search {
-  flex-grow: 1;
-  display: flex;
-  position: relative;
-
-  > button {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    font-family: inherit;
-    font-size: 1em;
-    cursor: pointer;
-    position: absolute;
-    top: 1px;
-    width: @search-button-width;
-    height: @component-line-height;
-    line-height: @component-line-height;
-    color: @text-color-subtle;
-
-    &.unhoist {
-      left: 0;
-      width: 0;
-      color: @input-background-color;
-      background: @base-accent-color;
-      border-top-right-radius: @component-border-radius;
-      border-bottom-right-radius: @component-border-radius;
-      transform: scaleX(-1);
-      transition:width @ft-hoist-animation-duration;
-    }
-
-    &.find {
-      left: 0;
-      transition:left @ft-hoist-animation-duration;
-    }
-
-    &.cancel {
-      right: 0;
-    }
-  }
-
-  > atom-text-editor[mini] {
-    flex-grow: 1;
-    padding-left: @search-button-width;
-    padding-right: @search-button-width;
-    transition:padding-left @ft-hoist-animation-duration;
-
-    &,
-    &::shadow {
-      font-size: @input-font-size;
-      font-family: @ft-font-family;
-      .source.itempath .string {
-        color: @text-color;
-      }
-    }
-  }
-
-  &.hoisted {
-    > button {
-      &.unhoist {
-        width: @search-button-width;
-        transition:width @ft-hoist-animation-duration;
-      }
-      &.find {
-        left: @search-button-width;
-        transition:left @ft-hoist-animation-duration;
-      }
-    }
-    > atom-text-editor[mini] {
-      padding-left: @search-button-width * 2;
-      transition:padding-left @ft-hoist-animation-duration;
-    }
   }
 }

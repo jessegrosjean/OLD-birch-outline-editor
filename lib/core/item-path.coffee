@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 ItemPathParser = require './item-path-parser'
 _ = require 'underscore-plus'
 
@@ -281,7 +283,7 @@ class ItemPath
       modifier = predicate.modifier
       value = predicate.value
 
-      if !relation and !value
+      if not relation and not value
         return @valueForAttributePath(attributePath, item) isnt null
 
       predicateValueCache = predicate.predicateValueCache

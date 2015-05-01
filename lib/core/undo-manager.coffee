@@ -3,6 +3,7 @@
 {Emitter} = require 'atom'
 assert = require 'assert'
 
+module.exports =
 class UndoManager
 
   constructor: ->
@@ -65,7 +66,7 @@ class UndoManager
           else
             @undoStack.push(@currentGroup)
 
-        if !@isUndoing && !@isRedoing
+        if not @isUndoing and not @isRedoing
           @redoStack = []
 
         @currentGroup = null
@@ -93,7 +94,7 @@ class UndoManager
 
   setUndoGroupMetadata: (key, value) ->
     undoStack = @undoStack
-    lastOrCurrentGoup = @currentGroup || undoStack[undoStack.length - 1]
+    lastOrCurrentGoup = @currentGroup or undoStack[undoStack.length - 1]
     lastOrCurrentGoup?.metadata[key] = value
 
   ###
@@ -101,10 +102,10 @@ class UndoManager
   ###
 
   canUndo: ->
-    !@isUndoing && !@isRedoing && @undoStack.length > 0
+    not @isUndoing and not @isRedoing and @undoStack.length > 0
 
   canRedo: ->
-    !@isUndoing && !@isRedoing && @redoStack.length > 0
+    not @isUndoing and not @isRedoing and @redoStack.length > 0
 
   undo: (context) ->
     assert.ok(@groupingLevel is 0, 'Unclosed grouping')
@@ -159,5 +160,3 @@ class UndoManager
     assert.ok(@disabledLevel is 0, 'Unclosed disable')
     @undoStack = []
     @redoStack = []
-
-module.exports = UndoManager;

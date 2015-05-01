@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../../foldingtext-service'
 
 togglePriority = (editor, priority) ->
@@ -46,11 +48,11 @@ atom.commands.add 'ft-outline-editor',
 
 atom.keymaps.add 'priorities-bindings',
   'ft-outline-editor.outlineMode':
-    '1' : 'outline-editor:toggle-priority-1'
-    '2' : 'outline-editor:toggle-priority-2'
-    '3' : 'outline-editor:toggle-priority-3'
-    '4' : 'outline-editor:toggle-priority-4'
-    '5' : 'outline-editor:toggle-priority-5'
-    '6' : 'outline-editor:toggle-priority-6'
-    '7' : 'outline-editor:toggle-priority-7'
-    '0' : 'outline-editor:clear-priority'
+    '1': 'outline-editor:toggle-priority-1'
+    '2': 'outline-editor:toggle-priority-2'
+    '3': 'outline-editor:toggle-priority-3'
+    '4': 'outline-editor:toggle-priority-4'
+    '5': 'outline-editor:toggle-priority-5'
+    '6': 'outline-editor:toggle-priority-6'
+    '7': 'outline-editor:toggle-priority-7'
+    '0': 'outline-editor:clear-priority'

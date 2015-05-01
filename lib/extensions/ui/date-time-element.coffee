@@ -1,4 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 

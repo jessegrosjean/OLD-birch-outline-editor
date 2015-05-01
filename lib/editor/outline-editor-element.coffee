@@ -416,10 +416,10 @@ class OutlineEditorElement extends HTMLElement
     scrollBottom = viewportRect.bottom
     startsAboveTop = startOffset < scrollTop
     endsBelowBottom = endOffset > scrollBottom
-    needsScroll = startsAboveTop || endsBelowBottom
-    overlappingBothEnds = startsAboveTop && endsBelowBottom
+    needsScroll = startsAboveTop or endsBelowBottom
+    overlappingBothEnds = startsAboveTop and endsBelowBottom
 
-    if needsScroll && !overlappingBothEnds
+    if needsScroll and not overlappingBothEnds
       if center
         @scrollToOffsetRange(startOffset, endOffset, 'center')
       else
@@ -703,7 +703,7 @@ class OutlineEditorElement extends HTMLElement
         undoManager = outline.undoManager
 
         if insertItem.parent
-          compareTo = dropInsertBeforeItem ? dropInsertBeforeItem : dropParentItem.lastChild
+          compareTo = if dropInsertBeforeItem then dropInsertBeforeItem else dropParentItem.lastChild
           unless compareTo
             compareTo = dropParentItem
 

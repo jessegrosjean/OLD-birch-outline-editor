@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 ItemPath = require '../core/item-path'
 # construct path on separate line for endokken
 grammarPath = atom.config.resourcePath + '/node_modules/first-mate/lib/grammar'

@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 ChildrenAnimation = require './animations/children-animation'
 InsertAnimation = require './animations/insert-animation'
 RemoveAnimation = require './animations/remove-animation'

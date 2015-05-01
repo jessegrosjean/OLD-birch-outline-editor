@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 foldingTextService = require '../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 TextInputElement = require './ui/text-input-element'
@@ -6,7 +8,7 @@ ItemPathGrammar = require './item-path-grammar'
 exports.consumeStatusBarService = (statusBar) ->
   searchElement = document.createElement 'ft-text-input'
   searchElement.classList.add 'inline-block'
-  searchElement.classList.add 'ft-statusbar-filter'
+  searchElement.classList.add 'ft-search-status-bar-item'
   searchElement.cancelOnBlur = false
   searchElement.setPlaceholderText 'Search'
   searchElement.setGrammar new ItemPathGrammar(atom.grammars)

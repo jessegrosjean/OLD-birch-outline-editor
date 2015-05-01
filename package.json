@@ -2,7 +2,7 @@
   "name": "foldingtext",
   "main": "./lib/foldingtext",
   "version": "1.8.0",
-  "description": "FoldingText outline editor.",
+  "description": "Outline editor with productivity features.",
   "keywords": [
     "outline",
     "notes",
@@ -10,7 +10,7 @@
     "todos",
     "GTD"
   ],
-  "repository": "https://github.com/jessegrosjean/outline-editor",
+  "repository": "https://github.com/FoldingText/foldingtext",
   "license": "Commercial Shared Source",
   "engines": {
     "atom": ">=0.192.0 <2.0.0"
@@ -24,7 +24,7 @@
   },
   "providedServices": {
     "foldingtext-service": {
-      "description": "FoldingText Editor Service",
+      "description": "FoldingText Service",
       "versions": {
         "1.0.0": "foldingTextService"
       }

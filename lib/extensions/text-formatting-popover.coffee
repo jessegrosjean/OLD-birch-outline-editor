@@ -1,4 +1,5 @@
 # Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../foldingtext-service'
 {Disposable, CompositeDisposable} = require 'atom'
 
@@ -91,7 +92,7 @@ class TextFormattingPopover extends HTMLElement
     unless @linkButton.classList.contains('selected') is formattingTags['A']?
       @linkButton.classList.toggle('selected')
 
-FoldingTextService.eventRegistery.listen 'text-formatting-popover button',
+FoldingTextService.eventRegistery.listen 'ft-text-formatting-popover button',
   mousedown: (e) ->
     outlineEditorElement = FoldingTextService.getActiveOutlineEditor()?.outlineEditorElement
     if outlineEditorElement and command = e.target.getAttribute?('data-command')
@@ -102,7 +103,7 @@ FoldingTextService.eventRegistery.listen 'text-formatting-popover button',
       e.stopPropagation()
       e.preventDefault()
 
-formattingBar = document.createElement 'text-formatting-popover'
+formattingBar = document.createElement 'ft-text-formatting-popover'
 formattingBarPanel = atom.workspace.addPopoverPanel
   item: formattingBar
   target: ->
@@ -117,4 +118,4 @@ FoldingTextService.observeActiveOutlineEditorSelection (selection) ->
   else
     formattingBarPanel.hide()
 
-module.exports = document.registerElement 'text-formatting-popover', prototype: TextFormattingPopover.prototype
+module.exports = document.registerElement 'ft-text-formatting-popover', prototype: TextFormattingPopover.prototype

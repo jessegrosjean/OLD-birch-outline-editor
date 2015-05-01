@@ -419,8 +419,8 @@ class Item
   isEmpty: null
   Object.defineProperty @::, 'isEmpty',
     get: ->
-      !@hasBodyText and
-      !@firstChild and
+      not @hasBodyText and
+      not @firstChild and
       @attributeNames.length is 0
 
   # Public: Read-only true if item is part of owning {Outline}

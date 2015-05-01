@@ -56,7 +56,7 @@ tidyHTMLDOM = (element, indent) ->
     childIndent = indent + '  '
     while eachChild
       tagName = eachChild.tagName
-      if tagName is 'UL' && !eachChild.firstElementChild
+      if tagName is 'UL' and not eachChild.firstElementChild
         ref = eachChild
         eachChild = eachChild.nextElementSibling
         element.removeChild ref
@@ -226,11 +226,11 @@ OPMLToItems = (opml, editor) ->
     tree = this
     state
 
-    if !opmlDoc
+    unless opmlDoc
       return null
 
     documentElement = opmlDoc.documentElement
-    if !documentElement
+    unless documentElement
       return null
 
     headElement = documentElement.getElementsByTagName('head')[0]
@@ -238,7 +238,7 @@ OPMLToItems = (opml, editor) ->
       state = headElement.getAttribute('jsonstate')
 
     bodyElement = documentElement.getElementsByTagName('body')[0]
-    if !bodyElement
+    unless bodyElement
       return null
 
     eachOutline = bodyElement.firstElementChild

@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 panelContainerPath = atom.config.resourcePath + '/src/panel-container'
 PanelContainer = require panelContainerPath
 panelElementPath = atom.config.resourcePath + '/src/panel-element'
@@ -151,6 +153,6 @@ schedulePositionPopovers = ->
 
 positionPopovers = ->
   positionPopoversFrameID = null
-  for panel in atom.workspace.getPopoverPanels()
+  for panel in atom.workspace?.getPopoverPanels()
     if panel.isVisible()
       atom.views.getView(panel).positionPopover()

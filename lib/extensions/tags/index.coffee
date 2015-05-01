@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Jesse Grosjean. All rights reserved.
+
 FoldingTextService = require '../../foldingtext-service'
 TokenInputElement = require '../ui/token-input-element'
 ListInputElement = require '../ui/list-input-element'
@@ -128,5 +130,5 @@ atom.commands.add 'ft-outline-editor .btag',
 
 atom.contextMenu.add
   'ft-outline-editor .btag': [
-    {label: 'Delete Tag', command:'outline-editor:delete-tag'}
+    {label: 'Delete Tag', command: 'outline-editor:delete-tag'}
   ]
