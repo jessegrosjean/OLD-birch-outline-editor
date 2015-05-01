@@ -1,5 +1,5 @@
 {
-  "name": "foldingtext",
+  "name": "foldingtext-atom",
   "main": "./lib/foldingtext",
   "version": "1.0.0",
   "description": "Outline editor with productivity features.",
@@ -10,7 +10,7 @@
     "todos",
     "GTD"
   ],
-  "repository": "https://github.com/FoldingText/foldingtext",
+  "repository": "https://github.com/FoldingText/foldingtext-atom",
   "license": "Commercial Shared Source",
   "engines": {
     "atom": ">=0.192.0 <2.0.0"

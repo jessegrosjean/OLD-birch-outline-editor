@@ -119,13 +119,13 @@ describe 'Item', ->
         one.bodyHTML.should.equal('<i>o<b>ne</b></i>')
 
       it 'should add consecutive attribute with different values', ->
-        one.addElementInBodyTextRange('SPAN', {'data-a' : 'a'}, 0, 1)
-        one.addElementInBodyTextRange('SPAN', {'data-b' : 'b'}, 1, 2)
+        one.addElementInBodyTextRange('SPAN', 'data-a': 'a', 0, 1)
+        one.addElementInBodyTextRange('SPAN', 'data-b': 'b', 1, 2)
         one.bodyHTML.should.equal('<span data-a="a">o</span><span data-b="b">ne</span>')
 
       it 'should add consecutive attribute with same values', ->
-        one.addElementInBodyTextRange('SPAN', {'data-a' : 'a'}, 0, 1)
-        one.addElementInBodyTextRange('SPAN', {'data-a' : 'a'}, 1, 2)
+        one.addElementInBodyTextRange('SPAN', 'data-a': 'a', 0, 1)
+        one.addElementInBodyTextRange('SPAN', 'data-a': 'a', 1, 2)
         one.bodyHTML.should.equal('<span data-a="a">one</span>')
 
       it 'should remove element', ->

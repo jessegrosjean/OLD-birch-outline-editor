@@ -797,7 +797,8 @@ class Outline
     @fileSubscriptions.add @file.onWillThrowWatchError (errorObject) =>
       @emitter.emit 'will-throw-watch-error', errorObject
 
-  hasMultipleEditors: -> @refcount > 1
+  hasMultipleEditors: ->
+    @refcount > 1
 
   cancelStoppedChangingTimeout: ->
     clearTimeout(@stoppedChangingTimeout) if @stoppedChangingTimeout
