@@ -315,7 +315,7 @@ class ItemPath
     else if modifier is 'd'
       Date.parse(value) # weak
     else
-      value
+      value # case insensitive is default
 
   evaluateRelation: (left, relation, right, predicate) ->
     switch relation

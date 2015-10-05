@@ -7,43 +7,7 @@ exports.consumeStatusBarService = (statusBar) ->
   hoistElement = document.createElement 'a'
   hoistElement.className = 'ft-location-status-bar-item icon-location inline-block'
   hoistElement.addEventListener 'click', (e) ->
-    editor = foldingTextService.getActiveOutlineEditor()
-    savedSelection = editor.selection
-    return unless editor
-
-    listInput = document.createElement 'ft-list-input'
-    listInput.setText editor.getSearch().query
-
-    listInput.setDelegate
-      elementForListItem: (item) ->
-        li = document.createElement 'li'
-        span = document.createElement 'span'
-        span.textContent = item.bodyText
-        li.appendChild span
-        li
-
-      mouseClickListItem: (e) ->
-
-      didSelectListItem: (item) ->
-
-      restoreFocus: ->
-        editor.focus()
-        editor.moveSelectionRange savedSelection
-
-      cancelled: ->
-        listInputPanel.destroy()
-
-      confirm: ->
-        listInputPanel.destroy()
-        @restoreFocus()
-
-    listInput.setItems editor.outline.evaluateItemPath '//*/parent::*'
-    listInputPanel = atom.workspace.addPopoverPanel
-      className: 'ft-text-input-panel'
-      item: listInput
-      target: e.target
-
-    listInput.focusTextEditor()
+    foldingTextService.getActiveOutlineEditor()?.unhoist()
 
   locationStatusBarItem = statusBar.addLeftTile(item: hoistElement, priority: 0)
 

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Endokken</title>
+    <link rel='stylesheet' href='bootstrap.min.css' type='text/css'>
+    <link rel='stylesheet' href='base.css' type='text/css'>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md-2 navigation'>
+          <div class='list-group'>
+  <h4 class='list-group-item-heading'>Classes</h4>
+  <a class='list-group-item' href='AttributedString'>AttributedString</a>
+<a class='list-group-item' href='Item'>Item</a>
+<a class='list-group-item' href='Mutation'>Mutation</a>
+<a class='list-group-item' href='Outline'>Outline</a>
+<a class='list-group-item' href='OutlineEditor'>OutlineEditor</a>
+<a class='list-group-item' href='Selection'>Selection</a>
+<a class='list-group-item' href='FoldingTextService'>FoldingTextService</a>
+</div>
+<div class='list-group'>
+  <h4 class='list-group-item-heading'>Files</h4>
+  <a class='list-group-item' href='CHANGELOG'>CHANGELOG</a>
+<a class='list-group-item' href='LICENSE'>LICENSE</a>
+<a class='list-group-item' href='README'>README</a>
+</div>
+        </div>
+        <div class='col-md-10'>
+          <div class='content'>
+            <h1>Class: Mutation</h1>
+<div class='row'>
+  <div class='col-md-6'>
+    <table class='info-table table table-bordered'>
+      <tbody>
+        <tr>
+          <th>Class Name</th>
+          <td>Mutation</td>
+        </tr>
+        <tr>
+          <th>Superclass</th>
+          <td><a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a></td>
+        </tr>
+        <tr>
+          <th>File</th>
+          <td>
+            <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L11'>lib&#47;core&#47;mutation.coffee</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<h2>Description</h2>
+<p>A record of a single change in a target <a class='reference' href='Item'>Item</a>.</p>
+<p>A new mutation is created to record each attribute set, body text change,
+and child item’s update. Use <a class='reference' href='Outline#instance-onDidChange'>Outline::onDidChange</a> to receive this mutation
+record so you can track what has changed as an outline is edited. </p>
+
+<h2>Constants</h2>
+<div class='section'>
+  
+  <div class='panel panel-primary property' id='static-ATTRIBUTE_CHANGED'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.ATTRIBUTE_CHANGED</span>
+      <a href='#static-ATTRIBUTE_CHANGED'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L18'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>ATTRIBUTE_CHANGED Mutation type constant. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='static-BODT_TEXT_CHANGED'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.BODT_TEXT_CHANGED</span>
+      <a href='#static-BODT_TEXT_CHANGED'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L21'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>BODT_TEXT_CHANGED Mutation type constant. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='static-CHILDREN_CHANGED'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.CHILDREN_CHANGED</span>
+      <a href='#static-CHILDREN_CHANGED'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L24'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>CHILDREN_CHANGED Mutation type constant. </p>
+    
+  </div>
+</div>
+  
+  
+  
+</div>
+<h2>Attributes</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-target'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::target</span>
+      <a href='#instance-target'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L31'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='Item'>Item</a> target of the change delta. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-type'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::type</span>
+      <a href='#instance-type'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L35'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only type of change. <a class='reference' href='Mutation#static-ATTRIBUTE_CHANGED'>Mutation.ATTRIBUTE_CHANGED</a>,
+<a class='reference' href='Mutation#static-BODT_TEXT_CHANGED'>Mutation.BODT_TEXT_CHANGED</a>, or <a class='reference' href='Mutation#static-CHILDREN_CHANGED'>Mutation.CHILDREN_CHANGED</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-attributeName'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::attributeName</span>
+      <a href='#instance-attributeName'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L38'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only name of changed attribute in the target <a class='reference' href='Item'>Item</a>, or null. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-attributeOldValue'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::attributeOldValue</span>
+      <a href='#instance-attributeOldValue'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L42'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only previous value of changed attribute in the target
+<a class='reference' href='Item'>Item</a>, or null. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-insertedTextLocation'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::insertedTextLocation</span>
+      <a href='#instance-insertedTextLocation'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L46'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only value of the body text location where the insert started
+in the target <a class='reference' href='Item'>Item</a>, or null. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-insertedTextLength'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::insertedTextLength</span>
+      <a href='#instance-insertedTextLength'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L50'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only value of length of the inserted body text in the target
+<a class='reference' href='Item'>Item</a>, or null. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-replacedText'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::replacedText</span>
+      <a href='#instance-replacedText'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L54'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only value of replaced body text in the target <a class='reference' href='Item'>Item</a>, or
+null. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-addedItems'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::addedItems</span>
+      <a href='#instance-addedItems'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L57'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of child <a class='reference' href='Item'>Item</a>s added to the target. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-removedItems'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::removedItems</span>
+      <a href='#instance-removedItems'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L60'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of child <a class='reference' href='Item'>Item</a>s removed from the target. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-previousSibling'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::previousSibling</span>
+      <a href='#instance-previousSibling'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L64'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only previous sibling <a class='reference' href='Item'>Item</a> of the added or removed Items,
+or null. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-nextSibling'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::nextSibling</span>
+      <a href='#instance-nextSibling'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/mutation.coffee#L68'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only next sibling <a class='reference' href='Item'>Item</a> of the added or removed Items, or
+null. </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+          </div>
+          <div class='footer text-center'>
+            <small>
+              Generated on Tue May 05 2015 10:36:49 GMT-0400 (EDT) by
+              <a href='https://github.com/lee-dohm/endokken'>endokken v0.1.0</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='bootstrap.min.js'></script>
+    <script src='base.js'></script>
+  </body>
+</html>

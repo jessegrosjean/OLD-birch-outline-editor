@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Endokken</title>
+    <link rel='stylesheet' href='bootstrap.min.css' type='text/css'>
+    <link rel='stylesheet' href='base.css' type='text/css'>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md-2 navigation'>
+          <div class='list-group'>
+  <h4 class='list-group-item-heading'>Classes</h4>
+  <a class='list-group-item' href='AttributedString'>AttributedString</a>
+<a class='list-group-item' href='Item'>Item</a>
+<a class='list-group-item' href='Mutation'>Mutation</a>
+<a class='list-group-item' href='Outline'>Outline</a>
+<a class='list-group-item' href='OutlineEditor'>OutlineEditor</a>
+<a class='list-group-item' href='Selection'>Selection</a>
+<a class='list-group-item' href='FoldingTextService'>FoldingTextService</a>
+</div>
+<div class='list-group'>
+  <h4 class='list-group-item-heading'>Files</h4>
+  <a class='list-group-item' href='CHANGELOG'>CHANGELOG</a>
+<a class='list-group-item' href='LICENSE'>LICENSE</a>
+<a class='list-group-item' href='README'>README</a>
+</div>
+        </div>
+        <div class='col-md-10'>
+          <div class='content'>
+            <h1>Class: AttributedString</h1>
+<div class='row'>
+  <div class='col-md-6'>
+    <table class='info-table table table-bordered'>
+      <tbody>
+        <tr>
+          <th>Class Name</th>
+          <td>AttributedString</td>
+        </tr>
+        <tr>
+          <th>Superclass</th>
+          <td><a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a></td>
+        </tr>
+        <tr>
+          <th>File</th>
+          <td>
+            <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/attributed-string.coffee#L16'>lib&#47;core&#47;attributed-string.coffee</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<h2>Description</h2>
+<p>A text container holding both characters and formatting attributes.</p>
+<p>AttributedStrings are opaque and immutable. They are only useful for moving
+text and attributes from on <a class='reference' href='Item'>Item</a>s body text to another items body text.
+See:</p>
+<ul>
+<li><a class='reference' href='Item#instance-getAttributedBodyTextSubstring'>Item::getAttributedBodyTextSubstring</a></li>
+<li><a class='reference' href='Item#instance-replaceBodyTextInRange'>Item::replaceBodyTextInRange</a> </li>
+</ul>
+
+          </div>
+          <div class='footer text-center'>
+            <small>
+              Generated on Tue May 05 2015 10:36:47 GMT-0400 (EDT) by
+              <a href='https://github.com/lee-dohm/endokken'>endokken v0.1.0</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='bootstrap.min.js'></script>
+    <script src='base.js'></script>
+  </body>
+</html>

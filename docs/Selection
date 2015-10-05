@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Endokken</title>
+    <link rel='stylesheet' href='bootstrap.min.css' type='text/css'>
+    <link rel='stylesheet' href='base.css' type='text/css'>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md-2 navigation'>
+          <div class='list-group'>
+  <h4 class='list-group-item-heading'>Classes</h4>
+  <a class='list-group-item' href='AttributedString'>AttributedString</a>
+<a class='list-group-item' href='Item'>Item</a>
+<a class='list-group-item' href='Mutation'>Mutation</a>
+<a class='list-group-item' href='Outline'>Outline</a>
+<a class='list-group-item' href='OutlineEditor'>OutlineEditor</a>
+<a class='list-group-item' href='Selection'>Selection</a>
+<a class='list-group-item' href='FoldingTextService'>FoldingTextService</a>
+</div>
+<div class='list-group'>
+  <h4 class='list-group-item-heading'>Files</h4>
+  <a class='list-group-item' href='CHANGELOG'>CHANGELOG</a>
+<a class='list-group-item' href='LICENSE'>LICENSE</a>
+<a class='list-group-item' href='README'>README</a>
+</div>
+        </div>
+        <div class='col-md-10'>
+          <div class='content'>
+            <h1>Class: Selection</h1>
+<div class='row'>
+  <div class='col-md-6'>
+    <table class='info-table table table-bordered'>
+      <tbody>
+        <tr>
+          <th>Class Name</th>
+          <td>Selection</td>
+        </tr>
+        <tr>
+          <th>Superclass</th>
+          <td><a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a></td>
+        </tr>
+        <tr>
+          <th>File</th>
+          <td>
+            <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L22'>lib&#47;editor&#47;selection.coffee</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<h2>Description</h2>
+<p>The selection returned by <a class='reference' href='OutlineEditor#instance-selection'>OutlineEditor::selection</a>.</p>
+<p>The anchor of a selection is the beginning point of the selection. When
+making a selection with a mouse, the anchor is where in the document the
+mouse button is initially pressed. As the user changes the selection using
+the mouse or the keyboard, the anchor does not move.</p>
+<p>The focus of a selection is the end point of the selection. When making a
+selection with a mouse, the focus is where in the document the mouse button
+is released. As the user changes the selection using the mouse or the
+keyboard, the focus is the end of the selection that moves.</p>
+<p>The start of a selection is the boundary closest to the beginning of the
+document. The end of a selection is the boundary closest to the end of the
+document. </p>
+
+<h2>Anchor and Focus</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-anchorItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::anchorItem</span>
+      <a href='#instance-anchorItem'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L37'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='Item'>Item</a> where the selection is anchored. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-anchorOffset'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::anchorOffset</span>
+      <a href='#instance-anchorOffset'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L40'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only text offset in the anchor <a class='reference' href='Item'>Item</a> where the selection is anchored. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-focusItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::focusItem</span>
+      <a href='#instance-focusItem'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L43'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='Item'>Item</a> where the selection is focused. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-focusOffset'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::focusOffset</span>
+      <a href='#instance-focusOffset'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L46'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only text offset in the focus <a class='reference' href='Item'>Item</a> where the selection is focused. </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+<h2>Start and End</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-startItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::startItem</span>
+      <a href='#instance-startItem'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L53'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only first selected <a class='reference' href='Item'>Item</a> in outline order. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-startOffset'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::startOffset</span>
+      <a href='#instance-startOffset'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L56'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only text offset in the start <a class='reference' href='Item'>Item</a> where selection starts. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-endItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::endItem</span>
+      <a href='#instance-endItem'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L59'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only last selected <a class='reference' href='Item'>Item</a> in outline order. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-endOffset'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::endOffset</span>
+      <a href='#instance-endOffset'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L62'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only text offset in the end <a class='reference' href='Item'>Item</a> where selection end. </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+<h2>Items</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-items'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::items</span>
+      <a href='#instance-items'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L69'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of selected <a class='reference' href='Item'>Item</a>s. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-itemsCommonAncestors'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::itemsCommonAncestors</span>
+      <a href='#instance-itemsCommonAncestors'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L72'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of common ancestors of selected <a class='reference' href='Item'>Item</a>s. </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+<h2>Selection State</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-isCollapsed'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isCollapsed</span>
+      <a href='#instance-isCollapsed'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/selection.coffee#L150'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only indicating whether the selection’s start and end points
+are at the same position. </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+          </div>
+          <div class='footer text-center'>
+            <small>
+              Generated on Tue May 05 2015 10:36:52 GMT-0400 (EDT) by
+              <a href='https://github.com/lee-dohm/endokken'>endokken v0.1.0</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='bootstrap.min.js'></script>
+    <script src='base.js'></script>
+  </body>
+</html>

@@ -1,6 +1,6 @@
-# FoldingText
+# FoldingText for Atom
 
-For making lists in [Atom](https://atom.io). FoldingText is an outline editor with productivity features. Use *File > New Outline* to get started.
+For making lists in [Atom](https://atom.io). FoldingText is an outline editor with productivity features. Once you've installed the FoldingText package use *File > New Outline* to get started.
 
 Features:
 

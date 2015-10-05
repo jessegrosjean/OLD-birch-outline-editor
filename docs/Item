@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Endokken</title>
+    <link rel='stylesheet' href='bootstrap.min.css' type='text/css'>
+    <link rel='stylesheet' href='base.css' type='text/css'>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md-2 navigation'>
+          <div class='list-group'>
+  <h4 class='list-group-item-heading'>Classes</h4>
+  <a class='list-group-item' href='AttributedString'>AttributedString</a>
+<a class='list-group-item' href='Item'>Item</a>
+<a class='list-group-item' href='Mutation'>Mutation</a>
+<a class='list-group-item' href='Outline'>Outline</a>
+<a class='list-group-item' href='OutlineEditor'>OutlineEditor</a>
+<a class='list-group-item' href='Selection'>Selection</a>
+<a class='list-group-item' href='FoldingTextService'>FoldingTextService</a>
+</div>
+<div class='list-group'>
+  <h4 class='list-group-item-heading'>Files</h4>
+  <a class='list-group-item' href='CHANGELOG'>CHANGELOG</a>
+<a class='list-group-item' href='LICENSE'>LICENSE</a>
+<a class='list-group-item' href='README'>README</a>
+</div>
+        </div>
+        <div class='col-md-10'>
+          <div class='content'>
+            <h1>Class: Item</h1>
+<div class='row'>
+  <div class='col-md-6'>
+    <table class='info-table table table-bordered'>
+      <tbody>
+        <tr>
+          <th>Class Name</th>
+          <td>Item</td>
+        </tr>
+        <tr>
+          <th>Superclass</th>
+          <td><a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a></td>
+        </tr>
+        <tr>
+          <th>File</th>
+          <td>
+            <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L53'>lib&#47;core&#47;item.coffee</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<h2>Description</h2>
+<p>A paragraph of text in an <a class='reference' href='Outline'>Outline</a>.</p>
+<p>Items cannot be instantiated directly, instead use <a class='reference' href='Outline#instance-createItem'>Outline::createItem</a>.</p>
+<p>Items may contain other child items to form a hierarchical outline structure.
+When you move an item all of its children are moved with it.</p>
+<p>Items have a single paragraph of body text. You can access it as plain text,
+a HTML string, or an AttributedString. You can add formatting to make parts
+of the text bold, italic, etc.</p>
+<p>You can assign item level attributes to items. For example you might store a
+due date in the <code>data-due-date</code> attribute. Or store an item type in the
+<code>data-type</code> attribute.</p>
+<h2>Examples</h2>
+Create Items:
+<pre><code class="lang-coffeescript">item = outline.createItem(<span class="hljs-string">'Hello World!'</span>)
+outline.root.appendChild(item)
+</code></pre>
+Add body text formatting:
+<pre><code class="lang-coffeescript">item = outline.createItem(<span class="hljs-string">'Hello World!'</span>)
+item.addElementInBodyTextRange(<span class="hljs-string">'B'</span>, {}, <span class="hljs-number">6</span>, <span class="hljs-number">5</span>)
+item.addElementInBodyTextRange(<span class="hljs-string">'I'</span>, {}, <span class="hljs-number">0</span>, <span class="hljs-number">11</span>)
+</code></pre>
+Read body text formatting:
+<pre><code class="lang-coffeescript">effectiveRange = <span class="hljs-attribute">end</span>: <span class="hljs-number">0</span>
+textLength = item.bodyText.length
+<span class="hljs-keyword">while</span> effectiveRange.end &lt; textLength
+  <span class="hljs-built_in">console</span>.log item.getElementsAtBodyTextIndex effectiveRange.end, effectiveRange
+</code></pre>
+
+
+<h2>Attributes</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-id'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::id</span>
+      <a href='#instance-id'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L87'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only unique and persistent <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> item ID. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-attributeNames'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::attributeNames</span>
+      <a href='#instance-attributeNames'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L92'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of this item’s attribute names. </p>
+    
+  </div>
+</div>
+  
+  <div class='method-block panel panel-primary' id='instance-hasAttribute'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::hasAttribute(name)</span>
+      <a href='#instance-hasAttribute' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L111' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Test to see if this item has an attribute with the given name.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    name
+  </th>
+  <td>
+    The <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> attribute name.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a>
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getAttribute'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getAttribute(name, array<sup>?</sup>, clazz<sup>?</sup>)</span>
+      <a href='#instance-getAttribute' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L122' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Get the value of the specified attribute. If the attribute does
+not exist will return <code>undefined</code>.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    name
+  </th>
+  <td>
+    The <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> attribute name.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    array
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> true if should split comma separated value to create an array.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    clazz
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    {Class} (<a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number'>Number</a> or <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date'>Date</a>) to convert string values into.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns attribute value.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-setAttribute'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::setAttribute(name, value)</span>
+      <a href='#instance-setAttribute' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L141' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Adds a new attribute or changes the value of an existing
+attribute. <code>id</code> is reserved and an exception is thrown if you try to set
+it. Non string values (such as <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date'>Date</a>s) will be converted to appropriate
+string format so that they can be read back using <a class='reference' href='#instance-getAttribute()'>::getAttribute()</a>.
+Setting an attribute to <code>null</code> or <code>undefined</code> will remove the attribute.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    name
+  </th>
+  <td>
+    The <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> attribute name.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    value
+  </th>
+  <td>
+    The new attribute value. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-removeAttribute'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::removeAttribute(name)</span>
+      <a href='#instance-removeAttribute' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L167' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Removes an attribute from the specified item. Attempting to remove
+an attribute that is not on the item doesn’t raise an exception.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    name
+  </th>
+  <td>
+    The <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> attribute name. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+</div>
+<h2>Body Text</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-hasBodyText'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::hasBodyText</span>
+      <a href='#instance-hasBodyText'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L213'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only true if this item has body text </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-bodyText'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::bodyText</span>
+      <a href='#instance-bodyText'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L218'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Body text as plain text <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-bodyHTML'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::bodyHTML</span>
+      <a href='#instance-bodyHTML'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L232'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Body text as HTML <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-attributedBodyText'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::attributedBodyText</span>
+      <a href='#instance-attributedBodyText'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L241'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Body text as <a class='reference' href='AttributedString'>AttributedString</a>. </p>
+    
+  </div>
+</div>
+  
+  <div class='method-block panel panel-primary' id='instance-getAttributedBodyTextSubstring'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getAttributedBodyTextSubstring(location, length)</span>
+      <a href='#instance-getAttributedBodyTextSubstring' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L255' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    location
+  </th>
+  <td>
+    Substring’s strart location.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    length
+  </th>
+  <td>
+    Length of substring to extract. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns an <a class='reference' href='AttributedString'>AttributedString</a> substring of this item’s body text.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getElementAtBodyTextIndex'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getElementAtBodyTextIndex(tagName, index, effectiveRange<sup>?</sup>, longestEffectiveRange<sup>?</sup>)</span>
+      <a href='#instance-getElementAtBodyTextIndex' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L270' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Looks to see if there’s an element with the given <code>tagName</code> at the
+given index. If there is then that element’s attributes are returned and
+by reference the range over which the element applies.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    tagName
+  </th>
+  <td>
+    Tag name of the element.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    index
+  </th>
+  <td>
+    The character index.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    effectiveRange
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> whose <code>location</code> and <code>length</code>  properties will be set to effective range of element.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    longestEffectiveRange
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> whose <code>location</code> and <code>length</code>  properties will be set to longest effective range of element.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns elements attribute values as an <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> or {}
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getElementsAtBodyTextIndex'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getElementsAtBodyTextIndex(index, effectiveRange<sup>?</sup>, longestEffectiveRange<sup>?</sup>)</span>
+      <a href='#instance-getElementsAtBodyTextIndex' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L287' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    index
+  </th>
+  <td>
+    The character index.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    effectiveRange
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> whose <code>location</code> and <code>length</code>  properties will be set to effective range of element.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    longestEffectiveRange
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> whose <code>location</code> and <code>length</code>  properties will be set to longest effective range of element. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns an <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> with keys for each element at the given
+character index, and by reference the range over which the elements apply.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-addElementInBodyTextRange'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::addElementInBodyTextRange(tagName, attributes, location, length)</span>
+      <a href='#instance-addElementInBodyTextRange' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L302' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Adds an element with the given tagName and attributes to the
+characters in the specified range.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    tagName
+  </th>
+  <td>
+    Tag name of the element.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    attributes
+  </th>
+  <td>
+    Element attributes. Use <code>null</code> as a placeholder if element  doesn’t need attributes.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    location
+  </th>
+  <td>
+    Start location character index.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    length
+  </th>
+  <td>
+    Range length. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-removeElementInBodyTextRange'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::removeElementInBodyTextRange(tagName, location, length)</span>
+      <a href='#instance-removeElementInBodyTextRange' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L323' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Removes the element with the tagName from the characters in the
+specified range.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    tagName
+  </th>
+  <td>
+    Tag name of the element.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    location
+  </th>
+  <td>
+    Start location character index.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    length
+  </th>
+  <td>
+    Range length. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-replaceBodyTextInRange'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::replaceBodyTextInRange(insertedText, location, length)</span>
+      <a href='#instance-replaceBodyTextInRange' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L346' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Replace body text in the given range.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    insertedText
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> or <a class='reference' href='AttributedString'>AttributedString</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    location
+  </th>
+  <td>
+    Start location character index.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    length
+  </th>
+  <td>
+    Range length. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-appendBodyText'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::appendBodyText(text, elements<sup>?</sup>)</span>
+      <a href='#instance-appendBodyText' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L401' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Append body text.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    text
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> or <a class='reference' href='AttributedString'>AttributedString</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    elements
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> whose keys are formatting element tagNames and values are attributes for those elements. If specified the appended text will include these elements. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+</div>
+<h2>Outline Structure</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-isRoot'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isRoot</span>
+      <a href='#instance-isRoot'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L413'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only true if is root <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-isEmpty'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isEmpty</span>
+      <a href='#instance-isEmpty'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L419'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> true if this item has no body text and no
+attributes and no children. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-isInOutline'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isInOutline</span>
+      <a href='#instance-isInOutline'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L427'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only true if item is part of owning <a class='reference' href='Outline'>Outline</a> </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-root'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::root</span>
+      <a href='#instance-root'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L434'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only root <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-parent'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::parent</span>
+      <a href='#instance-parent'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L446'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only parent <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-firstChild'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::firstChild</span>
+      <a href='#instance-firstChild'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L451'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only first child <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-lastChild'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::lastChild</span>
+      <a href='#instance-lastChild'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L456'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only last child <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-previousSibling'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::previousSibling</span>
+      <a href='#instance-previousSibling'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L461'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only previous sibling <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-nextSibling'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::nextSibling</span>
+      <a href='#instance-nextSibling'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L466'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only next sibling <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-previousBranch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::previousBranch</span>
+      <a href='#instance-previousBranch'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L471'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only previous branch <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-nextBranch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::nextBranch</span>
+      <a href='#instance-nextBranch'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L476'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only next branch <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-ancestors'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::ancestors</span>
+      <a href='#instance-ancestors'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L481'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of ancestor {Items}. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-descendants'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::descendants</span>
+      <a href='#instance-descendants'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L492'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of descendant {Items}. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-lastDescendant'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::lastDescendant</span>
+      <a href='#instance-lastDescendant'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L504'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only last descendant <a class='reference' href='Item'>Item</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-previousItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::previousItem</span>
+      <a href='#instance-previousItem'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L516'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only previous <a class='reference' href='Item'>Item</a> in the outline. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-nextItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::nextItem</span>
+      <a href='#instance-nextItem'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L533'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only next <a class='reference' href='Item'>Item</a> in the outline. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-hasChildren'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::hasChildren</span>
+      <a href='#instance-hasChildren'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L554'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only has children <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a>. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-children'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::children</span>
+      <a href='#instance-children'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L564'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of child {Items}. </p>
+    
+  </div>
+</div>
+  <div class='method-block panel panel-primary' id='static-getCommonAncestors'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.getCommonAncestors(items)</span>
+      <a href='#static-getCommonAncestors' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L605' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Given an array of items determines and returns the common
+ancestors of those items.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    items
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of {Items}.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of common ancestor {Items}.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+  <div class='method-block panel panel-primary' id='instance-contains'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::contains(item)</span>
+      <a href='#instance-contains' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L579' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Determines if this item contains the given item.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    The <a class='reference' href='Item'>Item</a> to check for containment.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a>.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-comparePosition'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::comparePosition(item)</span>
+      <a href='#instance-comparePosition' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L590' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Compares the position of this item against another item in the
+outline. See
+<a href="https://developer.mozilla.org/en-
+US/docs/Web/API/Node.compareDocumentPosition">Node.compareDocumentPosition()</a> for more information.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    The <a class='reference' href='Item'>Item</a> to compare against.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number'>Number</a> bitmask.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-cloneItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::cloneItem()</span>
+      <a href='#instance-cloneItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L596' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Deep clones this item.</p>
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a duplicate <a class='reference' href='Item'>Item</a>.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+<h2>Mutating Outline Structure</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-insertChildBefore'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::insertChildBefore(child, referenceSibling<sup>?</sup>)</span>
+      <a href='#instance-insertChildBefore' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L647' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Insert the new child item before the referenced sibling in this
+item’s list of children. If referenceSibling isn’t defined the item is
+inserted at the end.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    child
+  </th>
+  <td>
+    The inserted child <a class='reference' href='Item'>Item</a> .
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    referenceSibling
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    The referenced sibling <a class='reference' href='Item'>Item</a> . 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-insertChildrenBefore'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::insertChildrenBefore(children, referenceSibling<sup>?</sup>)</span>
+      <a href='#instance-insertChildrenBefore' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L656' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Insert the new children before the referenced sibling
+in this item’s list of children. If referenceSibling isn’t defined the new
+children are inserted at the end.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    children
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a class='reference' href='Item'>Item</a>s to insert.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    referenceSibling
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    The referenced sibling <a class='reference' href='Item'>Item</a>. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-appendChildren'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::appendChildren(children)</span>
+      <a href='#instance-appendChildren' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L694' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Append the new children to this item’s list of children.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    children
+  </th>
+  <td>
+    The children <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> to append. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-appendChild'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::appendChild(child)</span>
+      <a href='#instance-appendChild' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L700' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Append the new child to this item’s list of children.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    child
+  </th>
+  <td>
+    The child <a class='reference' href='Item'>Item</a> to append. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-removeChildren'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::removeChildren(children)</span>
+      <a href='#instance-removeChildren' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L706' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Remove the children from this item’s list of children.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    children
+  </th>
+  <td>
+    The <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of children {Items}s to remove. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-removeChild'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::removeChild(child)</span>
+      <a href='#instance-removeChild' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L757' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Remove the given child from this item’s list of children.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    child
+  </th>
+  <td>
+    The child <a class='reference' href='Item'>Item</a> to remove. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-removeFromParent'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::removeFromParent()</span>
+      <a href='#instance-removeFromParent' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L761' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Remove this item from it’s parent item if it has a parent. </p>
+    
+    
+    
+  </div>
+</div>
+</div>
+<h2>Debug</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-branchToString'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::branchToString()</span>
+      <a href='#instance-branchToString' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L782' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns debug string for this branch.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-branchToHTML'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::branchToHTML()</span>
+      <a href='#instance-branchToHTML' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L790' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns debug HTML string for this branch.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-toString'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::toString()</span>
+      <a href='#instance-toString' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/core/item.coffee#L794' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns debug string for this item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+          </div>
+          <div class='footer text-center'>
+            <small>
+              Generated on Tue May 05 2015 10:36:48 GMT-0400 (EDT) by
+              <a href='https://github.com/lee-dohm/endokken'>endokken v0.1.0</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='bootstrap.min.js'></script>
+    <script src='base.js'></script>
+  </body>
+</html>

@@ -6,6 +6,7 @@ ListInputElement = require '../ui/list-input-element'
 {CompositeDisposable} = require 'atom'
 
 FoldingTextService.observeOutlineEditors (editor) ->
+  editor.addSearchAttributeShortcut 'tags', 'data-tags'
   editor.addItemBadgeRenderer (item, addBadgeElement) ->
     if tags = item.getAttribute 'data-tags', true
       for each in tags
@@ -43,6 +44,7 @@ editTags = (editor) ->
   addedTokens = {}
   deletedTokens = {}
   tokenInput = document.createElement 'ft-token-input'
+  tokenInput.setPlaceholderText 'Tag…'
   tokenInput.tokenizeText(Object.keys(selectedTagsMap).join(','))
 
   tokenInput.setDelegate
@@ -128,7 +130,13 @@ atom.commands.add 'ft-outline-editor .btag',
     e.stopPropagation()
     e.preventDefault()
 
-atom.contextMenu.add
-  'ft-outline-editor .btag': [
-    {label: 'Delete Tag', command: 'outline-editor:delete-tag'}
-  ]
+atom.keymaps.add 'tags-bindings',
+  'ft-outline-editor':
+    'cmd-shift-t': 'outline-editor:edit-tags'
+  'ft-outline-editor.outlineMode':
+    't': 'outline-editor:edit-tags'
+
+#atom.contextMenu.add
+#  'ft-outline-editor .btag': [
+#    {label: 'Delete Tag', command: 'outline-editor:delete-tag'}
+#  ]

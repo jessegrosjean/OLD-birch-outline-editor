@@ -5,7 +5,6 @@ FoldingTextService = require '../../foldingtext-service'
 toggleStatus = (editor, status) ->
   outline = editor.outline
   undoManager = outline.undoManager
-  #doneDate = new Date().toISOString()
   selectedItems = editor.selection.items
   firstItem = selectedItems[0]
 
@@ -44,6 +43,8 @@ atom.commands.add 'ft-outline-editor',
   'outline-editor:toggle-status-complete': -> toggleStatus @editor, 'complete'
 
 atom.keymaps.add 'status-bindings',
+  'ft-outline-editor':
+    'ctrl-space': 'outline-editor:toggle-status-complete'
   'ft-outline-editor.outlineMode':
     's t': 'outline-editor:toggle-status-todo'
     's w': 'outline-editor:toggle-status-waiting'

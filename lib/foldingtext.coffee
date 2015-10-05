@@ -41,12 +41,12 @@ module.exports =
     require './extensions/ui/popovers'
     require './extensions/edit-link-popover'
     require './extensions/text-formatting-popover'
+    require './extensions/priorities'
     require './extensions/status'
     require './extensions/tags'
     ###
     require '../packages/durations'
     require '../packages/mentions'
-    require '../packages/priorities'
     require '../packages/tags'
     ###
 

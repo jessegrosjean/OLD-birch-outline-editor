@@ -7,11 +7,37 @@ Mutation = require './core/mutation'
 Outline = require './core/outline'
 Item = require './core/item'
 
-# Public: This is the Atom [services
+# Public: This is the object vended by the `ft-foldingtext-service` and the
+# entry point to FoldingText's API.
+#
+# ## Examples
+#
+# To get an instance of {FoldingTextService} you subscribe to `foldingtext-
+# service` using Atom's #[services
 # API](https://atom.io/docs/latest/creating-a-package#interacting-with-other-
-# packages-via-services) object vended for `ft-foldingtext-service`.
-# Please see the [Customizing FoldingText](README#customizing-ft) to get started
-# in creating a package that uses this service.
+# packages-via-services).
+#
+# First subscibe to `foldingtext- service` in your package's `package.json`
+# and then consume the service in your main module.
+#
+# ```cson
+# "consumedServices": {
+#   "foldingtext-service": {
+#     "versions": {
+#       "1": "consumeFoldingTextService"
+#     }
+#   }
+# },
+# ```
+#
+# ```coffeescript
+# {Disposable, CompositeDisposable} = require 'atom'
+#   ...
+#   consumeFoldingTextService: (foldingTextService) ->
+#     @foldingTextService = foldingTextService
+#     new Disposable =>
+#       @foldingTextService = null
+# ```
 class FoldingTextService
 
   ###

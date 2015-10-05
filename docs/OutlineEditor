@@ -1,0 +1,3253 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Endokken</title>
+    <link rel='stylesheet' href='bootstrap.min.css' type='text/css'>
+    <link rel='stylesheet' href='base.css' type='text/css'>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md-2 navigation'>
+          <div class='list-group'>
+  <h4 class='list-group-item-heading'>Classes</h4>
+  <a class='list-group-item' href='AttributedString'>AttributedString</a>
+<a class='list-group-item' href='Item'>Item</a>
+<a class='list-group-item' href='Mutation'>Mutation</a>
+<a class='list-group-item' href='Outline'>Outline</a>
+<a class='list-group-item' href='OutlineEditor'>OutlineEditor</a>
+<a class='list-group-item' href='Selection'>Selection</a>
+<a class='list-group-item' href='FoldingTextService'>FoldingTextService</a>
+</div>
+<div class='list-group'>
+  <h4 class='list-group-item-heading'>Files</h4>
+  <a class='list-group-item' href='CHANGELOG'>CHANGELOG</a>
+<a class='list-group-item' href='LICENSE'>LICENSE</a>
+<a class='list-group-item' href='README'>README</a>
+</div>
+        </div>
+        <div class='col-md-10'>
+          <div class='content'>
+            <h1>Class: OutlineEditor</h1>
+<div class='row'>
+  <div class='col-md-6'>
+    <table class='info-table table table-bordered'>
+      <tbody>
+        <tr>
+          <th>Class Name</th>
+          <td>OutlineEditor</td>
+        </tr>
+        <tr>
+          <th>Superclass</th>
+          <td><a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a></td>
+        </tr>
+        <tr>
+          <th>File</th>
+          <td>
+            <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L35'>lib&#47;editor&#47;outline-editor.coffee</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<h2>Description</h2>
+<p>Editor for <a class='reference' href='Outline'>Outline</a>s.</p>
+<p>Maintains all editing state for the outline incuding: hoisted items,
+filtering items, expanded items, and item selection.</p>
+<p>A single <a class='reference' href='Outline'>Outline</a> can belong to multiple editors. For example, if the same
+outline is open in two different panes, Atom creates a separate editor for
+each pane. If the outline is manipulated the changes are reflected in both
+editors, but each maintains its own selection, expanded items, etc.</p>
+<p>The easiest way to get hold of <code>OutlineEditor</code> objects is by registering a
+callback with <code>::observeOutlineEditors</code> through the <a class='reference' href='FoldingTextService'>FoldingTextService</a>. </p>
+
+<h2>Attributes</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-id'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::id</span>
+      <a href='#instance-id'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L185'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only unique (not persistent) <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> editor ID. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-outline'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::outline</span>
+      <a href='#instance-outline'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L190'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>The <a class='reference' href='Outline'>Outline</a> that is being edited. </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+<h2>Event Subscription</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-onDidChangeTitle'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeTitle(callback)</span>
+      <a href='#instance-onDidChangeTitle' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L202' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when the editor’s outline title has
+changed.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangePath'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangePath(callback)</span>
+      <a href='#instance-onDidChangePath' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L211' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when the editor’s outline path, and
+therefore title, has changed.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChange'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChange(callback)</span>
+      <a href='#instance-onDidChange' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L222' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback when the editor’s outline changes.</p>
+<p>See <a class='reference' href='Outline'>Outline</a> Examples for an example of subscribing to these events.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called when the outline changes.
+    <ul>
+  <li>
+  <code>mutations</code>
+  &mdash;
+  <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a class='reference' href='Mutation'>Mutation</a>s describing the changes.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangeModified'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeModified(callback)</span>
+      <a href='#instance-onDidChangeModified' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L230' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when the result of <a class='reference' href='#instance-isModified'>::isModified</a> changes.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidConflict'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidConflict(callback)</span>
+      <a href='#instance-onDidConflict' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L240' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when the editor’s outline’s underlying
+file changes on disk at a moment when the result of <a class='reference' href='#instance-isModified'>::isModified</a> is
+true.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidSave'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidSave(callback)</span>
+      <a href='#instance-onDidSave' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L251' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback after the editor’s outline is saved to
+disk.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called after the buffer is saved.
+    <ul>
+  <li>
+  <code>event</code>
+  &mdash;
+  <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> with the following keys:
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidDestroy'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidDestroy(callback)</span>
+      <a href='#instance-onDidDestroy' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L259' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback when the editor is destroyed.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called when the editor is destroyed.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangeSelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeSelection(callback)</span>
+      <a href='#instance-onDidChangeSelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L268' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when <a class='reference' href='Selection'>Selection</a> changes in the editor.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    <ul>
+  <li>
+  <code>selection</code>
+  &mdash;
+  <a class='reference' href='Selection'>Selection</a> in editor.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-observeSelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::observeSelection(callback)</span>
+      <a href='#instance-observeSelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L278' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when <a class='reference' href='Selection'>Selection</a> changes in the editor.
+Immediately calls your callback for existing selection.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    <ul>
+  <li>
+  <code>selection</code>
+  &mdash;
+  <a class='reference' href='Selection'>Selection</a> in editor.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangeHoistedItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeHoistedItem(callback)</span>
+      <a href='#instance-onDidChangeHoistedItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L289' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when the hoisted <a class='reference' href='Item'>Item</a> changes in the
+editor.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    <ul>
+  <li>
+  <code>item</code>
+  &mdash;
+  Hoisted <a class='reference' href='Item'>Item</a> in editor.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangeSearch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeSearch(callback)</span>
+      <a href='#instance-onDidChangeSearch' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L302' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Calls your <code>callback</code> when the editor’s search changes.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a>
+    <ul>
+  <li>
+  <code>searchInfo</code>
+  &mdash;
+  
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+<h2>Hoisting Items</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-getHoistedItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getHoistedItem()</span>
+      <a href='#instance-getHoistedItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L310' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns the current hoisted <a class='reference' href='Item'>Item</a>.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-hoistItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::hoistItem(item)</span>
+      <a href='#instance-hoistItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L316' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Push a new hoisted <a class='reference' href='Item'>Item</a>.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> to hoist. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-unhoist'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::unhoist()</span>
+      <a href='#instance-unhoist' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L332' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Pop the current hoisted <a class='reference' href='Item'>Item</a>. </p>
+    
+    
+    
+  </div>
+</div>
+</div>
+<h2>Expanding Items</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-isExpanded'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isExpanded(item)</span>
+      <a href='#instance-isExpanded' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L416' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> to test. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns true if the item is expanded.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-isCollapsed'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isCollapsed(item)</span>
+      <a href='#instance-isCollapsed' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L422' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> to test. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns true if the item is collapsed.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-setExpanded'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::setExpanded(items)</span>
+      <a href='#instance-setExpanded' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L428' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Expand the given items in this editor.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    items
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> or <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of items. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-setCollapsed'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::setCollapsed(items)</span>
+      <a href='#instance-setCollapsed' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L434' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Collapse the given items in this editor.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    items
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> or <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of items. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+</div>
+<h2>Searching Items</h2>
+<div class='section'>
+  
+  <div class='panel panel-primary property' id='static-ITEM_PATH_SEARCH'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.ITEM_PATH_SEARCH</span>
+      <a href='#static-ITEM_PATH_SEARCH'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L516'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Search type used for item path search syntax. </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='static-X_PATH_SEARCH'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.X_PATH_SEARCH</span>
+      <a href='#static-X_PATH_SEARCH'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L519'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Search type used for xpath search syntax. </p>
+    
+  </div>
+</div>
+  
+  
+  <div class='method-block panel panel-primary' id='instance-addSearchAttributeShortcut'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::addSearchAttributeShortcut(shortcutName, attributeName)</span>
+      <a href='#instance-addSearchAttributeShortcut' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L529' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Add a shortcut for an attribute name in the
+<a class='reference' href='OutlineEditor#static-ITEM_PATH_SEARCH'>OutlineEditor.ITEM_PATH_SEARCH</a> search syntax. For example if you want
+the user to be able to type <code>@status</code> instead of having to type <code>@data-
+status</code> then you can add <code>status</code> as a shortcut for <code>data-status</code>.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    shortcutName
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> Shortcut name, <code>status</code> for example.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    attributeName
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> Attribute name, ‘data-status’ for example.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getSearch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getSearch(query, type, keywords, error)</span>
+      <a href='#instance-getSearch' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L540' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    query
+  </th>
+  <td>
+    Search <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    type
+  </th>
+  <td>
+    either <a class='reference' href='OutlineEditor#static-ITEM_PATH_SEARCH'>OutlineEditor.ITEM_PATH_SEARCH</a> or <a class='reference' href='OutlineEditor#static-X_PATH_SEARCH'>OutlineEditor.X_PATH_SEARCH</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    keywords
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of recognized keyword ranges.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    error
+  </th>
+  <td>
+    Any error encountered while parsing search query. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns search <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> with keys:
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-setSearch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::setSearch(query, type<sup>?</sup>)</span>
+      <a href='#instance-setSearch' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L550' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Sets search used to filter the contents of this outline. The
+search <code>type</code> parameter determines how the search is performed. It
+defaults to <a class='reference' href='OutlineEditor#static-ITEM_PATH_SEARCH'>OutlineEditor.ITEM_PATH_SEARCH</a> syntax, but you can also use
+<a class='reference' href='OutlineEditor#static-X_PATH_SEARCH'>OutlineEditor.X_PATH_SEARCH</a> syntax.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    query
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> Search query.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    type
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='OutlineEditor#static-ITEM_PATH_SEARCH'>OutlineEditor.ITEM_PATH_SEARCH</a> (default) or <a class='reference' href='OutlineEditor#static-X_PATH_SEARCH'>OutlineEditor.X_PATH_SEARCH</a> 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+</div>
+<h2>Rendering Items</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-addItemBodyTextRenderer'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::addItemBodyTextRenderer(callback, priority<sup>?</sup>)</span>
+      <a href='#instance-addItemBodyTextRenderer' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L637' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Render additional text formatting elements in an <a class='reference' href='Item'>Item</a>‘s body
+text. Intended to support syntax highlighting.</p>
+    <h2>Examples</h2>
+<pre><code class="lang-coffee">editor.addItemBodyTextRenderer (item, renderElementInBodyTextRange) -&gt;
+  highlight = <span class="hljs-string">'super!'</span>
+  <span class="hljs-keyword">while</span> (index = item.bodyText.indexOf highlight, index) <span class="hljs-keyword">isnt</span> -<span class="hljs-number">1</span>
+    renderElementInBodyTextRange <span class="hljs-string">'B'</span>, <span class="hljs-literal">null</span>, index, highlight.length
+    index += highlight.length
+</code></pre>
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> Text rendering function.
+    <ul>
+  <li>
+  <code>item</code>
+  &mdash;
+  <a class='reference' href='Item'>Item</a> being rendered.
+</li>
+<li>
+  <code>renderElementInBodyTextRange</code>
+  &mdash;
+  <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> Render text element, accepts the same parameters as <a class='reference' href='Item#instance-addElementInBodyTextRange'>Item::addElementInBodyTextRange</a>.
+</li>
+</ul>
+  </td>
+</tr>
+<tr>
+  <th>
+    priority
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number'>Number</a> Determines rendering order.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to remove the renderer.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-addItemBadgeRenderer'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::addItemBadgeRenderer(callback, priority<sup>?</sup>)</span>
+      <a href='#instance-addItemBadgeRenderer' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L663' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Render item badges after an <a class='reference' href='Item'>Item</a>‘s body text. Item badges are
+intended to make visible item attribute values. For example badges are
+used to display the <code>data-priority</code> attribute of an item.</p>
+    <h2>Examples</h2>
+<pre><code class="lang-coffee">editor.addItemBadgeRenderer (item, renderBadgeElement) -&gt;
+  <span class="hljs-keyword">if</span> tags = item.getAttribute <span class="hljs-string">'data-tags'</span>, <span class="hljs-literal">true</span>
+    <span class="hljs-keyword">for</span> each <span class="hljs-keyword">in</span> tags
+      span = <span class="hljs-built_in">document</span>.createElement <span class="hljs-string">'A'</span>
+      span.className = <span class="hljs-string">'btag'</span>
+      span.textContent = each.trim()
+      renderBadgeElement span
+</code></pre>
+
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> Badge rendering function.
+    <ul>
+  <li>
+  <code>item</code>
+  &mdash;
+  <a class='reference' href='Item'>Item</a> being rendered.
+</li>
+<li>
+  <code>renderBadgeElement</code>
+  &mdash;
+  <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> Render passed in badge element.
+</li>
+</ul>
+  </td>
+</tr>
+<tr>
+  <th>
+    priority
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number'>Number</a> Determines rendering order.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to remove the renderer.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+<h2>Item Visibility</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-isVisible'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isVisible(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-isVisible' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L678' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Determine if an <a class='reference' href='Item'>Item</a> is visible. An item is visible if it
+descends from the current hoisted item, and it isn’t filtered, and all
+ancestors up to hoisted node are expanded.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> to test.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> indicating if item is visible.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-makeVisible'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::makeVisible(item)</span>
+      <a href='#instance-makeVisible' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L694' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Make the given item visible in the outline, expanding ancestors,
+removing filter, and unhoisting as needed.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> to make visible. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getFirstVisibleItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getFirstVisibleItem(hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getFirstVisibleItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L719' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns first visible <a class='reference' href='Item'>Item</a> in editor.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getLastVisibleItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getLastVisibleItem(hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getLastVisibleItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L726' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns last visible <a class='reference' href='Item'>Item</a> in editor.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getPreviousVisibleSibling'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getPreviousVisibleSibling(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getPreviousVisibleSibling' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L747' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns previous visible sibling <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getNextVisibleSibling'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getNextVisibleSibling(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getNextVisibleSibling' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L758' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns next visible sibling <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getNextVisibleItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getNextVisibleItem(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getNextVisibleItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L769' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns next visible <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getPreviousVisibleItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getPreviousVisibleItem(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getPreviousVisibleItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L780' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns previous visible <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getFirstVisibleChild'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getFirstVisibleChild(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getFirstVisibleChild' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L791' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns first visible child <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getLastVisibleChild'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getLastVisibleChild(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getLastVisibleChild' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L801' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns last visible child <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getPreviousVisibleBranch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getPreviousVisibleBranch(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getPreviousVisibleBranch' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L818' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns previous visible branch <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getNextVisibleBranch'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getNextVisibleBranch(item, hoistedItem<sup>?</sup>)</span>
+      <a href='#instance-getNextVisibleBranch' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L829' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    hoistedItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Hoisted item <a class='reference' href='Item'>Item</a> case to consider. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns next visible branch <a class='reference' href='Item'>Item</a> relative to given item.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+<h2>Focus</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-isFocused'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isFocused()</span>
+      <a href='#instance-isFocused' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L841' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> indicating if this editor has focus.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-focus'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::focus()</span>
+      <a href='#instance-focus' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L850' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Focus this editor. </p>
+    
+    
+    
+  </div>
+</div>
+</div>
+<h2>Selection</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-selection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::selection</span>
+      <a href='#instance-selection'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L861'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Read-only current <a class='reference' href='Selection'>Selection</a>. </p>
+    
+  </div>
+</div>
+  
+  <div class='method-block panel panel-primary' id='instance-isSelected'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isSelected(item)</span>
+      <a href='#instance-isSelected' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L868' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    item
+  </th>
+  <td>
+    <a class='reference' href='Item'>Item</a> 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> indicating if given item is selected.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-isOutlineMode'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isOutlineMode()</span>
+      <a href='#instance-isOutlineMode' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L872' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <code>true</code> if is selecting at item level.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-isTextMode'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::isTextMode()</span>
+      <a href='#instance-isTextMode' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L876' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <code>true</code> if is selecting at text level.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveBackward'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveBackward()</span>
+      <a href='#instance-moveBackward' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L889' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection backward. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveBackwardAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveBackwardAndModifySelection()</span>
+      <a href='#instance-moveBackwardAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L893' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection backward and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveForward'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveForward()</span>
+      <a href='#instance-moveForward' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L897' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection forward. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveForwardAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveForwardAndModifySelection()</span>
+      <a href='#instance-moveForwardAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L901' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection forward and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveUp'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveUp()</span>
+      <a href='#instance-moveUp' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L905' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection up. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveUpAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveUpAndModifySelection()</span>
+      <a href='#instance-moveUpAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L909' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection up and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveDown'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveDown()</span>
+      <a href='#instance-moveDown' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L913' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection down. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveDownAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveDownAndModifySelection()</span>
+      <a href='#instance-moveDownAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L917' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection down and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveLeft'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveLeft()</span>
+      <a href='#instance-moveLeft' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L921' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection left. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveLeftAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveLeftAndModifySelection()</span>
+      <a href='#instance-moveLeftAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L925' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection left and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToBeginningOfLine'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToBeginningOfLine()</span>
+      <a href='#instance-moveToBeginningOfLine' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L929' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to begining of line. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToBeginningOfLineAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToBeginningOfLineAndModifySelection()</span>
+      <a href='#instance-moveToBeginningOfLineAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L933' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to begining of line and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToBeginningOfParagraph'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToBeginningOfParagraph()</span>
+      <a href='#instance-moveToBeginningOfParagraph' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L937' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to begining of paragraph. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToBeginningOfParagraphAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToBeginningOfParagraphAndModifySelection()</span>
+      <a href='#instance-moveToBeginningOfParagraphAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L941' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to begining of paragraph and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveParagraphBackward'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveParagraphBackward()</span>
+      <a href='#instance-moveParagraphBackward' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L945' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to next start of paragraph. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveParagraphBackwardAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveParagraphBackwardAndModifySelection()</span>
+      <a href='#instance-moveParagraphBackwardAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L953' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to next start of paragraph and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveWordLeft'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveWordLeft()</span>
+      <a href='#instance-moveWordLeft' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L961' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection word left. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveWordLeftAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveWordLeftAndModifySelection()</span>
+      <a href='#instance-moveWordLeftAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L965' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection word left and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveRight'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveRight()</span>
+      <a href='#instance-moveRight' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L969' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection right. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveRightAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveRightAndModifySelection()</span>
+      <a href='#instance-moveRightAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L973' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection right and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveWordRight'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveWordRight()</span>
+      <a href='#instance-moveWordRight' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L977' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection word right. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveWordRightAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveWordRightAndModifySelection()</span>
+      <a href='#instance-moveWordRightAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L981' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection word right and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToEndOfLine'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToEndOfLine()</span>
+      <a href='#instance-moveToEndOfLine' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L985' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to end of line. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToEndOfLineAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToEndOfLineAndModifySelection()</span>
+      <a href='#instance-moveToEndOfLineAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L989' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to end of line and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToEndOfParagraph'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToEndOfParagraph()</span>
+      <a href='#instance-moveToEndOfParagraph' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L993' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to end of paragraph. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToEndOfParagraphAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToEndOfParagraphAndModifySelection()</span>
+      <a href='#instance-moveToEndOfParagraphAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L997' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to end of paragraph and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveParagraphForward'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveParagraphForward()</span>
+      <a href='#instance-moveParagraphForward' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1001' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to next end of paragraph. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveParagraphForwardAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveParagraphForwardAndModifySelection()</span>
+      <a href='#instance-moveParagraphForwardAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1009' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to next end of paragraph and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToBeginningOfDocument'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToBeginningOfDocument()</span>
+      <a href='#instance-moveToBeginningOfDocument' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1017' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to begining of document. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToBeginningOfDocumentAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToBeginningOfDocumentAndModifySelection()</span>
+      <a href='#instance-moveToBeginningOfDocumentAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1021' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to begining of document and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToEndOfDocument'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToEndOfDocument()</span>
+      <a href='#instance-moveToEndOfDocument' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1025' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to end of document. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveToEndOfDocumentAndModifySelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveToEndOfDocumentAndModifySelection()</span>
+      <a href='#instance-moveToEndOfDocumentAndModifySelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1029' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Move selection to end of document and modify selection. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-moveSelectionRange'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::moveSelectionRange(focusItem, focusOffset<sup>?</sup>, anchorItem<sup>?</sup>, anchorOffset<sup>?</sup>)</span>
+      <a href='#instance-moveSelectionRange' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1079' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Set a new <a class='reference' href='Selection'>Selection</a>.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    focusItem
+  </th>
+  <td>
+    Selection focus <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    focusOffset
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Selection focus offset index. Or <code>undefined</code>  when selecting at item level.
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    anchorItem
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Selection anchor <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    anchorOffset
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Selection anchor offset index. Or <code>undefined</code>  when selecting at item level. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-extendSelectionRange'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::extendSelectionRange(focusItem, focusOffset<sup>?</sup>)</span>
+      <a href='#instance-extendSelectionRange' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1088' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Extend the <a class='reference' href='Selection'>Selection</a> to a new focus item/offset.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    focusItem
+  </th>
+  <td>
+    Selection focus <a class='reference' href='Item'>Item</a>
+    
+  </td>
+</tr>
+<tr>
+  <th>
+    focusOffset
+    <span class='label label-info'>Optional</span>
+  </th>
+  <td>
+    Selection focus offset index. Or <code>undefined</code>  when selecting at item level. 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-selectAll'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::selectAll()</span>
+      <a href='#instance-selectAll' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1115' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Select all children of the current <a class='reference' href='#instance-hoistedItem'>::hoistedItem</a> item. </p>
+    
+    
+    
+  </div>
+</div>
+</div>
+<h2>Insert Items</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-insertText'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::insertText(text)</span>
+      <a href='#instance-insertText' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1227' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Insert text at current selection. If is in text selection mode the
+current text selection will get replaced with this text. If in item
+selection mode a new item will get inserted.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    text
+  </th>
+  <td>
+    Text <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> or <a class='reference' href='AttributedString'>AttributedString</a> to insert 
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-insertItem'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::insertItem(text)</span>
+      <a href='#instance-insertItem' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1273' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Insert item at current selection.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    text
+  </th>
+  <td>
+    Text <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'>String</a> or <a class='reference' href='AttributedString'>AttributedString</a> for new item.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns the new <a class='reference' href='Item'>Item</a>.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+<h2>Undo</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-undo'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::undo()</span>
+      <a href='#instance-undo' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1696' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Undo the last change. </p>
+    
+    
+    
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-redo'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::redo()</span>
+      <a href='#instance-redo' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1700' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Redo the last change. </p>
+    
+    
+    
+  </div>
+</div>
+</div>
+<h2>Util</h2>
+<div class='section'>
+  
+  
+  
+  <div class='method-block panel panel-primary' id='static-findOutlineEditor'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>.findOutlineEditor(element)</span>
+      <a href='#static-findOutlineEditor' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/editor/outline-editor.coffee#L1839' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Given a view DOM element find and return the <a class='reference' href='OutlineEditor'>OutlineEditor</a> that
+contains it. For example this is useful when doing event handling. If you
+detect a click on some element you use this method to find the associated
+editor.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    element
+  </th>
+  <td>
+    DOM element.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns <a class='reference' href='OutlineEditor'>OutlineEditor</a>.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+  
+</div>
+          </div>
+          <div class='footer text-center'>
+            <small>
+              Generated on Tue May 05 2015 10:36:51 GMT-0400 (EDT) by
+              <a href='https://github.com/lee-dohm/endokken'>endokken v0.1.0</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='bootstrap.min.js'></script>
+    <script src='base.js'></script>
+  </body>
+</html>

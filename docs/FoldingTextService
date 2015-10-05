@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Endokken</title>
+    <link rel='stylesheet' href='bootstrap.min.css' type='text/css'>
+    <link rel='stylesheet' href='base.css' type='text/css'>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md-2 navigation'>
+          <div class='list-group'>
+  <h4 class='list-group-item-heading'>Classes</h4>
+  <a class='list-group-item' href='AttributedString'>AttributedString</a>
+<a class='list-group-item' href='Item'>Item</a>
+<a class='list-group-item' href='Mutation'>Mutation</a>
+<a class='list-group-item' href='Outline'>Outline</a>
+<a class='list-group-item' href='OutlineEditor'>OutlineEditor</a>
+<a class='list-group-item' href='Selection'>Selection</a>
+<a class='list-group-item' href='FoldingTextService'>FoldingTextService</a>
+</div>
+<div class='list-group'>
+  <h4 class='list-group-item-heading'>Files</h4>
+  <a class='list-group-item' href='CHANGELOG'>CHANGELOG</a>
+<a class='list-group-item' href='LICENSE'>LICENSE</a>
+<a class='list-group-item' href='README'>README</a>
+</div>
+        </div>
+        <div class='col-md-10'>
+          <div class='content'>
+            <h1>Class: FoldingTextService</h1>
+<div class='row'>
+  <div class='col-md-6'>
+    <table class='info-table table table-bordered'>
+      <tbody>
+        <tr>
+          <th>Class Name</th>
+          <td>FoldingTextService</td>
+        </tr>
+        <tr>
+          <th>Superclass</th>
+          <td><a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a></td>
+        </tr>
+        <tr>
+          <th>File</th>
+          <td>
+            <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L15'>lib&#47;foldingtext-service.coffee</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<h2>Description</h2>
+<p>This is the Atom <a href="https://atom.io/docs/latest/creating-a-package#interacting-with-other-
+packages-via-services">services
+API</a> object vended for <code>ft-foldingtext-service</code>.
+Please see the <a href="README#customizing-ft">Customizing FoldingText</a> to get started
+in creating a package that uses this service. </p>
+
+<h2>Classes</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-Item'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::Item</span>
+      <a href='#instance-Item'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L22'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p><a class='reference' href='Item'>Item</a> Class </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-Outline'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::Outline</span>
+      <a href='#instance-Outline'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L25'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p><a class='reference' href='Outline'>Outline</a> Class </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-Mutation'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::Mutation</span>
+      <a href='#instance-Mutation'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L28'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p><a class='reference' href='Mutation'>Mutation</a> Class </p>
+    
+  </div>
+</div>
+<div class='panel panel-primary property' id='instance-OutlineEditor'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::OutlineEditor</span>
+      <a href='#instance-OutlineEditor'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L31'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p><a class='reference' href='OutlineEditor'>OutlineEditor</a> Class </p>
+    
+  </div>
+</div>
+  
+  
+</div>
+<h2>Workspace Outline Editors</h2>
+<div class='section'>
+  
+  
+  
+  
+  <div class='method-block panel panel-primary' id='instance-getOutlineEditors'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getOutlineEditors()</span>
+      <a href='#instance-getOutlineEditors' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L40' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Get all outline editors in the workspace.</p>
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns an <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a class='reference' href='OutlineEditor'>OutlineEditor</a>s.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getActiveOutlineEditor'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getActiveOutlineEditor()</span>
+      <a href='#instance-getActiveOutlineEditor' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L47' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Get the active item if it is an <a class='reference' href='OutlineEditor'>OutlineEditor</a>.</p>
+    
+    
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns an <a class='reference' href='OutlineEditor'>OutlineEditor</a> or `` if the current active item is
+not an <a class='reference' href='OutlineEditor'>OutlineEditor</a>.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-getOutlineEditorsForOutline'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::getOutlineEditorsForOutline(outline)</span>
+      <a href='#instance-getOutlineEditorsForOutline' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L56' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Get all outline editors for a given outine the workspace.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    outline
+  </th>
+  <td>
+    The <a class='reference' href='Outline'>Outline</a> to search for.
+    
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns an <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a class='reference' href='OutlineEditor'>OutlineEditor</a>s.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+<h2>Event Subscription</h2>
+<div class='section'>
+  
+  
+  <div class='panel panel-primary property' id='instance-eventRegistery'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::eventRegistery</span>
+      <a href='#instance-eventRegistery'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L65'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>{EventRegistery} instance. </p>
+    
+  </div>
+</div>
+  
+  <div class='method-block panel panel-primary' id='instance-onDidAddOutlineEditor'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidAddOutlineEditor(callback)</span>
+      <a href='#instance-onDidAddOutlineEditor' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L78' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback when an outline editor is added to the
+workspace.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called panes are added.
+    <ul>
+  <li>
+  <code>event</code>
+  &mdash;
+  <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object'>Object</a> with the following keys:
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-observeOutlineEditors'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::observeOutlineEditors(callback)</span>
+      <a href='#instance-observeOutlineEditors' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L92' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback with all current and future outline
+editors in the workspace.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called with current and future outline  editors.
+    <ul>
+  <li>
+  <code>editor</code>
+  &mdash;
+  An <a class='reference' href='OutlineEditor'>OutlineEditor</a> that is present in <a class='reference' href='#instance-getOutlineEditors'>::getOutlineEditors</a>  at the time of subscription or that is added at some later time.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangeActiveOutlineEditor'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeActiveOutlineEditor(callback)</span>
+      <a href='#instance-onDidChangeActiveOutlineEditor' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L102' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback when the active <a class='reference' href='OutlineEditor'>OutlineEditor</a> changes.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called when the active <a class='reference' href='OutlineEditor'>OutlineEditor</a> changes.
+    <ul>
+  <li>
+  <code>outlineEditor</code>
+  &mdash;
+  The active OutlineEditor.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-observeActiveOutlineEditor'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::observeActiveOutlineEditor(callback)</span>
+      <a href='#instance-observeActiveOutlineEditor' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L118' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback with the current <a class='reference' href='OutlineEditor'>OutlineEditor</a> and
+with all future active outline editors in the workspace.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called when the <a class='reference' href='OutlineEditor'>OutlineEditor</a> changes.
+    <ul>
+  <li>
+  <code>outlineEditor</code>
+  &mdash;
+  The current active {OultineEditor}.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-onDidChangeActiveOutlineEditorSelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::onDidChangeActiveOutlineEditorSelection(callback)</span>
+      <a href='#instance-onDidChangeActiveOutlineEditorSelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L134' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback when the active <a class='reference' href='OutlineEditor'>OutlineEditor</a>
+<a class='reference' href='Selection'>Selection</a> changes.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called when the active <a class='reference' href='OutlineEditor'>OutlineEditor</a> <a class='reference' href='Selection'>Selection</a> changes.
+    <ul>
+  <li>
+  <code>selection</code>
+  &mdash;
+  The active <a class='reference' href='OutlineEditor'>OutlineEditor</a> <a class='reference' href='Selection'>Selection</a>.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+<div class='method-block panel panel-primary' id='instance-observeActiveOutlineEditorSelection'>
+  <div class='panel-heading'>
+    <div class='panel-title'>
+      <span class='signature'>::observeActiveOutlineEditorSelection(callback)</span>
+      <a href='#instance-observeActiveOutlineEditorSelection' data-toggle='tooltip' title='Permalink'>
+        <span class='octicon octicon-link'></span>
+      </a>
+      <a href='https://github.com/FoldingText/foldingtext-atom/blob/v1.0.0/lib/foldingtext-service.coffee#L151' data-toggle='tooltip' title='Source Code'>
+        <span class='octicon octicon-file-code'></span>
+      </a>
+    </div>
+  </div>
+  <div class='panel-body'>
+    <p>Invoke the given callback with the active <a class='reference' href='OutlineEditor'>OutlineEditor</a> <a class='reference' href='Selection'>Selection</a> and
+with all future active outline editor selections in the workspace.</p>
+    
+    <table class='parameter table table-condensed table-hover'>
+  <col style='width:25%'>
+  <col style='width:75%'>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <th>
+    callback
+  </th>
+  <td>
+    <a class='reference' href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function'>Function</a> to be called when the <a class='reference' href='OutlineEditor'>OutlineEditor</a> <a class='reference' href='Selection'>Selection</a> changes.
+    <ul>
+  <li>
+  <code>selection</code>
+  &mdash;
+  The current active {OultineEditor} <a class='reference' href='Selection'>Selection</a>.
+</li>
+</ul>
+  </td>
+</tr>
+  </tbody>
+</table>
+    <table class='return-value table table-condensed table-hover'>
+  <thead>
+    <tr>
+      <th>Return Values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+  <td>Returns a {Disposable} on which <code>.dispose()</code> can be called to unsubscribe.
+</td>
+</tr>
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+          </div>
+          <div class='footer text-center'>
+            <small>
+              Generated on Tue May 05 2015 10:36:52 GMT-0400 (EDT) by
+              <a href='https://github.com/lee-dohm/endokken'>endokken v0.1.0</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='bootstrap.min.js'></script>
+    <script src='base.js'></script>
+  </body>
+</html>
